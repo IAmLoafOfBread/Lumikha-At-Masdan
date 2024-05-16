@@ -1,0 +1,63 @@
+#include "../../../Build-Info.h"
+
+#if defined(SYSTEM_LINUX) || defined(SYSTEM_WINDOWS)
+#include "../GPU.hpp"
+
+
+
+static GPULocalAllocation g_vertexAllocation = { nullptr };
+static GPUSharedAllocation g_indirectCommandAllocation = { nullptr };
+static GPUSharedAllocation g_instanceAllocation = { nullptr };
+static GPULocalTexture* g_textures[DEFERRED_RENDERING_ATTACHMENT_COUNT] = { nullptr };
+
+
+
+void GPUFixedContext::build_meshes(uint32_t* in_vertexCounts, GPUStageAllocation* in_vertexAllocation, uint32_t* in_maxInstanceCounts, GPUStageAllocation** in_textureAllocations, GPUExtent3D** in_extents) {
+	build_localAllocation(&g_vertexAllocation, in_vertexAllocation, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
+	
+	build_sharedAllocation(&g_indirectCommandAllocation, m_meshCount * sizeof(*m_graphicsIndirectCommands), VK_BUFFER_USAGE_INDIRECT_BUFFER_BIT, 0);
+	m_graphicsIndirectCommands = static_cast<GPUIndirectDrawCommand*>(g_indirectCommandAllocation.data);
+	m_graphicsIndirectCommandBuffer = g_indirectCommandAllocation.buffer;
+	
+	uint32_t VertexCount = 0;
+	uint32_t InstanceCount = 0;
+	for(uint32_t i = 0; i < m_meshCount; i++) {
+		m_graphicsIndirectCommands[i].vertexCount = in_vertexCounts[i];
+		m_graphicsIndirectCommands[i].instanceCount = 0;
+		m_graphicsIndirectCommands[i].firstVertex = VertexCount;
+		m_graphicsIndirectCommands[i].firstInstance = InstanceCount;
+		VertexCount += in_vertexCounts[i];
+		InstanceCount += in_maxInstanceCounts[i];
+		
+	}
+	
+	build_sharedAllocation(&g_instanceAllocation, InstanceCount * sizeof(Instance), VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, 1);
+	
+	VkFormat Formats[DEFERRED_RENDERING_REQUIRED_TEXTURE_COUNT] = DEFERRED_RENDERING_REQUIRED_TEXTURE_FORMATS;
+	for(uint32_t i = 0; i < DEFERRED_RENDERING_REQUIRED_TEXTURE_COUNT; i++) {
+		g_textures[i] = new GPULocalTexture[m_meshCount];
+		m_graphicsMeshTextureViews[i] = new GPUTextureView[m_meshCount];
+		for(uint32_t j = 0; j < m_meshCount; j++) {
+			build_localTexture(&g_textures[i][j], &in_textureAllocations[i][j], Formats[i], in_extents[i][j], VK_IMAGE_USAGE_SAMPLED_BIT);
+			m_graphicsMeshTextureViews[i][j] = g_textures[i][j].view;
+		}
+	}
+	
+}
+
+void GPUFixedContext::ruin_meshes(void) {
+	for(uint32_t i = 0; i < DEFERRED_RENDERING_REQUIRED_TEXTURE_COUNT; i++) {
+		for(uint32_t j = 0; j < m_meshCount; j++) {
+			ruin_localTexture(&g_textures[i][j]);
+		}
+		delete[] g_textures[i];
+		delete[] m_graphicsMeshTextureViews[i];
+	}
+	ruin_sharedAllocation(&g_instanceAllocation);
+	ruin_sharedAllocation(&g_indirectCommandAllocation);
+	ruin_localAllocation(&g_vertexAllocation);
+}
+
+
+
+#endif

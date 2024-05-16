@@ -7,7 +7,7 @@
 
 #if !defined(SHADER_INCLUDE)
 
-#include "Utilities.h"
+#include "../Utilities.h"
 #define TYPEDEF(name) name
 
 #elif defined(SHADER_INCLUDE)
@@ -29,6 +29,7 @@ typedef struct Vertex {
 } TYPEDEF(Vertex);
 typedef struct Light {
 	float3 position;
+	float3 rotation;
 	float3 glare;
 	float3 colour;
 } TYPEDEF(Light);

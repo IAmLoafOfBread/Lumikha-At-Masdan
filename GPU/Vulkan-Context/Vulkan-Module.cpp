@@ -7,23 +7,23 @@
 
 
 void GPUFixedContext::build_module(GPUModule in_module, const char* in_path) {
-	int File = open(in_path, O_RDONLY);
-	size_t Size = 0; {
-		struct stat Status = {};
-		fstat(File, &Status);
-		Size = Status.st_size;
-	}
-	auto Buffer = static_cast<uint32_t*>(mmap(nullptr, Size, PROT_READ, MAP_PRIVATE, File, 0));
+	File File = open_file(in_path);
+	const size_t Size = get_fileSize(File);
+	FileMap Map = map_file(File);
+	void* View = view_fileMap(Map, Size);
+
 	const VkShaderModuleCreateInfo CreateInfo = {
 		.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
 		.pNext = nullptr,
 		.flags = 0,
 		.codeSize = Size,
-		.pCode = Buffer
+		.pCode = static_cast<uint32_t*>(View)
 	};
 	CHECK(vkCreateShaderModule(m_logical, &CreateInfo, nullptr, &in_module))
-	munmap(Buffer, Size);
-	close(File);
+
+	unview_fileMap(View, Size);
+	unmap_file(Map);
+	close_file(File);
 }
 
 void GPUFixedContext::ruin_module(GPUModule in_module) {

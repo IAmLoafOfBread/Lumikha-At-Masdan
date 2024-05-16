@@ -76,6 +76,16 @@ void GPUFixedContext::run_shadowMaps(uint32_t in_index, uint32_t in_divisor) {
 		.pSignalSemaphores = &Semaphore
 	};
 	
+	View LightViewData = {
+		.position = { 0 },
+		.rotation = { 0 },
+		.projection = {
+			.vecs = { // DOO THIS NOW aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+			}
+		}
+	};
+	View* LightView = &LightViewData;
+
 	while(!glfwWindowShouldClose(m_surfaceWindow)) {
 		glfwPollEvents();
 		vkBeginCommandBuffer(Set, &g_commandInfo);
@@ -84,8 +94,10 @@ void GPUFixedContext::run_shadowMaps(uint32_t in_index, uint32_t in_divisor) {
 		vkCmdBindVertexBuffers(Set, 0, 1, &m_graphicsVertexBuffer, &Offset);
 
 		for(uint32_t i = 0; i < m_lightCount; i++) {
+			LightViewData.position = m_lights[i].position;
+			LightViewData.rotation = m_lights[i].rotation;
 			RenderInfo.framebuffer = Framebuffers[i];
-			vkCmdPushConstants(Set, m_shadowMappingLayout, VK_SHADER_STAGE_VERTEX_BIT, ViewSize, ViewSize, &m_lights[i]);
+			vkCmdPushConstants(Set, m_shadowMappingLayout, VK_SHADER_STAGE_VERTEX_BIT, ViewSize, ViewSize, LightView);
 			vkCmdBeginRenderPass(Set, &RenderInfo, VK_SUBPASS_CONTENTS_INLINE);
 			vkCmdDrawIndirect(Set, m_graphicsIndirectCommandBuffer, 0, m_meshCount, DrawCommandSize);
 			vkCmdEndRenderPass(Set);
@@ -190,10 +202,12 @@ void GPUFixedContext::run_deferredRenders(float3** in_viewPosition, float3** in_
 		.position = { 0 },
 		.rotation = { 0 },
 		.projection = {
-			.vecs[0] = {static_cast<float>(m_surfaceExtent.height) / static_cast<float>(m_surfaceExtent.width) * XYFunc, 0, 0, 0},
-			.vecs[1] = {0, XYFunc, 0, 0},
-			.vecs[2] = {0, 0, ZFunc, 1},
-			.vecs[3] = {0, 0, -ZFunc * ZNear, 0},
+			.vecs = {
+				{static_cast<float>(m_surfaceExtent.height) / static_cast<float>(m_surfaceExtent.width) * XYFunc, 0, 0, 0},
+				{0, XYFunc, 0, 0},
+				{0, 0, ZFunc, 1},
+				{0, 0, -ZFunc * ZNear, 0}
+			}
 		}
 	};
 	*in_viewPosition = &CameraData.position;

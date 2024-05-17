@@ -17,7 +17,7 @@
 
 class GPUFixedContext {
 public:
-	GPUFixedContext(GLFWwindow* in_surfaceWindow, GPUExtent3D in_surfaceExtent, uint32_t in_meshCount, uint32_t* in_meshInstanceMaxCounts, const char** in_positionFiles, const char** in_normalFiles, const char** in_uvFiles, const char** in_indexFiles, const char*** in_textureFiles);
+	GPUFixedContext(GLFWwindow* in_surfaceWindow, GPUExtent3D in_surfaceExtent, const uint32_t in_meshCount, const uint32_t* in_meshInstanceMaxCounts, const char** in_positionFiles, const char** in_normalFiles, const char** in_uvFiles, const char** in_indexFiles, const char*** in_textureFiles);
 	~GPUFixedContext();
 	
 private:
@@ -125,7 +125,7 @@ private:
 	void build_shadowMappingPipelines(void);
 	void ruin_shadowMappingPipelines(void);
 	
-	void build_meshes(uint32_t* in_vertexCounts, GPUStageAllocation* in_vertexAllocation, uint32_t* in_maxInstanceCounts, GPUStageAllocation** in_textureAllocations, GPUExtent3D** in_extents);
+	void build_meshes(uint32_t* in_vertexCounts, GPUStageAllocation* in_vertexAllocation, const uint32_t* in_maxInstanceCounts, GPUStageAllocation** in_textureAllocations, GPUExtent3D** in_extents);
 	void ruin_meshes(void);
 	
 	void build_lights(void);

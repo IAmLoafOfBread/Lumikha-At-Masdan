@@ -12,7 +12,7 @@ static GPULocalTexture* g_textures[DEFERRED_RENDERING_ATTACHMENT_COUNT] = { null
 
 
 
-void GPUFixedContext::build_meshes(uint32_t* in_vertexCounts, GPUStageAllocation* in_vertexAllocation, uint32_t* in_maxInstanceCounts, GPUStageAllocation** in_textureAllocations, GPUExtent3D** in_extents) {
+void GPUFixedContext::build_meshes(uint32_t* in_vertexCounts, GPUStageAllocation* in_vertexAllocation, const uint32_t* in_maxInstanceCounts, GPUStageAllocation** in_textureAllocations, GPUExtent3D** in_extents) {
 	build_localAllocation(&g_vertexAllocation, in_vertexAllocation, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
 	
 	build_sharedAllocation(&g_indirectCommandAllocation, m_meshCount * sizeof(*m_graphicsIndirectCommands), VK_BUFFER_USAGE_INDIRECT_BUFFER_BIT, 0);

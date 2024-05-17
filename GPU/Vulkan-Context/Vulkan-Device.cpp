@@ -9,7 +9,7 @@
 static VkInstance g_instance = VK_NULL_HANDLE;
 
 #if defined(RUN_DEBUG)
-static VKAPI_ATTR VkBool32 VKAPI_CALL debug_vulkan(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageTypes, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData) {
+static VKAPI_ATTR VkBool32 VKAPI_CALL g_debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageTypes, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData) {
 	printf("Validation Layer: %s\n", pCallbackData->pMessage);
 	return VK_FALSE;
 }
@@ -57,8 +57,9 @@ void GPUFixedContext::build_device(GLFWwindow* in_window, GPUExtent3D in_extent)
 			.applicationVersion = VK_VERSION_1_0,
 			.pEngineName = "TemperLogic",
 			.engineVersion = VK_VERSION_1_0,
-			.apiVersion = VK_API_VERSION_1_2
+			.apiVersion = VK_API_VERSION_1_3
 		};
+
 #if defined(RUN_DEBUG)
 		const char* Validation = "VK_LAYER_KHRONOS_validation";
 		const VkDebugUtilsMessengerCreateInfoEXT DebugInfo = {
@@ -67,9 +68,10 @@ void GPUFixedContext::build_device(GLFWwindow* in_window, GPUExtent3D in_extent)
 			.flags = 0,
 			.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT,
 			.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_DEVICE_ADDRESS_BINDING_BIT_EXT,
-			.pfnUserCallback = &debug_vulkan
+			.pfnUserCallback = &g_debugCallback
 		};
 #endif
+
 		uint32_t SwapchainColourSpaceExtension = 0;
 		{
 			CHECK(vkEnumerateInstanceExtensionProperties(nullptr, &HelperCount, nullptr))
@@ -79,16 +81,24 @@ void GPUFixedContext::build_device(GLFWwindow* in_window, GPUExtent3D in_extent)
 			delete[] ExtensionProperties;
 		}
 
+#if defined(RUN_DEBUG)
+		HelperCount++;
+#endif
+		
 		const char** RequiredExtensions = glfwGetRequiredInstanceExtensions(&HelperCount);
 		HelperCount += SwapchainColourSpaceExtension;
 		auto Extensions = new const char*[HelperCount];
-		for(uint32_t i = 0; i < HelperCount; i++) {
-			if(SwapchainColourSpaceExtension && i == HelperCount - 1) {
-				Extensions[i] = VK_EXT_SWAPCHAIN_COLOR_SPACE_EXTENSION_NAME;
-				break;
-			}
+
+		uint32_t DebugUtilsExtension = 0;
+#if defined(RUN_DEBUG)
+		DebugUtilsExtension = 1;
+#endif
+
+		for (uint32_t i = 0; i < HelperCount - (SwapchainColourSpaceExtension + DebugUtilsExtension); i++) {
 			Extensions[i] = RequiredExtensions[i];
 		}
+		if (SwapchainColourSpaceExtension) Extensions[HelperCount - 2] = VK_EXT_SWAPCHAIN_COLOR_SPACE_EXTENSION_NAME;
+		if(DebugUtilsExtension) Extensions[HelperCount - 1] = "VK_EXT_debug_utils";
 
 		const VkInstanceCreateInfo CreateInfo = {
 			.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
@@ -153,6 +163,7 @@ void GPUFixedContext::build_device(GLFWwindow* in_window, GPUExtent3D in_extent)
 			vkGetPhysicalDeviceQueueFamilyProperties(Physical, &HelperCount, nullptr);
 			auto Properties = new VkQueueFamilyProperties[HelperCount];
 			vkGetPhysicalDeviceQueueFamilyProperties(Physical, &HelperCount, Properties);
+
 			for(uint32_t i = 0; i < HelperCount; i++) {
 				if(Properties[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) {
 					m_graphicsQueueFamilyIndex = i;
@@ -168,13 +179,13 @@ void GPUFixedContext::build_device(GLFWwindow* in_window, GPUExtent3D in_extent)
 			delete[] Properties;
 		}
 		
-		VkPhysicalDeviceVulkan12Features Features12 = {
-			.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES,
+		VkPhysicalDeviceVulkan13Features Features13 = {
+			.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES,
 			.pNext = nullptr
 		};
 		VkPhysicalDeviceFeatures2 FeaturesExtent = {
 			.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2,
-			.pNext = &Features12
+			.pNext = &Features13
 		};
 		vkGetPhysicalDeviceFeatures2(Physical, &FeaturesExtent);
 

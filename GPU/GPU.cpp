@@ -5,10 +5,10 @@
 void* GPUFixedContext::m_shadowMappingCallback(void* in_info) {
 	auto Info = static_cast<ShadowMappingInfo*>(in_info);
 	Info->context->run_shadowMaps(Info->index, Info->divisor);
-	return NULL;
+	return nullptr;
 };
 
-GPUFixedContext::GPUFixedContext(GLFWwindow* in_surfaceWindow, GPUExtent3D in_surfaceExtent, uint32_t in_meshCount, uint32_t* in_meshInstanceMaxCounts, const char** in_positionFiles, const char** in_normalFiles, const char** in_uvFiles, const char** in_indexFiles, const char*** in_textureFiles) {
+GPUFixedContext::GPUFixedContext(GLFWwindow* in_surfaceWindow, GPUExtent3D in_surfaceExtent, const uint32_t in_meshCount, const uint32_t* in_meshInstanceMaxCounts, const char** in_positionFiles, const char** in_normalFiles, const char** in_uvFiles, const char** in_indexFiles, const char*** in_textureFiles) {
 	m_surfaceWindow = in_surfaceWindow;
 	build_device(in_surfaceWindow, in_surfaceExtent);
 	build_deferredRenderingPass();

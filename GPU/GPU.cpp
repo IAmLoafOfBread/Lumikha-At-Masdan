@@ -11,7 +11,7 @@ void* GPUFixedContext::m_shadowMappingCallback(void* in_info) {
 GPUFixedContext::GPUFixedContext(GLFWwindow* in_surfaceWindow, GPUExtent3D in_surfaceExtent, const uint32_t in_meshCount, const uint32_t* in_meshInstanceMaxCounts, const char** in_positionFiles, const char** in_normalFiles, const char** in_uvFiles, const char** in_indexFiles, const char*** in_textureFiles, void(*in_startupCallback)(void*)) {
 	m_surfaceWindow = in_surfaceWindow;
 	build_device(in_surfaceWindow, in_surfaceExtent);
-	build_shadowMappingPasses();
+	build_shadowMappingPass();
 	build_geometryPass();
 	build_lightingPass();
 	build_swapchain();

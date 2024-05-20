@@ -21,7 +21,7 @@ void GPUFixedContext::build_shadowMappingPasses(void) {
 		.attachment = 0,
 		.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
 	};
-	const VkSubpassDescription Pass = {
+	const VkSubpassDescription Subpass = {
 		.flags = 0,
 		.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS,
 		.inputAttachmentCount = 0,
@@ -40,13 +40,11 @@ void GPUFixedContext::build_shadowMappingPasses(void) {
 		.attachmentCount = 1,
 		.pAttachments = &Description,
 		.subpassCount = 1,
-		.pSubpasses = &Pass,
+		.pSubpasses = &Subpass,
 		.dependencyCount = 0,
 		.pDependencies = nullptr
 	};
-	for(uint32_t i = 0; i < CASCADED_SHADOW_MAP_COUNT; i++) {
-		CHECK(vkCreateRenderPass(m_logical, &CreateInfo, nullptr, &m_shadowMappingPasses[i]))
-	}
+	for(uint32_t i = 0; i < CASCADED_SHADOW_MAP_COUNT; i++) CHECK(vkCreateRenderPass(m_logical, &CreateInfo, nullptr, &m_shadowMappingPasses[i]))
 }
 
 void GPUFixedContext::ruin_shadowMappingPasses(void) {

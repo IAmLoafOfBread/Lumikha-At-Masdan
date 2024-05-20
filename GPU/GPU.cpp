@@ -18,7 +18,8 @@ GPUFixedContext::GPUFixedContext(GLFWwindow* in_surfaceWindow, GPUExtent3D in_su
 	build_shadowMappingFramebuffers();
 	build_geometryFramebuffer();
 	build_lightingFramebuffers();
-	build_geometryBindings(in_meshCount);
+	build_graphicsBindingPool(in_meshCount);
+	build_geometryBindings();
 	build_lightingBindings(in_meshCount);
 	build_shadowMappingPipelines();
 	build_geometryPipeline();
@@ -73,6 +74,7 @@ GPUFixedContext::~GPUFixedContext() {
 	ruin_lightingPipeline();
 	ruin_geometryBindings();
 	ruin_lightingBindings();
+	ruin_graphicsBindingPool();
 	ruin_shadowMappingFramebuffers();
 	ruin_geometryFramebuffer();
 	ruin_lightingFramebuffers();

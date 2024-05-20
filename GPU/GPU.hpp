@@ -66,6 +66,7 @@ private:
 	GPUFramebuffer* m_lightingFramebuffers = nullptr;
 	
 	uint32_t m_meshCount = 0;
+	GPUDescriptorPool m_graphicsBindingPool = GPU_NULL_HANDLE;
 
 	GPUDescriptorLayout m_geometryDescriptorLayout = GPU_NULL_HANDLE;
 	GPUDescriptorSet m_geometryDescriptorSet = GPU_NULL_HANDLE;
@@ -133,8 +134,11 @@ private:
 
 	void build_lightingFramebuffers(void);
 	void ruin_lightingFramebuffers(void);
+
+	void build_graphicsBindingPool(uint32_t in_meshCount);
+	void ruin_graphicsBindingPool(void);
 	
-	void build_geometryBindings(uint32_t in_meshCount);
+	void build_geometryBindings(void);
 	void ruin_geometryBindings(void);
 
 	void build_lightingBindings(uint32_t in_meshCount);

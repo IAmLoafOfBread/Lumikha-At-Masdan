@@ -5,10 +5,6 @@
 
 
 
-static VkDescriptorPool g_pool = VK_NULL_HANDLE;
-
-
-
 void GPUFixedContext::build_deferredRenderingBindings(uint32_t in_meshCount) {
 	m_meshCount = in_meshCount;
 	

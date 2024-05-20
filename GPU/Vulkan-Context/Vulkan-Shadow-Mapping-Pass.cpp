@@ -5,7 +5,7 @@
 
 
 
-void GPUFixedContext::build_shadowMappingPasses(void) {
+void GPUFixedContext::build_shadowMappingPass(void) {
 	const VkAttachmentDescription Description = {
 		.flags = 0,
 		.format = VK_FORMAT_D32_SFLOAT,
@@ -44,11 +44,11 @@ void GPUFixedContext::build_shadowMappingPasses(void) {
 		.dependencyCount = 0,
 		.pDependencies = nullptr
 	};
-	for(uint32_t i = 0; i < CASCADED_SHADOW_MAP_COUNT; i++) CHECK(vkCreateRenderPass(m_logical, &CreateInfo, nullptr, &m_shadowMappingPasses[i]))
+	CHECK(vkCreateRenderPass(m_logical, &CreateInfo, nullptr, &m_shadowMappingPass))
 }
 
-void GPUFixedContext::ruin_shadowMappingPasses(void) {
-	for(uint32_t i = 0; i < CASCADED_SHADOW_MAP_COUNT; i++) vkDestroyRenderPass(m_logical, m_shadowMappingPasses[i], nullptr);
+void GPUFixedContext::ruin_shadowMappingPass(void) {
+	vkDestroyRenderPass(m_logical, m_shadowMappingPass, nullptr);
 }
 
 

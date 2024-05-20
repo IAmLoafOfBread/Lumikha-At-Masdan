@@ -48,7 +48,7 @@ private:
 	GPUFormat m_surfaceFormat = static_cast<GPUFormat>(0);
 	GPUColourSpace m_surfaceColourSpace = static_cast<GPUColourSpace>(0);
 	
-	GPURenderPass m_shadowMappingPasses[CASCADED_SHADOW_MAP_COUNT] = { GPU_NULL_HANDLE };
+	GPURenderPass m_shadowMappingPass = GPU_NULL_HANDLE;
 	
 	GPURenderPass m_geometryPass = GPU_NULL_HANDLE;
 	
@@ -113,8 +113,8 @@ private:
 	void build_device(GLFWwindow* in_window, GPUExtent3D in_extent);
 	void ruin_device(void);
 	
-	void build_shadowMappingPasses(void);
-	void ruin_shadowMappingPasses(void);
+	void build_shadowMappingPass(void);
+	void ruin_shadowMappingPass(void);
 	
 	void build_geometryPass(void);
 	void ruin_geometryPass(void);

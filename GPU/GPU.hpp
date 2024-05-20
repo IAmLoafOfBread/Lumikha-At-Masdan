@@ -17,8 +17,12 @@
 
 class GPUFixedContext {
 public:
-	GPUFixedContext(GLFWwindow* in_surfaceWindow, GPUExtent3D in_surfaceExtent, const uint32_t in_meshCount, const uint32_t* in_meshInstanceMaxCounts, const char** in_positionFiles, const char** in_normalFiles, const char** in_uvFiles, const char** in_indexFiles, const char*** in_textureFiles);
+	GPUFixedContext(GLFWwindow* in_surfaceWindow, GPUExtent3D in_surfaceExtent, const uint32_t in_meshCount, const uint32_t* in_meshInstanceMaxCounts, const char** in_positionFiles, const char** in_normalFiles, const char** in_uvFiles, const char** in_indexFiles, const char*** in_textureFiles, void(*in_startupCallback)(void*));
 	~GPUFixedContext();
+
+	Camera* m_camera = nullptr;
+	Instance* m_instances = nullptr;
+	Light* m_lights = nullptr;
 	
 private:
 	GLFWwindow* m_surfaceWindow = nullptr;
@@ -28,7 +32,7 @@ private:
 	GPUDevice m_logical = GPU_NULL_HANDLE;
 	
 	uint32_t m_graphicsQueueFamilyIndex = 0;
-	bool m_multiThreadedGraphics = true;
+	bool m_multiThreadedGraphics = false;
 
 	GPUCommandQueue m_deferredRenderingCommandQueue = GPU_NULL_HANDLE;
 	GPUCommandPool m_deferredRenderingCommandPool = GPU_NULL_HANDLE;
@@ -44,28 +48,39 @@ private:
 	GPUFormat m_surfaceFormat = static_cast<GPUFormat>(0);
 	GPUColourSpace m_surfaceColourSpace = static_cast<GPUColourSpace>(0);
 	
-	GPURenderPass m_deferredRenderingPass = GPU_NULL_HANDLE;
-	
 	GPURenderPass m_shadowMappingPasses[CASCADED_SHADOW_MAP_COUNT] = { GPU_NULL_HANDLE };
+	
+	GPURenderPass m_geometryPass = GPU_NULL_HANDLE;
+	
+	GPURenderPass m_lightingPass = GPU_NULL_HANDLE;
 	
 	GPUSwapchain m_swapchain = GPU_NULL_HANDLE;
 	GPUTextureView* m_presentViews = nullptr;
 	
-	GPULocalTexture m_geometryOutputAttachments[GEOMETRY_PASS_OUTPUT_COUNT] = { { GPU_NULL_HANDLE } };
-	GPUFramebuffer* m_deferredRenderingFramebuffers = nullptr;
-	
-	GPULocalTexture m_shadowMappingAttachments[CASCADED_SHADOW_MAP_COUNT][MAX_LIGHT_COUNT] = { { { GPU_NULL_HANDLE } } };
+	GPUTextureView m_shadowMappingViews[CASCADED_SHADOW_MAP_COUNT][MAX_LIGHT_COUNT] = { { { GPU_NULL_HANDLE } } };
 	GPUFramebuffer m_shadowMappingFramebuffers[CASCADED_SHADOW_MAP_COUNT][MAX_LIGHT_COUNT] = { { GPU_NULL_HANDLE } };
 	
-	uint32_t m_meshCount = 0;
-	GPUDescriptorLayout m_deferredRenderingDescriptorLayout = GPU_NULL_HANDLE;
-	GPUDescriptorSet m_deferredRenderingDescriptorSet = GPU_NULL_HANDLE;
+	GPUTextureView m_geometryViews[GEOMETRY_PASS_OUTPUT_COUNT] = { { GPU_NULL_HANDLE } };
+	GPUFramebuffer m_geometryFramebuffer = GPU_NULL_HANDLE;
+
+	GPUFramebuffer* m_lightingFramebuffers = nullptr;
 	
-	GPUGraphicsLayout m_deferredRenderingLayout = GPU_NULL_HANDLE;
-	GPUGraphicsPipeline m_deferredRenderingPipelines[2] = { GPU_NULL_HANDLE };
+	uint32_t m_meshCount = 0;
+
+	GPUDescriptorLayout m_geometryDescriptorLayout = GPU_NULL_HANDLE;
+	GPUDescriptorSet m_geometryDescriptorSet = GPU_NULL_HANDLE;
+
+	GPUDescriptorLayout m_lightingDescriptorLayout = GPU_NULL_HANDLE;
+	GPUDescriptorSet m_lightingDescriptorSet = GPU_NULL_HANDLE;
 	
 	GPUGraphicsLayout m_shadowMappingLayout = GPU_NULL_HANDLE;
 	GPUGraphicsPipeline m_shadowMappingPipelines[CASCADED_SHADOW_MAP_COUNT] = { GPU_NULL_HANDLE };
+
+	GPUGraphicsLayout m_geometryLayout = GPU_NULL_HANDLE;
+	GPUGraphicsPipeline m_geometryPipeline = GPU_NULL_HANDLE;
+
+	GPUGraphicsLayout m_lightingLayout = GPU_NULL_HANDLE;
+	GPUGraphicsPipeline m_lightingPipeline = GPU_NULL_HANDLE;
 	
 	GPUBuffer m_graphicsVertexBuffer = GPU_NULL_HANDLE;
 	GPUIndirectDrawCommand* m_graphicsIndirectCommands = nullptr;
@@ -98,29 +113,41 @@ private:
 	void build_device(GLFWwindow* in_window, GPUExtent3D in_extent);
 	void ruin_device(void);
 	
-	void build_deferredRenderingPass(void);
-	void ruin_deferredRenderingPass(void);
-	
 	void build_shadowMappingPasses(void);
 	void ruin_shadowMappingPasses(void);
+	
+	void build_geometryPass(void);
+	void ruin_geometryPass(void);
+
+	void build_lightingPass(void);
+	void ruin_lightingPass(void);
 	
 	void build_swapchain(void);
 	void ruin_swapchain(void);
 	
-	void build_deferredRenderingFramebuffers(void);
-	void ruin_deferredRenderingFramebuffers(void);
-	
 	void build_shadowMappingFramebuffers(void);
 	void ruin_shadowMappingFramebuffers(void);
 	
-	void build_deferredRenderingBindings(uint32_t in_meshCount);
-	void ruin_deferredRenderingBindings(void);
+	void build_geometryFramebuffer(void);
+	void ruin_geometryFramebuffer(void);
+
+	void build_lightingFramebuffers(void);
+	void ruin_lightingFramebuffers(void);
 	
-	void build_deferredRenderingPipelines(void);
-	void ruin_deferredRenderingPipelines(void);
+	void build_geometryBindings(uint32_t in_meshCount);
+	void ruin_geometryBindings(void);
+
+	void build_lightingBindings(uint32_t in_meshCount);
+	void ruin_lightingBindings(void);
 	
 	void build_shadowMappingPipelines(void);
 	void ruin_shadowMappingPipelines(void);
+
+	void build_geometryPipeline(void);
+	void ruin_geometryPipeline(void);
+
+	void build_lightingPipeline(void);
+	void ruin_lightingPipeline(void);
 	
 	void build_meshes(uint32_t* in_vertexCounts, GPUStageAllocation* in_vertexAllocation, const uint32_t* in_maxInstanceCounts, GPUStageAllocation** in_textureAllocations, GPUExtent3D** in_extents);
 	void ruin_meshes(void);
@@ -128,11 +155,14 @@ private:
 	void build_lights(void);
 	void ruin_lights(void);
 	
-	void set_deferredRenderingBindings(void);
-	void unset_deferredRenderingBindings(void);
+	void set_geometryBindings(void);
+	void unset_geometryBindings(void);
+
+	void set_lightingBindings(void);
+	void unset_lightingBindings(void);
 	
-	void run_shadowMaps(uint32_t in_index, uint32_t in_divisor);
-	void run_deferredRenders(float3** in_viewPosition, float3** in_viewRotation, Instance** in_instances, Light** in_lights, void(*in_startupCallback)(void));
+	void run_shadowMappings(uint32_t in_index, uint32_t in_divisor);
+	void run_deferredRenderings(void);
 	
 	void add_instance(Instance* in_instance);
 	void rid_instance(uint32_t);

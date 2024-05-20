@@ -4,21 +4,25 @@
 
 void* GPUFixedContext::m_shadowMappingCallback(void* in_info) {
 	auto Info = static_cast<ShadowMappingInfo*>(in_info);
-	Info->context->run_shadowMaps(Info->index, Info->divisor);
+	Info->context->run_shadowMappings(Info->index, Info->divisor);
 	return nullptr;
 };
 
-GPUFixedContext::GPUFixedContext(GLFWwindow* in_surfaceWindow, GPUExtent3D in_surfaceExtent, const uint32_t in_meshCount, const uint32_t* in_meshInstanceMaxCounts, const char** in_positionFiles, const char** in_normalFiles, const char** in_uvFiles, const char** in_indexFiles, const char*** in_textureFiles) {
+GPUFixedContext::GPUFixedContext(GLFWwindow* in_surfaceWindow, GPUExtent3D in_surfaceExtent, const uint32_t in_meshCount, const uint32_t* in_meshInstanceMaxCounts, const char** in_positionFiles, const char** in_normalFiles, const char** in_uvFiles, const char** in_indexFiles, const char*** in_textureFiles, void(*in_startupCallback)(void*)) {
 	m_surfaceWindow = in_surfaceWindow;
 	build_device(in_surfaceWindow, in_surfaceExtent);
-	build_deferredRenderingPass();
 	build_shadowMappingPasses();
+	build_geometryPass();
+	build_lightingPass();
 	build_swapchain();
-	build_deferredRenderingFramebuffers();
 	build_shadowMappingFramebuffers();
-	build_deferredRenderingBindings(in_meshCount);
-	build_deferredRenderingPipelines();
+	build_geometryFramebuffer();
+	build_lightingFramebuffers();
+	build_geometryBindings(in_meshCount);
+	build_lightingBindings(in_meshCount);
 	build_shadowMappingPipelines();
+	build_geometryPipeline();
+	build_lightingPipeline();
 	{
 		GPUStageAllocation VertexAllocations = { nullptr };
 		auto VertexCounts = new uint32_t[in_meshCount];
@@ -43,7 +47,8 @@ GPUFixedContext::GPUFixedContext(GLFWwindow* in_surfaceWindow, GPUExtent3D in_su
 		}
 	}
 	build_lights();
-	set_deferredRenderingBindings();
+	set_geometryBindings();
+	set_lightingBindings();
 	
 	Thread ShadowMappingThreads[CASCADED_SHADOW_MAP_COUNT] = { NULL };
 	ShadowMappingInfo Infos[CASCADED_SHADOW_MAP_COUNT] = { NULL };
@@ -54,20 +59,27 @@ GPUFixedContext::GPUFixedContext(GLFWwindow* in_surfaceWindow, GPUExtent3D in_su
 		create_thread(&ShadowMappingThreads[i], &m_shadowMappingCallback, static_cast<void*>(&Infos[i]));
 	}
 	for(uint32_t i = 0; i < CASCADED_SHADOW_MAP_COUNT; i++) await_thread(ShadowMappingThreads[i]);
+
+	run_deferredRenderings();
 }
 
 GPUFixedContext::~GPUFixedContext() {
-	unset_deferredRenderingBindings();
-	ruin_lights();
+	unset_geometryBindings();
+	unset_lightingBindings();
 	ruin_meshes();
+	ruin_lights();
 	ruin_shadowMappingPipelines();
-	ruin_deferredRenderingPipelines();
-	ruin_deferredRenderingBindings();
+	ruin_geometryPipeline();
+	ruin_lightingPipeline();
+	ruin_geometryBindings();
+	ruin_lightingBindings();
 	ruin_shadowMappingFramebuffers();
-	ruin_deferredRenderingFramebuffers();
+	ruin_geometryFramebuffer();
+	ruin_lightingFramebuffers();
 	ruin_swapchain();
 	ruin_shadowMappingPasses();
-	ruin_deferredRenderingPass();
+	ruin_geometryPass();
+	ruin_lightingPass();
 	ruin_device();
 
 }

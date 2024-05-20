@@ -22,7 +22,11 @@ void GPUFixedContext::build_geometryFramebuffer(void) {
 	
 	{
 		VkImageView Attachments[ATTACHMENT_COUNT] = { VK_NULL_HANDLE };
-		for(uint32_t i = 0; i < ATTACHMENT_COUNT; i++) Attachments[i] = g_textures[i].view;
+		for (uint32_t i = 0; i < GEOMETRY_PASS_COLOUR_ATTACHMENT_COUNT; i++) {
+			m_geometryViews[i] = g_textures[i].view;
+			Attachments[i] = g_textures[i].view;
+		}
+		Attachments[GEOMETRY_PASS_COLOUR_ATTACHMENT_COUNT] = g_textures[GEOMETRY_PASS_COLOUR_ATTACHMENT_COUNT].view;
 		
 		const VkFramebufferCreateInfo CreateInfo = {
 			.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,

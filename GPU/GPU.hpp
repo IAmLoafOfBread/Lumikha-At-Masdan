@@ -60,7 +60,7 @@ private:
 	GPUTextureView m_shadowMappingViews[CASCADED_SHADOW_MAP_COUNT][MAX_LIGHT_COUNT] = { { { GPU_NULL_HANDLE } } };
 	GPUFramebuffer m_shadowMappingFramebuffers[CASCADED_SHADOW_MAP_COUNT][MAX_LIGHT_COUNT] = { { GPU_NULL_HANDLE } };
 	
-	GPUTextureView m_geometryViews[GEOMETRY_PASS_OUTPUT_COUNT] = { { GPU_NULL_HANDLE } };
+	GPUTextureView m_geometryViews[GEOMETRY_PASS_COLOUR_ATTACHMENT_COUNT] = { { GPU_NULL_HANDLE } };
 	GPUFramebuffer m_geometryFramebuffer = GPU_NULL_HANDLE;
 
 	GPUFramebuffer* m_lightingFramebuffers = nullptr;
@@ -86,7 +86,7 @@ private:
 	GPUIndirectDrawCommand* m_graphicsIndirectCommands = nullptr;
 	GPUBuffer m_graphicsIndirectCommandBuffer = GPU_NULL_HANDLE;
 	GPUBuffer m_graphicsInstanceBuffer = GPU_NULL_HANDLE;
-	GPUTextureView* m_graphicsMeshTextureViews[DEFERRED_RENDERING_ATTACHMENT_COUNT] = { nullptr };
+	GPUTextureView* m_graphicsMeshTextureViews[GEOMETRY_PASS_REQUIRED_TEXTURE_COUNT] = { nullptr };
 	
 	uint32_t m_lightCount = 0;
 	GPUBuffer m_graphicsLightBuffer = GPU_NULL_HANDLE;

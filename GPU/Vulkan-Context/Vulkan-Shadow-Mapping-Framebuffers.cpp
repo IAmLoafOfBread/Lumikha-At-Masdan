@@ -40,6 +40,7 @@ void GPUFixedContext::build_shadowMappingFramebuffers(void) {
 		CreateInfo.width /= Divisor;
 		CreateInfo.height /= Divisor;
 		for(uint32_t j = 0; j < MAX_LIGHT_COUNT; j++) {
+			m_shadowMappingViews[i][j] = g_textures[i][j].view;
 			CreateInfo.pAttachments = &g_textures[i][j].view;
 			CHECK(vkCreateFramebuffer(m_logical, &CreateInfo, nullptr, &m_shadowMappingFramebuffers[i][j]))
 		}

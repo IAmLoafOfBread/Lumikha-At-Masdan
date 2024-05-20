@@ -45,7 +45,7 @@ void GPUFixedContext::build_deferredRenderingBindings(uint32_t in_meshCount) {
 		for(uint32_t i = 0; i < DEFERRED_RENDERING_BINDING_COUNT; i++) {
 			Bindings[i].binding = i;
 			Bindings[i].pImmutableSamplers = nullptr;
-			Bindings[i].stageFlags = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+			Bindings[i].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
 		}
 		uint32_t Min = 0;
 		uint32_t Cap = LIGHTING_PASS_INPUT_COUNT;

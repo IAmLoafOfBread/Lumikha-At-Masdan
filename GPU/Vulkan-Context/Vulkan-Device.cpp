@@ -81,12 +81,11 @@ void GPUFixedContext::build_device(GLFWwindow* in_window, GPUExtent3D in_extent)
 			delete[] ExtensionProperties;
 		}
 
+		const char** RequiredExtensions = glfwGetRequiredInstanceExtensions(&HelperCount);
+		HelperCount += SwapchainColourSpaceExtension;
 #if defined(RUN_DEBUG)
 		HelperCount++;
 #endif
-		
-		const char** RequiredExtensions = glfwGetRequiredInstanceExtensions(&HelperCount);
-		HelperCount += SwapchainColourSpaceExtension;
 		auto Extensions = new const char*[HelperCount];
 
 		uint32_t DebugUtilsExtension = 0;
@@ -167,12 +166,7 @@ void GPUFixedContext::build_device(GLFWwindow* in_window, GPUExtent3D in_extent)
 			for(uint32_t i = 0; i < HelperCount; i++) {
 				if(Properties[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) {
 					m_graphicsQueueFamilyIndex = i;
-					break;
-				}
-			}
-			for(uint32_t i = 0; i < HelperCount; i++) {
-				if(Properties[i].queueFlags & VK_QUEUE_COMPUTE_BIT) {
-					m_computeQueueFamilyIndex = i;
+					m_multiThreadedGraphics = Properties[i].queueCount > 3 ? true : false;
 					break;
 				}
 			}
@@ -204,15 +198,7 @@ void GPUFixedContext::build_device(GLFWwindow* in_window, GPUExtent3D in_extent)
 				.pNext = nullptr,
 				.flags = 0,
 				.queueFamilyIndex = m_graphicsQueueFamilyIndex,
-				.queueCount = GRAPHICS_THREAD_COUNT,
-				.pQueuePriorities = Priorities
-			},
-			{
-				.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
-				.pNext = nullptr,
-				.flags = 0,
-				.queueFamilyIndex = m_computeQueueFamilyIndex,
-				.queueCount = 1,
+				.queueCount = static_cast<uint32_t>(m_multiThreadedGraphics ? GRAPHICS_THREAD_COUNT : 1),
 				.pQueuePriorities = Priorities
 			}
 		};
@@ -235,14 +221,14 @@ void GPUFixedContext::build_device(GLFWwindow* in_window, GPUExtent3D in_extent)
 	
 	build_commandThread(m_graphicsQueueFamilyIndex, 0, &m_deferredRenderingCommandQueue, &m_deferredRenderingCommandPool, &m_deferredRenderingCommandSet);
 	for(uint32_t i = 0; i < CASCADED_SHADOW_MAP_COUNT; i++) {
-		build_commandThread(m_graphicsQueueFamilyIndex, i, &m_shadowMappingCommandQueues[i], &m_shadowMappingCommandPools[i], &m_shadowMappingCommandSets[i]);
+		if(m_multiThreadedGraphics) build_commandThread(m_graphicsQueueFamilyIndex, i, &m_shadowMappingCommandQueues[i], &m_shadowMappingCommandPools[i], &m_shadowMappingCommandSets[i]);
+		else build_commandThread(m_graphicsQueueFamilyIndex, 0, &m_deferredRenderingCommandQueue, &m_shadowMappingCommandPools[i], &m_shadowMappingCommandSets[i]);
 	}
-	build_commandThread(m_computeQueueFamilyIndex, 0, &m_collisionComputingCommandQueue, &m_collisionComputingCommandPool, &m_collisionComputingCommandSet);
 	
-	glfwCreateWindowSurface(g_instance, in_window, nullptr, &m_surface);
+	CHECK(glfwCreateWindowSurface(g_instance, in_window, nullptr, &m_surface))
 	m_surfaceExtent = in_extent;
 	{
-		VkSurfaceCapabilitiesKHR Caps = {};
+		VkSurfaceCapabilitiesKHR Caps = { 0 };
 		CHECK(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(Physical, m_surface, &Caps))
 		m_surfaceFrameCount = Caps.minImageCount + 1;
 		CHECK(vkGetPhysicalDeviceSurfaceFormatsKHR(Physical, m_surface, &HelperCount, nullptr))
@@ -261,7 +247,6 @@ void GPUFixedContext::ruin_device(void) {
 	for(uint32_t i = 0; i < CASCADED_SHADOW_MAP_COUNT; i++) {
 		ruin_commandThread(&m_shadowMappingCommandPools[i], &m_shadowMappingCommandSets[i]);
 	}
-	ruin_commandThread(&m_collisionComputingCommandPool, &m_collisionComputingCommandSet);
 	vkDestroySurfaceKHR(g_instance, m_surface, nullptr);
 	vkDestroyDevice(m_logical, nullptr);
 	vkDestroyInstance(g_instance, nullptr);

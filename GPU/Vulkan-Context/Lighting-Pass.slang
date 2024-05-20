@@ -3,27 +3,29 @@
 
 
 
-#define SHADOW_MAP_ATTACHMENTS_OFFSET /**/ (LIGHTING_PASS_INPUT_COUNT + DEFERRED_RENDERING_REQUIRED_TEXTURE_COUNT)
+#define SHADOW_MAP_ATTACHMENTS_OFFSET /**/(LIGHTING_PASS_INPUT_COUNT + DEFERRED_RENDERING_REQUIRED_TEXTURE_COUNT)
 
-[[vk::input_attachment_index(0)]] let g_positionInput: SubpassInput<float3>;
-[[vk::input_attachment_index(1)]] let g_albedoInput: SubpassInput<float3>;
-[[vk::input_attachment_index(2)]] let g_normalInput: SubpassInput<float3>;
-[[vk::input_attachment_index(3)]] let g_metalnessInput: SubpassInput<float>;
-[[vk::input_attachment_index(4)]] let g_roughnessInput: SubpassInput<float>;
+[[vk::binding(0, 0)]] Texture2D<float4> g_positionInput;
+[[vk::binding(1, 0)]] Texture2D<float4> g_albedoInput;
+[[vk::binding(2, 0)]] Texture2D<float4> g_normalInput;
+[[vk::binding(3, 0)]] Texture2D<float> g_metalnessInput;
+[[vk::binding(4, 0)]] Texture2D<float> g_roughnessInput;
 
-[[vk::binding(0 + SHADOW_MAP_ATTACHMENTS_OFFSET, 0]] let g_cascadedShadowMapsDB1: Texture2D<float>[];
-[[vk::binding(1 + SHADOW_MAP_ATTACHMENTS_OFFSET, 0]] let g_cascadedShadowMapsDB2: Texture2D<float>[];
-[[vk::binding(2 + SHADOW_MAP_ATTACHMENTS_OFFSET, 0]] let g_cascadedShadowMapsDB3: Texture2D<float>[];
+[[vk::binding(0 + SHADOW_MAP_ATTACHMENTS_OFFSET, 0)]] Texture2D<float> g_cascadedShadowMapsDB1[MAX_LIGHT_COUNT];
+[[vk::binding(1 + SHADOW_MAP_ATTACHMENTS_OFFSET, 0)]] Texture2D<float> g_cascadedShadowMapsDB2[MAX_LIGHT_COUNT];
+[[vk::binding(2 + SHADOW_MAP_ATTACHMENTS_OFFSET, 0)]] Texture2D<float> g_cascadedShadowMapsDB3[MAX_LIGHT_COUNT];
 
-[[vk::binding(SHADOW_MAP_ATTACHMENTS_OFFSET + CASCADED_SHADOW_MAP_COUNT, 0)]] let g_lights: ConstantBuffer<Light[]>;
+[[vk::binding(SHADOW_MAP_ATTACHMENTS_OFFSET + CASCADED_SHADOW_MAP_COUNT, 0)]] ConstantBuffer<Light[]> g_lights;
 
-[[vk::push_constant]] let g_lightCount: uint;
+[[vk::push_constant]] uint g_lightCount;
 
-[shader("vertex")] func output_vertex(void) -> float2 {
-
+[shader("vertex")] float2 output_vertex(void) {
+    float2 Haha;
+    return Haha;
 }
 
-[shader("fragment")] func output_fragment(in_position: float2) -> float4 {
-
+[shader("fragment")] float4 output_fragment(float2 in_position) {
+    float4 yoyo;
+    return yoyo;
 }
 

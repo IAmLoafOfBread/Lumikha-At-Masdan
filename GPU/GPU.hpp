@@ -28,6 +28,8 @@ private:
 	GPUDevice m_logical = GPU_NULL_HANDLE;
 	
 	uint32_t m_graphicsQueueFamilyIndex = 0;
+	bool m_multiThreadedGraphics = true;
+
 	GPUCommandQueue m_deferredRenderingCommandQueue = GPU_NULL_HANDLE;
 	GPUCommandPool m_deferredRenderingCommandPool = GPU_NULL_HANDLE;
 	GPUCommandSet m_deferredRenderingCommandSet = GPU_NULL_HANDLE;
@@ -35,11 +37,6 @@ private:
 	GPUCommandQueue m_shadowMappingCommandQueues[CASCADED_SHADOW_MAP_COUNT] = { GPU_NULL_HANDLE };
 	GPUCommandPool m_shadowMappingCommandPools[CASCADED_SHADOW_MAP_COUNT] = { GPU_NULL_HANDLE };
 	GPUCommandSet m_shadowMappingCommandSets[CASCADED_SHADOW_MAP_COUNT] = { GPU_NULL_HANDLE };
-	
-	uint32_t m_computeQueueFamilyIndex = 0;
-	GPUCommandQueue m_collisionComputingCommandQueue = GPU_NULL_HANDLE;
-	GPUCommandPool m_collisionComputingCommandPool = GPU_NULL_HANDLE;
-	GPUCommandSet m_collisionComputingCommandSet = GPU_NULL_HANDLE;
 	
 	GPUSurface m_surface = GPU_NULL_HANDLE;
 	uint32_t m_surfaceFrameCount = 0;

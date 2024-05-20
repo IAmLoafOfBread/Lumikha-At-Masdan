@@ -32,7 +32,7 @@ void GPUFixedContext::run_shadowMaps(uint32_t in_index, uint32_t in_divisor) {
 		DepthToReadBarriers[i].pNext = nullptr;
 		DepthToReadBarriers[i].srcAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
 		DepthToReadBarriers[i].dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-		DepthToReadBarriers[i].oldLayout = VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL;
+		DepthToReadBarriers[i].oldLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 		DepthToReadBarriers[i].newLayout = VK_IMAGE_LAYOUT_READ_ONLY_OPTIMAL;
 		DepthToReadBarriers[i].srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
 		DepthToReadBarriers[i].dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;

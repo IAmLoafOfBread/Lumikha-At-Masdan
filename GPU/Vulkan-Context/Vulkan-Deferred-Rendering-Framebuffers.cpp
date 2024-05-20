@@ -12,7 +12,7 @@ void GPUFixedContext::build_deferredRenderingFramebuffers(void) {
 			if(i != DEFERRED_RENDERING_ATTACHMENT_DEPTH_INDEX) {
 				build_localTexture(&m_geometryOutputAttachments[i], nullptr, Formats[i], m_surfaceExtent, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT);
 			} else {
-				build_localTexture(&m_geometryOutputAttachments[i], nullptr, Formats[i], m_surfaceExtent, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT);
+				build_localTexture(&m_geometryOutputAttachments[i], nullptr, Formats[i], m_surfaceExtent, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT);
 			}
 		}
 	}

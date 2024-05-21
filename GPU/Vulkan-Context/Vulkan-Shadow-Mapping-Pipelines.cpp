@@ -12,23 +12,24 @@ static VkShaderModule g_vertexModule = VK_NULL_HANDLE;
 
 
 void GPUFixedContext::build_shadowMappingPipelines(void) {
+	build_module(g_vertexModule, VERTEX_MODULE_PATH);
+	
 	{
 		const VkPushConstantRange PushConstant = {
 			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
 			.offset = 0,
-			.size = sizeof(View) * 2
+			.size = sizeof(View) + sizeof(Camera)
 		};
 		const VkPipelineLayoutCreateInfo CreateInfo = {
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
 			.pNext = nullptr,
 			.flags = 0,
-			.setLayoutCount = 1,
-			.pSetLayouts = &m_deferredRenderingDescriptorLayout,
+			.setLayoutCount = 0,
+			.pSetLayouts = nullptr,
 			.pushConstantRangeCount = 1,
 			.pPushConstantRanges = &PushConstant
 		};
 		CHECK(vkCreatePipelineLayout(m_logical, &CreateInfo, nullptr, &m_shadowMappingLayout))
-		build_module(g_vertexModule, VERTEX_MODULE_PATH);
 	}
 	
 	
@@ -58,22 +59,20 @@ void GPUFixedContext::build_shadowMappingPipelines(void) {
 	VkVertexInputAttributeDescription Attributes[] = {
 		{
 			.binding = 0,
-			.format = VK_FORMAT_R32G32B32_SFLOAT,
 			.offset = offsetof(Vertex, position)
 		},
 		{
 			.binding = 1,
-			.format = VK_FORMAT_R32G32B32_SFLOAT,
 			.offset = offsetof(Instance, position)
 		},
 		{
 			.binding = 1,
-			.format = VK_FORMAT_R32G32B32_SFLOAT,
 			.offset = offsetof(Instance, rotation)
 		}
 	};
 	for(uint32_t i = 0; i < SIZE_OF(Attributes); i++) {
 		Attributes[i].location = i;
+		Attributes[i].format = VK_FORMAT_R32G32B32_SFLOAT;
 	}
 	
 	const VkPipelineVertexInputStateCreateInfo VertexInputState = {
@@ -151,6 +150,18 @@ void GPUFixedContext::build_shadowMappingPipelines(void) {
 		.depthBiasSlopeFactor = 0,
 		.lineWidth = 1
 	};
+
+	const VkPipelineMultisampleStateCreateInfo MultisampleState = {
+		.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO,
+		.pNext = nullptr,
+		.flags = 0,
+		.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT,
+		.sampleShadingEnable = VK_FALSE,
+		.minSampleShading = 0,
+		.pSampleMask = nullptr,
+		.alphaToCoverageEnable = VK_FALSE,
+		.alphaToOneEnable = VK_FALSE
+	};
 	
 	const VkPipelineDepthStencilStateCreateInfo DepthStencilState = {
 		.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
@@ -183,6 +194,17 @@ void GPUFixedContext::build_shadowMappingPipelines(void) {
 		.maxDepthBounds = 1,
 	};
 	
+	const VkPipelineColorBlendStateCreateInfo ColourBlendState = {
+		.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO,
+		.pNext = nullptr,
+		.flags = 0,
+		.logicOpEnable = VK_FALSE,
+		.logicOp = static_cast<VkLogicOp>(0),
+		.attachmentCount = 0,
+		.pAttachments = nullptr,
+		.blendConstants = { 0 }
+	};
+
 	const VkPipelineDynamicStateCreateInfo DynamicState = {
 		.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO,
 		.pNext = nullptr,
@@ -203,17 +225,16 @@ void GPUFixedContext::build_shadowMappingPipelines(void) {
 		CreateInfos[i].pTessellationState = &TessellationState;
 		CreateInfos[i].pViewportState = &ViewportStates[i];
 		CreateInfos[i].pRasterizationState = &RasterizationState;
-		CreateInfos[i].pMultisampleState = nullptr;
+		CreateInfos[i].pMultisampleState = &MultisampleState;
 		CreateInfos[i].pDepthStencilState = &DepthStencilState;
-		CreateInfos[i].pColorBlendState = nullptr;
+		CreateInfos[i].pColorBlendState = &ColourBlendState;
 		CreateInfos[i].pDynamicState = &DynamicState;
 		CreateInfos[i].layout = m_shadowMappingLayout;
-		CreateInfos[i].renderPass = m_shadowMappingPasses[i];
-		CreateInfos[i].subpass = i;
+		CreateInfos[i].renderPass = m_shadowMappingPass;
+		CreateInfos[i].subpass = 0;
 		CreateInfos[i].basePipelineHandle = VK_NULL_HANDLE;
 		CreateInfos[i].basePipelineIndex = -1;
 	}
-	
 	CHECK(vkCreateGraphicsPipelines(m_logical, nullptr, CASCADED_SHADOW_MAP_COUNT, CreateInfos, nullptr, m_shadowMappingPipelines))
 }
 
@@ -221,8 +242,8 @@ void GPUFixedContext::ruin_shadowMappingPipelines(void) {
 	for(uint32_t i = 0; i < CASCADED_SHADOW_MAP_COUNT; i++) {
 		vkDestroyPipeline(m_logical, m_shadowMappingPipelines[i], nullptr);
 	}
-	ruin_module(g_vertexModule);
 	vkDestroyPipelineLayout(m_logical, m_shadowMappingLayout, nullptr);
+	ruin_module(g_vertexModule);
 }
 
 

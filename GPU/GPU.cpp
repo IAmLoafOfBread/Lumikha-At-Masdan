@@ -20,7 +20,7 @@ GPUFixedContext::GPUFixedContext(GLFWwindow* in_surfaceWindow, GPUExtent3D in_su
 	build_lightingFramebuffers();
 	build_graphicsBindingPool(in_meshCount);
 	build_geometryBindings();
-	build_lightingBindings(in_meshCount);
+	build_lightingBindings();
 	build_shadowMappingPipelines();
 	build_geometryPipeline();
 	build_lightingPipeline();

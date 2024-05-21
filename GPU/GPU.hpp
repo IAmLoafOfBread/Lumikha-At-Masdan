@@ -141,7 +141,7 @@ private:
 	void build_geometryBindings(void);
 	void ruin_geometryBindings(void);
 
-	void build_lightingBindings(uint32_t in_meshCount);
+	void build_lightingBindings(void);
 	void ruin_lightingBindings(void);
 	
 	void build_shadowMappingPipelines(void);

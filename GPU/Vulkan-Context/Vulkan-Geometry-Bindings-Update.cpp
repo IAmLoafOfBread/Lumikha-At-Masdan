@@ -6,8 +6,8 @@
 
 
 void GPUFixedContext::set_geometryBindings(void) {
-	VkWriteDescriptorSet Writes[GEOMETRY_PASS_REQUIRED_TEXTURE_COUNT] = { };
 	VkDescriptorImageInfo* Infos[GEOMETRY_PASS_REQUIRED_TEXTURE_COUNT] = { { VK_NULL_HANDLE } };
+	VkWriteDescriptorSet Writes[GEOMETRY_PASS_REQUIRED_TEXTURE_COUNT] = { };
 	for(uint32_t i = 0; i < GEOMETRY_PASS_REQUIRED_TEXTURE_COUNT; i++) {
 		Infos[i] = new VkDescriptorImageInfo[m_meshCount];
 		for (uint32_t j = 0; j < m_meshCount; j++) {

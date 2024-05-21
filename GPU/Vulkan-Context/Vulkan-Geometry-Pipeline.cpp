@@ -82,16 +82,6 @@ void GPUFixedContext::build_geometryPipeline(void) {
 		},
 		{
 			.binding = 0,
-			.format = VK_FORMAT_R32G32B32_SFLOAT,
-			.offset = offsetof(Vertex, tangent)
-		},
-		{
-			.binding = 0,
-			.format = VK_FORMAT_R32G32B32_SFLOAT,
-			.offset = offsetof(Vertex, cotangent)
-		},
-		{
-			.binding = 0,
 			.format = VK_FORMAT_R32G32_SFLOAT,
 			.offset = offsetof(Vertex, uv)
 		},

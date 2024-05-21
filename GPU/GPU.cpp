@@ -27,11 +27,11 @@ GPUFixedContext::GPUFixedContext(GLFWwindow* in_surfaceWindow, GPUExtent3D in_su
 	{
 		GPUStageAllocation VertexAllocations = { nullptr };
 		auto VertexCounts = new uint32_t[in_meshCount];
-		GPUStageAllocation* TextureAllocations[DEFERRED_RENDERING_REQUIRED_TEXTURE_COUNT] = { nullptr };
-		GPUExtent3D* TextureExtents[DEFERRED_RENDERING_REQUIRED_TEXTURE_COUNT] = { nullptr };
+		GPUStageAllocation* TextureAllocations[GEOMETRY_PASS_REQUIRED_TEXTURE_COUNT] = { nullptr };
+		GPUExtent3D* TextureExtents[GEOMETRY_PASS_REQUIRED_TEXTURE_COUNT] = { nullptr };
 		
 		set_meshes(&VertexAllocations, in_meshCount, in_positionFiles, in_normalFiles, in_uvFiles, in_indexFiles, VertexCounts);
-		for(uint32_t i = 0; i < DEFERRED_RENDERING_REQUIRED_TEXTURE_COUNT; i++) {
+		for(uint32_t i = 0; i < GEOMETRY_PASS_REQUIRED_TEXTURE_COUNT; i++) {
 			TextureAllocations[i] = new GPUStageAllocation[in_meshCount];
 			TextureExtents[i] = new GPUExtent3D[in_meshCount];
 			for(uint32_t j = 0; j < in_meshCount; i++) {
@@ -42,7 +42,7 @@ GPUFixedContext::GPUFixedContext(GLFWwindow* in_surfaceWindow, GPUExtent3D in_su
 		build_meshes(VertexCounts, &VertexAllocations, in_meshInstanceMaxCounts, TextureAllocations, TextureExtents);
 		
 		delete[] VertexCounts;
-		for(uint32_t i = 0; i < DEFERRED_RENDERING_REQUIRED_TEXTURE_COUNT; i++) {
+		for(uint32_t i = 0; i < GEOMETRY_PASS_REQUIRED_TEXTURE_COUNT; i++) {
 			delete[] TextureAllocations[i];
 			delete[] TextureExtents[i];
 		}
@@ -79,7 +79,7 @@ GPUFixedContext::~GPUFixedContext() {
 	ruin_geometryFramebuffer();
 	ruin_lightingFramebuffers();
 	ruin_swapchain();
-	ruin_shadowMappingPasses();
+	ruin_shadowMappingPass();
 	ruin_geometryPass();
 	ruin_lightingPass();
 	ruin_device();

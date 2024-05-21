@@ -65,6 +65,8 @@ void rotate_vector(inout float3 in_vector, float3 in_rotation) {
 typedef struct Vertex {
 	float3 position;
 	float3 normal;
+	float3 tangent;
+	float3 cotangent;
 	float2 uv;
 } TYPEDEF(Vertex);
 typedef struct Light {

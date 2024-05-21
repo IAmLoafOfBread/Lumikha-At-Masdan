@@ -5,10 +5,10 @@
 
 
 
-static GPULocalAllocation g_vertexAllocation = { nullptr };
-static GPUSharedAllocation g_indirectCommandAllocation = { nullptr };
-static GPUSharedAllocation g_instanceAllocation = { nullptr };
-static GPULocalTexture* g_textures[DEFERRED_RENDERING_ATTACHMENT_COUNT] = { nullptr };
+static GPULocalAllocation g_vertexAllocation = { VK_NULL_HANDLE };
+static GPUSharedAllocation g_indirectCommandAllocation = { VK_NULL_HANDLE };
+static GPUSharedAllocation g_instanceAllocation = { VK_NULL_HANDLE };
+static GPULocalTexture* g_textures[GEOMETRY_PASS_REQUIRED_TEXTURE_COUNT] = { VK_NULL_HANDLE };
 
 
 
@@ -33,8 +33,8 @@ void GPUFixedContext::build_meshes(uint32_t* in_vertexCounts, GPUStageAllocation
 	
 	build_sharedAllocation(&g_instanceAllocation, InstanceCount * sizeof(Instance), VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, 1);
 	
-	VkFormat Formats[DEFERRED_RENDERING_REQUIRED_TEXTURE_COUNT] = DEFERRED_RENDERING_REQUIRED_TEXTURE_FORMATS;
-	for(uint32_t i = 0; i < DEFERRED_RENDERING_REQUIRED_TEXTURE_COUNT; i++) {
+	const VkFormat Formats[GEOMETRY_PASS_REQUIRED_TEXTURE_COUNT] = { GEOMETRY_PASS_REQUIRED_TEXTURE_FORMATS };
+	for(uint32_t i = 0; i < GEOMETRY_PASS_REQUIRED_TEXTURE_COUNT; i++) {
 		g_textures[i] = new GPULocalTexture[m_meshCount];
 		m_graphicsMeshTextureViews[i] = new GPUTextureView[m_meshCount];
 		for(uint32_t j = 0; j < m_meshCount; j++) {
@@ -46,7 +46,7 @@ void GPUFixedContext::build_meshes(uint32_t* in_vertexCounts, GPUStageAllocation
 }
 
 void GPUFixedContext::ruin_meshes(void) {
-	for(uint32_t i = 0; i < DEFERRED_RENDERING_REQUIRED_TEXTURE_COUNT; i++) {
+	for(uint32_t i = 0; i < GEOMETRY_PASS_REQUIRED_TEXTURE_COUNT; i++) {
 		for(uint32_t j = 0; j < m_meshCount; j++) {
 			ruin_localTexture(&g_textures[i][j]);
 		}

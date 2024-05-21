@@ -165,10 +165,8 @@ private:
 	void ruin_sampler(void);
 
 	void set_geometryBindings(void);
-	void unset_geometryBindings(void);
 
 	void set_lightingBindings(void);
-	void unset_lightingBindings(void);
 	
 	void run_shadowMappings(uint32_t in_index, uint32_t in_divisor);
 	void run_deferredRenderings(void);

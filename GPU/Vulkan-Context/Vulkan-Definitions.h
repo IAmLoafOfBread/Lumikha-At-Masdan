@@ -28,6 +28,7 @@ typedef VkFramebuffer GPUFramebuffer;
 typedef VkDescriptorPool GPUDescriptorPool;
 typedef VkDescriptorSetLayout GPUDescriptorLayout;
 typedef VkDescriptorSet GPUDescriptorSet;
+typedef VkSampler GPUSampler;
 typedef VkPipeline GPUGraphicsPipeline;
 typedef VkPipelineLayout GPUGraphicsLayout;
 typedef VkDrawIndirectCommand GPUIndirectDrawCommand;

@@ -93,6 +93,8 @@ private:
 	GPUBuffer m_graphicsLightBuffer = GPU_NULL_HANDLE;
 	Light* m_lights = nullptr;
 	
+	GPUSampler m_sampler = GPU_NULL_HANDLE;
+
 	View* m_cameraView = nullptr;
 	
 	void set_meshes(GPUStageAllocation* in_allocation, uint32_t in_meshCount, const char** in_positionFiles, const char** in_normalFiles, const char** in_uvFiles, const char** in_indexFiles, uint32_t* in_vertexCounts);
@@ -159,6 +161,9 @@ private:
 	void build_lights(void);
 	void ruin_lights(void);
 	
+	void build_sampler(void);
+	void ruin_sampler(void);
+
 	void set_geometryBindings(void);
 	void unset_geometryBindings(void);
 

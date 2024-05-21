@@ -48,6 +48,7 @@ GPUFixedContext::GPUFixedContext(GLFWwindow* in_surfaceWindow, GPUExtent3D in_su
 		}
 	}
 	build_lights();
+	build_sampler();
 	set_geometryBindings();
 	set_lightingBindings();
 	
@@ -67,6 +68,7 @@ GPUFixedContext::GPUFixedContext(GLFWwindow* in_surfaceWindow, GPUExtent3D in_su
 GPUFixedContext::~GPUFixedContext() {
 	unset_geometryBindings();
 	unset_lightingBindings();
+	ruin_sampler();
 	ruin_meshes();
 	ruin_lights();
 	ruin_shadowMappingPipelines();

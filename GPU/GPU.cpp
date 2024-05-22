@@ -63,7 +63,7 @@ GPUFixedContext::GPUFixedContext(GLFWwindow* in_surfaceWindow, GPUExtent3D in_su
 	}
 	for(uint32_t i = 0; i < CASCADED_SHADOW_MAP_COUNT; i++) await_thread(ShadowMappingThreads[i]);
 
-	run_deferredRenderings();
+	run_deferredRenderings(in_startupCallback);
 }
 
 GPUFixedContext::~GPUFixedContext() {

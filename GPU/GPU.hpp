@@ -83,7 +83,7 @@ private:
 	GPUGraphicsLayout m_lightingLayout = GPU_NULL_HANDLE;
 	GPUGraphicsPipeline m_lightingPipeline = GPU_NULL_HANDLE;
 	
-	GPUBuffer m_graphicsVertexBuffer = GPU_NULL_HANDLE;
+	GPUBuffer m_graphicsMeshBuffer = GPU_NULL_HANDLE;
 	GPUIndirectDrawCommand* m_graphicsIndirectCommands = nullptr;
 	GPUBuffer m_graphicsIndirectCommandBuffer = GPU_NULL_HANDLE;
 	GPUBuffer m_graphicsInstanceBuffer = GPU_NULL_HANDLE;
@@ -94,8 +94,6 @@ private:
 	Light* m_lights = nullptr;
 	
 	GPUSampler m_sampler = GPU_NULL_HANDLE;
-
-	View* m_cameraView = nullptr;
 	
 	void set_meshes(GPUStageAllocation* in_allocation, uint32_t in_meshCount, const char** in_positionFiles, const char** in_normalFiles, const char** in_uvFiles, const char** in_indexFiles, uint32_t* in_vertexCounts);
 	void set_texture(GPUStageAllocation* in_allocation, const char* in_file, GPUExtent3D* in_extent);
@@ -169,7 +167,7 @@ private:
 	void set_lightingBindings(void);
 	
 	void run_shadowMappings(uint32_t in_index, uint32_t in_divisor);
-	void run_deferredRenderings(void);
+	void run_deferredRenderings(void(*in_startupCallback)(void*), void* in_callbackArgument);
 	
 	void add_instance(Instance* in_instance);
 	void rid_instance(uint32_t);

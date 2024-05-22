@@ -14,6 +14,7 @@ static GPULocalTexture* g_textures[GEOMETRY_PASS_REQUIRED_TEXTURE_COUNT] = { VK_
 
 void GPUFixedContext::build_meshes(uint32_t* in_vertexCounts, GPUStageAllocation* in_vertexAllocation, const uint32_t* in_maxInstanceCounts, GPUStageAllocation** in_textureAllocations, GPUExtent3D** in_extents) {
 	build_localAllocation(&g_vertexAllocation, in_vertexAllocation, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
+	m_graphicsMeshBuffer = g_vertexAllocation.buffer;
 	
 	build_sharedAllocation(&g_indirectCommandAllocation, m_meshCount * sizeof(*m_graphicsIndirectCommands), VK_BUFFER_USAGE_INDIRECT_BUFFER_BIT, 0);
 	m_graphicsIndirectCommands = static_cast<GPUIndirectDrawCommand*>(g_indirectCommandAllocation.data);
@@ -28,10 +29,11 @@ void GPUFixedContext::build_meshes(uint32_t* in_vertexCounts, GPUStageAllocation
 		m_graphicsIndirectCommands[i].firstInstance = InstanceCount;
 		VertexCount += in_vertexCounts[i];
 		InstanceCount += in_maxInstanceCounts[i];
-		
 	}
 	
-	build_sharedAllocation(&g_instanceAllocation, InstanceCount * sizeof(Instance), VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, 1);
+	build_sharedAllocation(&g_instanceAllocation, InstanceCount * sizeof(Instance), VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, 1);
+	m_graphicsInstanceBuffer = g_instanceAllocation.buffer;
+	m_instances = static_cast<Instance*>(g_instanceAllocation.data);
 	
 	const VkFormat Formats[GEOMETRY_PASS_REQUIRED_TEXTURE_COUNT] = { GEOMETRY_PASS_REQUIRED_TEXTURE_FORMATS };
 	for(uint32_t i = 0; i < GEOMETRY_PASS_REQUIRED_TEXTURE_COUNT; i++) {

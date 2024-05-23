@@ -6,7 +6,6 @@
 struct VSVertexInput {
     [[vk::location(0)]] float3 position;
     [[vk::location(1)]] float3 normal;
-    [[vk::location(2)]] float3 tangent;
     [[vk::location(3)]] float2 uv;
 };
 
@@ -19,7 +18,6 @@ struct VSOutput {
     float4 viewPosition : SV_POSITION;
     [[vk::location(0)]] float3 worldPosition;
     [[vk::location(1)]] float3 normal;
-    [[vk::location(2)]] float3 tangent;
     [[vk::location(3)]] float2 uv;
     [[vk::location(4)]] nointerpolation uint textureIndex;
 };
@@ -32,10 +30,10 @@ struct FSOutput {
     float roughness: SV_TARGET4;
 };
 
-[[vk::binding(0 + LIGHTING_PASS_INPUT_COUNT, 0)]] Texture2D<float3> g_albedoTextures[];
-[[vk::binding(1 + LIGHTING_PASS_INPUT_COUNT, 0)]] Texture2D<float3> g_normalTextures[];
-[[vk::binding(2 + LIGHTING_PASS_INPUT_COUNT, 0)]] Texture2D<float> g_metalnessTextures[];
-[[vk::binding(3 + LIGHTING_PASS_INPUT_COUNT, 0)]] Texture2D<float> g_roughnessTextures[];
+[[vk::binding(0, 0)]] Texture2D<float3> g_albedoTextures[];
+[[vk::binding(1, 0)]] Texture2D<float3> g_normalTextures[];
+[[vk::binding(2, 0)]] Texture2D<float> g_metalnessTextures[];
+[[vk::binding(3, 0)]] Texture2D<float> g_roughnessTextures[];
 
 [[vk::push_constant]] ConstantBuffer<View> g_view;
 
@@ -46,13 +44,13 @@ struct FSOutput {
     rotate_vector(Position, in_instance.rotation);
     Position += in_instance.position;
     Output.worldPosition = Position;
-    Output.uv = in_vertex.uv;
-    Output.uv *= -1;
-    Output.uv += 1;
+    Output.normal = in_vertex.normal;
+    rotate_vector(Output.normal, in_instance.rotation);
+    Output.uv = (in_vertex.uv * -1) + 1;
     Output.textureIndex = spirv_asm {
         OpCapability DrawParameters;
         result:$$uint = OpLoad builtin(DrawIndex:uint);
-    };;
+    };
 
     return Output;
 }

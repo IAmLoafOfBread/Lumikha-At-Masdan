@@ -16,27 +16,22 @@ struct VSOutput {
 
 struct Constants {
     View view;
-	Camera camera;
+    float3 offset;
 };
 
 [[vk::push_constant]] Constants g_constants;
 
 [shader("vertex")] VSOutput output_vertex(VSVertexInput in_vertex, VSInstanceInput in_instance) {
     VSOutput Output = { 0 };
+    View View = g_constants.view;
     float3 Position = in_vertex.position;
-    float3 ViewPosition = g_constants.view.position;
-    float3 ViewRotation = g_constants.view.rotation;
-    Camera Camera = g_constants.camera;
 
     rotate_vector(Position, in_instance.rotation);
     Position += in_instance.position;
-    Position -= ViewPosition;
-    rotate_vector(Position, -ViewRotation);
-    Camera.position -= ViewPosition;
-    rotate_vector(Camera.position, -ViewRotation);
-    Camera.rotation -= ViewRotation;
+    Position -= View.position;
+    rotate_vector(Position, -View.rotation);
+    Output.viewPosition = mul(float4(Position.xyz, 1), View.projection);
 
-    
     return Output;
 }
 

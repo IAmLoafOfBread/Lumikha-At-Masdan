@@ -18,7 +18,7 @@ void GPUFixedContext::build_shadowMappingPipelines(void) {
 		const VkPushConstantRange PushConstant = {
 			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
 			.offset = 0,
-			.size = sizeof(View) + sizeof(Camera)
+			.size = sizeof(View) + sizeof(float3)
 		};
 		const VkPipelineLayoutCreateInfo CreateInfo = {
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,

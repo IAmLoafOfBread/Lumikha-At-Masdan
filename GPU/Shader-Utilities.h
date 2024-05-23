@@ -76,7 +76,6 @@ typedef struct Light {
 typedef struct Instance {
 	float3 position;
 	float3 rotation;
-	uint32_t textureIndex;
 } TYPEDEF(Instance);
 typedef struct View {
 	float3 position;

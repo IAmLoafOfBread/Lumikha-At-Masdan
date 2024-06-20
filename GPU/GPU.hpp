@@ -5,9 +5,9 @@
 
 #include "../Threads/Threads.h"
 #include "../Files/Files.h"
-#include "Shader-Utilities.h"
+#include "Shader-Utilities.hpp"
 
-#include "Vulkan-Context/Vulkan-Definitions.h"
+#include "Vulkan-Context/Vulkan-Definitions.hpp"
 
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
@@ -83,7 +83,7 @@ private:
 	GPUGraphicsLayout m_lightingLayout = GPU_NULL_HANDLE;
 	GPUGraphicsPipeline m_lightingPipeline = GPU_NULL_HANDLE;
 	
-	GPUBuffer m_graphicsMeshBuffer = GPU_NULL_HANDLE;
+	GPUBuffer m_graphicsVertexBuffer = GPU_NULL_HANDLE;
 	GPUIndirectDrawCommand* m_graphicsIndirectCommands = nullptr;
 	GPUBuffer m_graphicsIndirectCommandBuffer = GPU_NULL_HANDLE;
 	GPUBuffer m_graphicsInstanceBuffer = GPU_NULL_HANDLE;
@@ -178,7 +178,7 @@ private:
 	static void* m_shadowMappingCallback(void* in_info);
 };
 
-typedef struct ShadowMappingInfo {
+struct ShadowMappingInfo {
 	GPUFixedContext* context;
 	uint32_t index;
 	uint32_t divisor;

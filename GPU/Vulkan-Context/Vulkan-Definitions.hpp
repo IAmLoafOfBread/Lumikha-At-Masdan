@@ -37,28 +37,28 @@ typedef VkColorSpaceKHR GPUColourSpace;
 typedef VkBufferUsageFlags GPUBufferUsageFlags;
 typedef VkImageUsageFlags GPUImageUsageFlags;
 typedef VkBuffer GPUBuffer;
-typedef struct GPUSharedAllocation {
+struct GPUSharedAllocation {
 	VkBuffer buffer;
 	VkDeviceMemory memory;
 	VkDeviceAddress address;
 	void* data;
-} GPUSharedAllocation;
-typedef struct GPULocalAllocation {
+};
+struct GPULocalAllocation {
 	VkBuffer buffer;
 	VkDeviceMemory memory;
 	VkDeviceAddress address;
-} GPULocalAllocation;
-typedef struct GPULocalTexture {
+};
+struct GPULocalTexture {
 	VkImage image;
 	VkDeviceMemory memory;
 	VkImageView view;
-} GPULocalTexture;
-typedef struct GPUStageAllocation {
+};
+struct GPUStageAllocation {
 	VkBuffer buffer;
 	VkDeviceMemory memory;
 	VkDeviceSize size;
 	void* data;
-} GPUStageAllocation;
+};
 
 
 

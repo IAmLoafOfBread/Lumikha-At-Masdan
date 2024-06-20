@@ -16,25 +16,25 @@
 #define nullptr_FLOAT -2147483640.0f
 #define SIZE_OF(array) (sizeof(array) / sizeof(array[0]))
 
-typedef struct float2 {
+struct float2 {
 	float u;
 	float v;
-} float2;
-typedef struct float3 {
+};
+struct float3 {
 	float x;
 	float y;
 	float z;
-} float3;
-typedef struct float4 {
+};
+struct float4 {
 	float x;
 	float y;
 	float z;
 	float w;
-} float4;
+};
 
-typedef struct float4x4 {
+struct float4x4 {
 	float4 vecs[4];
-} float4x4;
+};
 
 
 

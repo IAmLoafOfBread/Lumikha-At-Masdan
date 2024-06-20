@@ -17,12 +17,13 @@ static const VkSemaphoreCreateInfo g_semaphoreInfo = {
 	.pNext = nullptr,
 	.flags = 0
 };
-static const VkCommandBufferBeginInfo g_commandInfo = {
+static const VkCommandBufferBeginInfo g_commandInfoData = {
 	.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
 	.pNext = nullptr,
 	.flags = 0,
 	.pInheritanceInfo = nullptr
 };
+static const VkCommandBufferBeginInfo* g_commandInfo = &g_commandInfoData;
 static const VkClearValue g_depthClearValue = {
 	.depthStencil = {
 		.depth = 0
@@ -41,7 +42,7 @@ void GPUFixedContext::run_shadowMappings(uint32_t in_index, uint32_t in_divisor)
 	VkQueue Queue = m_shadowMappingCommandQueues[in_index];
 	
 	const VkExtent3D Extent = SHADOW_MAP_EXTENT;
-	VkRenderPassBeginInfo RenderInfo = {
+	VkRenderPassBeginInfo RenderInfoData = {
 		.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
 		.pNext = nullptr,
 		.renderPass = m_shadowMappingPass,
@@ -53,9 +54,10 @@ void GPUFixedContext::run_shadowMappings(uint32_t in_index, uint32_t in_divisor)
 		.clearValueCount = 1,
 		.pClearValues = &g_depthClearValue
 	};
+	const VkRenderPassBeginInfo* RenderInfo = &RenderInfoData;
 	
 	VkPipelineStageFlags WaitStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
-	const VkSubmitInfo SubmitInfo = {
+	const VkSubmitInfo SubmitInfoData = {
 		.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
 		.pNext = nullptr,
 		.waitSemaphoreCount = 1,
@@ -66,7 +68,11 @@ void GPUFixedContext::run_shadowMappings(uint32_t in_index, uint32_t in_divisor)
 		.signalSemaphoreCount = 1,
 		.pSignalSemaphores = &Semaphore
 	};
+	const VkSubmitInfo* SubmitInfo = &SubmitInfoData;
 	
+	const VkBuffer* MeshBuffer = &m_graphicsVertexBuffer;
+	const VkBuffer* InstanceBuffer = &m_graphicsInstanceBuffer;
+
 	View LightViewData = {
 		.position = { 0 },
 		.rotation = { 0 },
@@ -75,30 +81,38 @@ void GPUFixedContext::run_shadowMappings(uint32_t in_index, uint32_t in_divisor)
 			}
 		}
 	};
-	View* LightView = &LightViewData;
+	const View* LightView = &LightViewData;
+	float3 ViewOffsetData = { 0 };
+	const float3* ViewOffset = &ViewOffsetData;
 
-	const uint32_t CameraSize = sizeof(Camera);
+	const uint32_t VectorSize = sizeof(float3);
+
+	Light* Light = nullptr;
 
 	while(!glfwWindowShouldClose(m_surfaceWindow)) {
 		glfwPollEvents();
-		vkBeginCommandBuffer(Set, &g_commandInfo);
+		vkBeginCommandBuffer(Set, g_commandInfo);
 		vkCmdBindPipeline(Set, VK_PIPELINE_BIND_POINT_GRAPHICS, Pipeline);
-		vkCmdPushConstants(Set, m_shadowMappingLayout, VK_SHADER_STAGE_VERTEX_BIT, g_viewSize, CameraSize, m_camera);
-		vkCmdBindVertexBuffers(Set, 0, 1, &m_graphicsMeshBuffer, g_offset);
-		vkCmdBindVertexBuffers(Set, 1, 1, &m_graphicsInstanceBuffer, g_offset);
+		vkCmdBindVertexBuffers(Set, 0, 1, MeshBuffer, g_offset);
+		vkCmdBindVertexBuffers(Set, 1, 1, InstanceBuffer, g_offset);
 
 		for(uint32_t i = 0; i < m_lightCount; i++) {
-			LightViewData.position = m_lights[i].position;
-			LightViewData.rotation = m_lights[i].rotation;
-			RenderInfo.framebuffer = Framebuffers[i];
-			vkCmdPushConstants(Set, m_shadowMappingLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, g_viewSize, LightView);
-			vkCmdBeginRenderPass(Set, &RenderInfo, VK_SUBPASS_CONTENTS_INLINE);
-			vkCmdDrawIndirect(Set, m_graphicsIndirectCommandBuffer, 0, m_meshCount, g_drawCommandSize);
-			vkCmdEndRenderPass(Set);
+			Light = &m_lights[i];
+			LightViewData.position = Light->position;
+			LightViewData.rotation = Light->rotation;
+
+			if (Light->inCameraView) {
+				RenderInfoData.framebuffer = Framebuffers[i];
+				vkCmdPushConstants(Set, m_shadowMappingLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, g_viewSize, LightView);
+				vkCmdPushConstants(Set, m_shadowMappingLayout, VK_SHADER_STAGE_VERTEX_BIT, g_viewSize, VectorSize, ViewOffset);
+				vkCmdBeginRenderPass(Set, RenderInfo, VK_SUBPASS_CONTENTS_INLINE);
+				vkCmdDrawIndirect(Set, m_graphicsIndirectCommandBuffer, 0, m_meshCount, g_drawCommandSize);
+				vkCmdEndRenderPass(Set);
+			}
 		}
 		
 		vkEndCommandBuffer(Set);
-		vkQueueSubmit(Queue, 1, &SubmitInfo, VK_NULL_HANDLE);
+		vkQueueSubmit(Queue, 1, SubmitInfo, VK_NULL_HANDLE);
 	}
 
 	vkQueueWaitIdle(Queue);
@@ -221,11 +235,11 @@ void GPUFixedContext::run_deferredRenderings(void(*in_startupCallback)(void*), v
 		vkAcquireNextImageKHR(m_logical, m_swapchain, UINT64_MAX, g_imageAvailableSemaphore, VK_NULL_HANDLE, &ImageIndex);
 		LightingRenderInfo.framebuffer = m_lightingFramebuffers[ImageIndex];
 		
-		vkBeginCommandBuffer(m_deferredRenderingCommandSet, &g_commandInfo);
+		vkBeginCommandBuffer(m_deferredRenderingCommandSet, g_commandInfo);
 		vkCmdBindDescriptorSets(m_deferredRenderingCommandSet, VK_PIPELINE_BIND_POINT_GRAPHICS, m_geometryLayout, 0, 1, &m_geometryDescriptorSet, 0 , nullptr);
 		vkCmdBindPipeline(m_deferredRenderingCommandSet, VK_PIPELINE_BIND_POINT_GRAPHICS, m_geometryPipeline);
 		vkCmdPushConstants(m_deferredRenderingCommandSet, m_geometryLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, g_viewSize, View);
-		vkCmdBindVertexBuffers(m_deferredRenderingCommandSet, 0, 1, &m_graphicsMeshBuffer, g_offset);
+		vkCmdBindVertexBuffers(m_deferredRenderingCommandSet, 0, 1, &m_graphicsVertexBuffer, g_offset);
 		vkCmdBindVertexBuffers(m_deferredRenderingCommandSet, 1, 1, &m_graphicsInstanceBuffer, g_offset);
 		
 		vkCmdBeginRenderPass(m_deferredRenderingCommandSet, &GeometryRenderInfo, VK_SUBPASS_CONTENTS_INLINE);
@@ -238,7 +252,7 @@ void GPUFixedContext::run_deferredRenderings(void(*in_startupCallback)(void*), v
 
 
 
-		vkBeginCommandBuffer(m_deferredRenderingCommandSet, &g_commandInfo);
+		vkBeginCommandBuffer(m_deferredRenderingCommandSet, g_commandInfo);
 		vkCmdBindDescriptorSets(m_deferredRenderingCommandSet, VK_PIPELINE_BIND_POINT_GRAPHICS, m_lightingLayout, 0, 1, &m_lightingDescriptorSet, 0, nullptr);
 		vkCmdBindPipeline(m_deferredRenderingCommandSet, VK_PIPELINE_BIND_POINT_GRAPHICS, m_lightingPipeline);
 		vkCmdPushConstants(m_deferredRenderingCommandSet, m_lightingLayout, VK_SHADER_STAGE_FRAGMENT_BIT, 0, UintSize, LightCount);

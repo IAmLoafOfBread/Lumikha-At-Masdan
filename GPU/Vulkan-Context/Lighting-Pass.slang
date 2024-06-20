@@ -1,27 +1,38 @@
 #define SHADER_INCLUDE
-#include "../Shader-Utilities.h"
+#include "../Shader-Utilities.hpp"
 
+struct VSOutput {
+    float4 position : SV_Position;
+    float2 uv;
+};
 
-
-#define SHADOW_MAP_ATTACHMENTS_OFFSET /**/(LIGHTING_PASS_INPUT_COUNT + DEFERRED_RENDERING_REQUIRED_TEXTURE_COUNT)
-
+[[vk::binding(0, 0)]] SamplerState g_sampler;
 [[vk::binding(0, 0)]] Texture2D<float4> g_positionInput;
-[[vk::binding(1, 0)]] Texture2D<float4> g_albedoInput;
-[[vk::binding(2, 0)]] Texture2D<float4> g_normalInput;
+[[vk::binding(1, 0)]] Texture2D<float4> g_normalInput;
+[[vk::binding(2, 0)]] Texture2D<float4> g_albedoInput;
 [[vk::binding(3, 0)]] Texture2D<float> g_metalnessInput;
 [[vk::binding(4, 0)]] Texture2D<float> g_roughnessInput;
 
-[[vk::binding(0 + SHADOW_MAP_ATTACHMENTS_OFFSET, 0)]] Texture2D<float> g_cascadedShadowMapsDB1[MAX_LIGHT_COUNT];
-[[vk::binding(1 + SHADOW_MAP_ATTACHMENTS_OFFSET, 0)]] Texture2D<float> g_cascadedShadowMapsDB2[MAX_LIGHT_COUNT];
-[[vk::binding(2 + SHADOW_MAP_ATTACHMENTS_OFFSET, 0)]] Texture2D<float> g_cascadedShadowMapsDB3[MAX_LIGHT_COUNT];
+[[vk::binding(5, 0)]] Texture2D<float> g_cascadedShadowMapsDB1[];
+[[vk::binding(6, 0)]] Texture2D<float> g_cascadedShadowMapsDB2[];
+[[vk::binding(7, 0)]] Texture2D<float> g_cascadedShadowMapsDB3[];
 
-[[vk::binding(SHADOW_MAP_ATTACHMENTS_OFFSET + CASCADED_SHADOW_MAP_COUNT, 0)]] ConstantBuffer<Light[]> g_lights;
+struct Constants {
+    float4 positions[4];
+    float2 uvs[4];
+    Light* lights;
+    uint lightCount;
+};
 
-[[vk::push_constant]] uint g_lightCount;
+[[vk::push_constant]] ConstantBuffer<Constants> g_constants;
 
-[shader("vertex")] float2 output_vertex(void) {
-    float2 Haha;
-    return Haha;
+[shader("vertex")] VSOutput output_vertex(uint in_index: SV_VertexID) {
+    VSOutput Output = { 0 };
+    
+    Output.position = g_constants.positions[in_index];
+    Output.uv = g_constants.uvs[in_index];
+    
+    return Output;
 }
 
 [shader("fragment")] float4 output_fragment(float2 in_position) {

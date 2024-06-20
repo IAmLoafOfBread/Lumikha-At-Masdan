@@ -48,22 +48,27 @@ void rotate_vector(inout float3 in_vector, float3 in_rotation) {
 	VK_FORMAT_R32G32B32A32_SFLOAT,\
 	VK_FORMAT_R32G32B32A32_SFLOAT,\
 	VK_FORMAT_R32G32B32A32_SFLOAT,\
+	VK_FORMAT_R32G32B32A32_SFLOAT,\
 	VK_FORMAT_R32_SFLOAT,\
 	VK_FORMAT_R32_SFLOAT
 
 #define GEOMETRY_PASS_REQUIRED_TEXTURE_FORMATS \
 	VK_FORMAT_R16G16B16_UNORM,\
 	VK_FORMAT_R16G16B16_UNORM,\
+	VK_FORMAT_R16G16B16_UNORM,\
 	VK_FORMAT_R16_UNORM,\
 	VK_FORMAT_R16_UNORM
 #endif
 
-#define GEOMETRY_PASS_COLOUR_ATTACHMENT_COUNT 5
-#define GEOMETRY_PASS_REQUIRED_TEXTURE_COUNT 4
+#define GEOMETRY_PASS_COLOUR_ATTACHMENT_COUNT 6
+#define GEOMETRY_PASS_REQUIRED_TEXTURE_COUNT 5
 
-struct View {
+struct Instance {
 	float3 position;
 	float3 rotation;
+};
+struct View {
+	Instance instance;
 	float4x4 projection;
 };
 struct Light {
@@ -76,10 +81,6 @@ struct Vertex {
 	float3 position;
 	float3 normal;
 	float2 uv;
-};
-struct Instance {
-	float3 position;
-	float3 rotation;
 };
 
 

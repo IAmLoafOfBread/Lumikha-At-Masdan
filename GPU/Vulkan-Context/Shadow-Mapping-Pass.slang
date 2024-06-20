@@ -22,8 +22,8 @@ struct VSOutput {
 
     rotate_vector(Position, in_instance.rotation);
     Position += in_instance.position;
-    Position -= g_view.position;
-    rotate_vector(Position, -g_view.rotation);
+    Position -= g_view.instance.position;
+    rotate_vector(Position, -g_view.instance.rotation);
     Output.viewPosition = mul(float4(Position.xyz, 1), g_view.projection);
 
     return Output;

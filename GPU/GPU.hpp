@@ -20,7 +20,7 @@ public:
 	GPUFixedContext(GLFWwindow* in_surfaceWindow, GPUExtent3D in_surfaceExtent, const uint32_t in_meshCount, const uint32_t* in_meshInstanceMaxCounts, const char** in_positionFiles, const char** in_normalFiles, const char** in_uvFiles, const char** in_indexFiles, const char*** in_textureFiles, void(*in_startupCallback)(void*));
 	~GPUFixedContext();
 
-	Camera* m_camera = nullptr;
+	View* m_camera = nullptr;
 	Instance* m_instances = nullptr;
 	Light* m_lights = nullptr;
 	
@@ -57,10 +57,10 @@ private:
 	GPUSwapchain m_swapchain = GPU_NULL_HANDLE;
 	GPUTextureView* m_presentViews = nullptr;
 	
-	GPUTextureView m_shadowMappingViews[CASCADED_SHADOW_MAP_COUNT][MAX_LIGHT_COUNT] = { { { GPU_NULL_HANDLE } } };
+	GPUTextureView m_shadowMappingViews[CASCADED_SHADOW_MAP_COUNT][MAX_LIGHT_COUNT] = { { GPU_NULL_HANDLE } };
 	GPUFramebuffer m_shadowMappingFramebuffers[CASCADED_SHADOW_MAP_COUNT][MAX_LIGHT_COUNT] = { { GPU_NULL_HANDLE } };
 	
-	GPUTextureView m_geometryViews[GEOMETRY_PASS_COLOUR_ATTACHMENT_COUNT] = { { GPU_NULL_HANDLE } };
+	GPUTextureView m_geometryViews[GEOMETRY_PASS_COLOUR_ATTACHMENT_COUNT] = { GPU_NULL_HANDLE };
 	GPUFramebuffer m_geometryFramebuffer = GPU_NULL_HANDLE;
 
 	GPUFramebuffer* m_lightingFramebuffers = nullptr;
@@ -91,7 +91,6 @@ private:
 	
 	uint32_t m_lightCount = 0;
 	GPUBuffer m_graphicsLightBuffer = GPU_NULL_HANDLE;
-	Light* m_lights = nullptr;
 	
 	GPUSampler m_sampler = GPU_NULL_HANDLE;
 	

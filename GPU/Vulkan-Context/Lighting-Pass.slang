@@ -10,12 +10,13 @@ struct VSOutput {
 [[vk::binding(0, 0)]] Texture2D<float4> g_positionInput;
 [[vk::binding(1, 0)]] Texture2D<float4> g_normalInput;
 [[vk::binding(2, 0)]] Texture2D<float4> g_albedoInput;
-[[vk::binding(3, 0)]] Texture2D<float> g_metalnessInput;
-[[vk::binding(4, 0)]] Texture2D<float> g_roughnessInput;
+[[vk::binding(3, 0)]] Texture2D<float4> g_specularInput;
+[[vk::binding(4, 0)]] Texture2D<float> g_metalnessInput;
+[[vk::binding(5, 0)]] Texture2D<float> g_roughnessInput;
 
-[[vk::binding(5, 0)]] Texture2D<float> g_cascadedShadowMapsDB1[];
-[[vk::binding(6, 0)]] Texture2D<float> g_cascadedShadowMapsDB2[];
-[[vk::binding(7, 0)]] Texture2D<float> g_cascadedShadowMapsDB3[];
+[[vk::binding(6, 0)]] Texture2D<float> g_cascadedShadowMapsDB1[];
+[[vk::binding(7, 0)]] Texture2D<float> g_cascadedShadowMapsDB2[];
+[[vk::binding(8, 0)]] Texture2D<float> g_cascadedShadowMapsDB3[];
 
 struct Constants {
     float4 positions[4];

@@ -27,7 +27,7 @@ void GPUFixedContext::set_lightingBindings(void) {
 		}
 	}
 	const VkDescriptorBufferInfo BufferInfo = {
-		.buffer = m_graphicsLightBuffer,
+		.buffer = m_lightAllocation.buffer,
 		.offset = 0,
 		.range = VK_WHOLE_SIZE
 	};

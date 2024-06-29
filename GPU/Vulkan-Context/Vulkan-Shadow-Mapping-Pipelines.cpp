@@ -5,7 +5,7 @@
 
 
 
-#define VERTEX_MODULE_PATH "Shadowing.vert.spv"
+#define VERTEX_MODULE_PATH "Shadow-Mapping.vert.spv"
 
 static VkShaderModule g_vertexModule = VK_NULL_HANDLE;
 

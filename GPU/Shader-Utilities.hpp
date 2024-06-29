@@ -6,7 +6,7 @@
 
 
 #if !defined(SHADER_INCLUDE)
-#include "../Utilities.hpp"
+#include "../Vector/Vector.h"
 
 #elif defined(SHADER_INCLUDE)
 
@@ -63,6 +63,8 @@ void rotate_vector(inout float3 in_vector, float3 in_rotation) {
 #define GEOMETRY_PASS_COLOUR_ATTACHMENT_COUNT 6
 #define GEOMETRY_PASS_REQUIRED_TEXTURE_COUNT 5
 
+#define CORNER_COUNT 8
+
 struct Instance {
 	float3 position;
 	float3 rotation;
@@ -81,6 +83,11 @@ struct Vertex {
 	float3 position;
 	float3 normal;
 	float2 uv;
+};
+struct Camera {
+	float fov;
+	float near;
+	float far;
 };
 
 

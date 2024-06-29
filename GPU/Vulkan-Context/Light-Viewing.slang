@@ -1,8 +1,6 @@
 #define SHADER_INCLUDE
 #include "../Shader-Utilities.hpp"
 
-#define CORNER_COUNT 8
-
 struct Constants {
     float3 frustum[CASCADED_SHADOW_MAP_COUNT][CORNER_COUNT];
     Light* lights;
@@ -10,7 +8,7 @@ struct Constants {
 };
 [[vk::push_constant]] ConstantBuffer<Constants> g_constants;
 
-[shader("compute")] [numthreads(CASCADED_SHADOW_MAP_COUNT, MAX_WORKGROUP_SIZE, 1)] void check_light(const uint in_frustumIndex: SV_GroupThreadID, const uint2 in_lightID: SV_DispatchThreadID) {
+[shader("compute")] [numthreads(CASCADED_SHADOW_MAP_COUNT, MAX_WORKGROUP_SIZE, 1)] void view_light(const uint in_frustumIndex: SV_GroupThreadID, const uint2 in_lightID: SV_DispatchThreadID) {
     const uint LightIndex = in_lightID.y;
     if (LightIndex >= g_constants.lightCount) return;
 

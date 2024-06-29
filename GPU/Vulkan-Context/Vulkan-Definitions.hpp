@@ -31,7 +31,10 @@ typedef VkDescriptorSet GPUDescriptorSet;
 typedef VkSampler GPUSampler;
 typedef VkPipeline GPUGraphicsPipeline;
 typedef VkPipelineLayout GPUGraphicsLayout;
+typedef VkPipeline GPUComputePipeline;
+typedef VkPipelineLayout GPUComputeLayout;
 typedef VkDrawIndirectCommand GPUIndirectDrawCommand;
+typedef VkSemaphore GPUSemaphore;
 typedef VkFormat GPUFormat;
 typedef VkColorSpaceKHR GPUColourSpace;
 typedef VkBufferUsageFlags GPUBufferUsageFlags;
@@ -59,6 +62,21 @@ struct GPUStageAllocation {
 	VkDeviceSize size;
 	void* data;
 };
+
+
+
+const VkCommandBufferBeginInfo G_FIXED_COMMAND_BEGIN_INFO = {
+	.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
+	.pNext = nullptr,
+	.flags = 0,
+	.pInheritanceInfo = nullptr
+};
+const VkClearValue G_FIXED_DEPTH_CLEAR_VALUE = {
+	.depthStencil = {
+		.depth = 0
+	}
+};
+const VkPipelineStageFlags G_FIXED_PIPELINE_STAGE_TOP_OF_PIPE_BIT = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
 
 
 

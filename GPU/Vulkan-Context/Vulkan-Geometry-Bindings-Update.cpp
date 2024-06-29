@@ -12,7 +12,7 @@ void GPUFixedContext::set_geometryBindings(void) {
 		Infos[i] = new VkDescriptorImageInfo[m_meshCount];
 		for (uint32_t j = 0; j < m_meshCount; j++) {
 			Infos[i][j].sampler = m_sampler;
-			Infos[i][j].imageView = m_graphicsMeshTextureViews[i][j];
+			Infos[i][j].imageView = m_meshTextureViews[i][j];
 			Infos[i][j].imageLayout = VK_IMAGE_LAYOUT_READ_ONLY_OPTIMAL;
 		}
 

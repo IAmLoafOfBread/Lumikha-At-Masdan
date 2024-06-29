@@ -1,6 +1,8 @@
 #ifndef GPU_TYPES_H
 #define GPU_TYPES_H
 
+
+
 #include <math.h>
 
 #include "../Threads/Threads.h"
@@ -17,22 +19,52 @@
 
 class GPUFixedContext {
 public:
-	GPUFixedContext(GLFWwindow* in_surfaceWindow, GPUExtent3D in_surfaceExtent, const uint32_t in_meshCount, const uint32_t* in_meshInstanceMaxCounts, const char** in_positionFiles, const char** in_normalFiles, const char** in_uvFiles, const char** in_indexFiles, const char*** in_textureFiles, void(*in_startupCallback)(void*));
+	GPUFixedContext(GLFWwindow* in_surfaceWindow, GPUExtent3D in_surfaceExtent, const uint32_t in_meshCount, const uint32_t* in_instanceMaxCounts, const char** in_positionFiles, const char** in_normalFiles, const char** in_uvFiles, const char** in_indexFiles, const char*** in_textureFiles);
 	~GPUFixedContext();
 
-	View* m_camera = nullptr;
+	bool m_multiThreadedGraphics = false;
+	
 	Instance* m_instances = nullptr;
 	Light* m_lights = nullptr;
 	
+	Camera m_cameraData = {
+		.fov = 1.5707,
+		.near = 0.1,
+		.far = 100
+	};
+	
+	void acquire_nextImage(void);
+	
+	void initialize_lightViewingUpdateData(void);
+	void dispatch_lightViewingUpdate(void);
+	
+	void initialize_shadowMappingUpdateData(uint32_t in_index, uint32_t in_divisor);
+	void draw_shadowMappingUpdate(uint32_t in_index, uint32_t in_divisor);
+	
+	void initialize_geometryUpdateData(void);
+	void draw_geometryUpdate(void);
+	
+	void initialize_lightingUpdateData(void);
+	void draw_lightingUpdate(void);
+	
+	void initialize_presentUpdateData(void);
+	void submit_presentUpdate(void);
+	
+	void transform_camera(Transform in_transform, float3 in_value);
+	void update_camera(void);
+	
 private:
+	const GPUSize m_fixedOffset = 0;
+	uint32_t m_currentImageIndex = 0;
+	
 	GLFWwindow* m_surfaceWindow = nullptr;
 	
 	uint32_t m_localMemoryIndex = 0;
 	uint32_t m_sharedMemoryIndex = 0;
 	GPUDevice m_logical = GPU_NULL_HANDLE;
 	
-	uint32_t m_graphicsQueueFamilyIndex = 0;
-	bool m_multiThreadedGraphics = false;
+	uint32_t m_graphicsQueueFamilyIndex = NULL_VALUE;
+	uint32_t m_computeQueueFamilyIndex = NULL_VALUE;
 
 	GPUCommandQueue m_deferredRenderingCommandQueue = GPU_NULL_HANDLE;
 	GPUCommandPool m_deferredRenderingCommandPool = GPU_NULL_HANDLE;
@@ -41,6 +73,10 @@ private:
 	GPUCommandQueue m_shadowMappingCommandQueues[CASCADED_SHADOW_MAP_COUNT] = { GPU_NULL_HANDLE };
 	GPUCommandPool m_shadowMappingCommandPools[CASCADED_SHADOW_MAP_COUNT] = { GPU_NULL_HANDLE };
 	GPUCommandSet m_shadowMappingCommandSets[CASCADED_SHADOW_MAP_COUNT] = { GPU_NULL_HANDLE };
+	
+	GPUCommandQueue m_lightViewingCommandQueue = GPU_NULL_HANDLE;
+	GPUCommandPool m_lightViewingCommandPool = GPU_NULL_HANDLE;
+	GPUCommandSet m_lightViewingCommandSet = GPU_NULL_HANDLE;
 	
 	GPUSurface m_surface = GPU_NULL_HANDLE;
 	uint32_t m_surfaceFrameCount = 0;
@@ -74,6 +110,9 @@ private:
 	GPUDescriptorLayout m_lightingDescriptorLayout = GPU_NULL_HANDLE;
 	GPUDescriptorSet m_lightingDescriptorSet = GPU_NULL_HANDLE;
 	
+	GPUComputeLayout m_lightViewingLayout = GPU_NULL_HANDLE;
+	GPUComputePipeline m_lightViewingPipeline = GPU_NULL_HANDLE;
+	
 	GPUGraphicsLayout m_shadowMappingLayout = GPU_NULL_HANDLE;
 	GPUGraphicsPipeline m_shadowMappingPipelines[CASCADED_SHADOW_MAP_COUNT] = { GPU_NULL_HANDLE };
 
@@ -83,18 +122,36 @@ private:
 	GPUGraphicsLayout m_lightingLayout = GPU_NULL_HANDLE;
 	GPUGraphicsPipeline m_lightingPipeline = GPU_NULL_HANDLE;
 	
-	GPUBuffer m_graphicsVertexBuffer = GPU_NULL_HANDLE;
-	GPUIndirectDrawCommand* m_graphicsIndirectCommands = nullptr;
-	GPUBuffer m_graphicsIndirectCommandBuffer = GPU_NULL_HANDLE;
-	GPUBuffer m_graphicsInstanceBuffer = GPU_NULL_HANDLE;
-	GPUTextureView* m_graphicsMeshTextureViews[GEOMETRY_PASS_REQUIRED_TEXTURE_COUNT] = { nullptr };
+	GPUBuffer m_vertexBuffer = GPU_NULL_HANDLE;
+	GPUIndirectDrawCommand* m_indirectCommands = nullptr;
+	GPUBuffer m_indirectCommandBuffer = GPU_NULL_HANDLE;
+	GPUBuffer m_instanceBuffer = GPU_NULL_HANDLE;
+	GPUTextureView* m_meshTextureViews[GEOMETRY_PASS_REQUIRED_TEXTURE_COUNT] = { nullptr };
 	
 	uint32_t m_lightCount = 0;
-	GPUBuffer m_graphicsLightBuffer = GPU_NULL_HANDLE;
+	GPUSharedAllocation m_lightAllocation = { GPU_NULL_HANDLE };
 	
 	GPUSampler m_sampler = GPU_NULL_HANDLE;
 	
-	void set_meshes(GPUStageAllocation* in_allocation, uint32_t in_meshCount, const char** in_positionFiles, const char** in_normalFiles, const char** in_uvFiles, const char** in_indexFiles, uint32_t* in_vertexCounts);
+	float3 m_subFrusta[CASCADED_SHADOW_MAP_COUNT][CORNER_COUNT] = { { 0 } };
+	
+	Semaphore m_subFrustaTransformFinishedSemaphores[CASCADED_SHADOW_MAP_COUNT] = { NULL };
+	GPUSemaphore m_imageAvailableSemaphore = GPU_NULL_HANDLE;
+	GPUSemaphore m_lightViewingsFinishedSemaphore = GPU_NULL_HANDLE;
+	GPUSemaphore m_shadowMappingsFinishedSemaphores[CASCADED_SHADOW_MAP_COUNT] = { VK_NULL_HANDLE };
+	GPUSemaphore m_renderFinishedSemaphore = GPU_NULL_HANDLE;
+	
+	Semaphore m_cameraSemaphore = NULL;
+	Semaphore m_instancesSemaphore = NULL;
+	Semaphore m_lightsSemaphore = NULL;
+	
+	View m_cameraView = {
+		.instance.position = { 0 },
+		.instance.rotation = { 0 },
+		.projection = { 0 }
+	};
+	
+	void set_vertices(GPUStageAllocation* in_allocation, uint32_t in_meshCount, const char** in_positionFiles, const char** in_normalFiles, const char** in_uvFiles, const char** in_indexFiles, uint32_t* in_vertexCounts);
 	void set_texture(GPUStageAllocation* in_allocation, const char* in_file, GPUExtent3D* in_extent);
 	
 	void build_stageAllocation(GPUStageAllocation* in_stage, GPUSize in_size);
@@ -107,6 +164,8 @@ private:
 	
 	void build_module(GPUModule in_module, const char* in_path);
 	void ruin_module(GPUModule in_module);
+	
+	void calculate_subFrustum(float3* in_corners, View* in_view, uint32_t in_multiplier);
 	
 	void build_commandThread(uint32_t in_queueFamilyIndex, uint32_t in_queueIndex, GPUCommandQueue* in_queue, GPUCommandPool* in_pool, GPUCommandSet* in_set);
 	void ruin_commandThread(GPUCommandPool* in_pool, GPUCommandSet* in_set);
@@ -143,6 +202,9 @@ private:
 	void build_lightingBindings(void);
 	void ruin_lightingBindings(void);
 	
+	void build_lightViewingPipeline(void);
+	void ruin_lightViewingPipeline(void);
+	
 	void build_shadowMappingPipelines(void);
 	void ruin_shadowMappingPipelines(void);
 
@@ -165,23 +227,15 @@ private:
 
 	void set_lightingBindings(void);
 	
-	void run_shadowMappings(uint32_t in_index, uint32_t in_divisor);
-	void run_deferredRenderings(void(*in_startupCallback)(void*), void* in_callbackArgument);
+	void build_semaphores(void);
+	void ruin_semaphores(void);
 	
-	void add_instance(Instance* in_instance);
-	void rid_instance(uint32_t);
+	void add_instance(uint32_t in_type, Instance* in_instance);
+	void rid_instance(uint32_t in_type, uint32_t in_index);
 	
 	void add_light(Light* in_light);
-	void rid_light(uint32_t);
-	
-	static void* m_shadowMappingCallback(void* in_info);
+	void rid_light(uint32_t in_index);
 };
-
-struct ShadowMappingInfo {
-	GPUFixedContext* context;
-	uint32_t index;
-	uint32_t divisor;
-} ShadowMappingInfo;
 
 
 

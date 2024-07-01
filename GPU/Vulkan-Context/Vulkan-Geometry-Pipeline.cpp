@@ -96,7 +96,7 @@ void GPUFixedContext::build_geometryPipeline(void) {
 			.offset = offsetof(Instance, rotation)
 		},
 	};
-	for(uint32_t i = 0; i < SIZE_OF(Attributes); i++) {
+	for(uint32_t i = 0; i < LENGTH_OF(Attributes); i++) {
 		Attributes[i].location = i;
 	}
 	
@@ -104,9 +104,9 @@ void GPUFixedContext::build_geometryPipeline(void) {
 		.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
 		.pNext = nullptr,
 		.flags = 0,
-		.vertexBindingDescriptionCount = SIZE_OF(Bindings),
+		.vertexBindingDescriptionCount = LENGTH_OF(Bindings),
 		.pVertexBindingDescriptions = Bindings,
-		.vertexAttributeDescriptionCount = SIZE_OF(Attributes),
+		.vertexAttributeDescriptionCount = LENGTH_OF(Attributes),
 		.pVertexAttributeDescriptions = Attributes
 	};
 	
@@ -241,7 +241,7 @@ void GPUFixedContext::build_geometryPipeline(void) {
 		.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
 		.pNext = nullptr,
 		.flags = 0,
-		.stageCount = SIZE_OF(ShaderStages),
+		.stageCount = LENGTH_OF(ShaderStages),
 		.pStages = ShaderStages,
 		.pVertexInputState = &VertexInputState,
 		.pInputAssemblyState = &InputAssemblyState,

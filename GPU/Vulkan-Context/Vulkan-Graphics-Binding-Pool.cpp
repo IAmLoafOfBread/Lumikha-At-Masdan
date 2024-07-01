@@ -25,7 +25,7 @@ void GPUFixedContext::build_graphicsBindingPool(uint32_t in_meshCount) {
 		.pNext = nullptr,
 		.flags = 0,
 		.maxSets = 1,
-		.poolSizeCount = SIZE_OF(PoolSizes),
+		.poolSizeCount = LENGTH_OF(PoolSizes),
 		.pPoolSizes = PoolSizes
 	};
 	CHECK(vkCreateDescriptorPool(m_logical, &CreateInfo, nullptr, &m_graphicsBindingPool))

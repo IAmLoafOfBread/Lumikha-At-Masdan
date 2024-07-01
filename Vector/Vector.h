@@ -17,7 +17,7 @@ extern "C" {
 #endif
 
 #define NULL_VALUE -2147483640
-#define SIZE_OF(array) (sizeof(array) / sizeof(array[0]))
+#define LENGTH_OF(array) (sizeof(array) / sizeof(array[0]))
 
 enum Transform {
 	POSITION,

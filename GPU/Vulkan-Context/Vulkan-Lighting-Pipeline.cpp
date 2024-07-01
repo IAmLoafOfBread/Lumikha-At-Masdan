@@ -165,7 +165,7 @@ void GPUFixedContext::build_lightingPipeline(void) {
 		.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
 		.pNext = nullptr,
 		.flags = 0,
-		.stageCount = SIZE_OF(ShaderStages),
+		.stageCount = LENGTH_OF(ShaderStages),
 		.pStages = ShaderStages,
 		.pVertexInputState = &VertexInputState,
 		.pInputAssemblyState = &InputAssemblyState,

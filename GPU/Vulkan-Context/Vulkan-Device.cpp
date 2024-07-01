@@ -196,7 +196,7 @@ void GPUFixedContext::build_device(GLFWwindow* in_window, GPUExtent3D in_extent)
 			.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
 			.pNext = &FeaturesExtent,
 			.flags = 0,
-			.queueCreateInfoCount = SIZE_OF(QueueInfos),
+			.queueCreateInfoCount = LENGTH_OF(QueueInfos),
 			.pQueueCreateInfos = QueueInfos,
 			.enabledLayerCount = 0,
 			.ppEnabledLayerNames = nullptr,

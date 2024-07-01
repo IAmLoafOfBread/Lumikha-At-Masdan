@@ -70,7 +70,7 @@ void GPUFixedContext::build_shadowMappingPipelines(void) {
 			.offset = offsetof(Instance, rotation)
 		}
 	};
-	for(uint32_t i = 0; i < SIZE_OF(Attributes); i++) {
+	for(uint32_t i = 0; i < LENGTH_OF(Attributes); i++) {
 		Attributes[i].location = i;
 		Attributes[i].format = VK_FORMAT_R32G32B32_SFLOAT;
 	}
@@ -79,9 +79,9 @@ void GPUFixedContext::build_shadowMappingPipelines(void) {
 		.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
 		.pNext = nullptr,
 		.flags = 0,
-		.vertexBindingDescriptionCount = SIZE_OF(Bindings),
+		.vertexBindingDescriptionCount = LENGTH_OF(Bindings),
 		.pVertexBindingDescriptions = Bindings,
-		.vertexAttributeDescriptionCount = SIZE_OF(Attributes),
+		.vertexAttributeDescriptionCount = LENGTH_OF(Attributes),
 		.pVertexAttributeDescriptions = Attributes
 	};
 	

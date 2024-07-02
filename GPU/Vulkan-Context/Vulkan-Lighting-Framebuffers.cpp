@@ -12,6 +12,8 @@ static GPULocalTexture g_depthTexture = { VK_NULL_HANDLE };
 
 
 void GPUFixedContext::build_lightingFramebuffers(void) {
+	m_lightingFramebuffers = new VkFramebuffer[m_surfaceFrameCount];
+
 	build_localTexture(&g_depthTexture, nullptr, VK_FORMAT_D32_SFLOAT, m_surfaceExtent, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT);
 
 	{
@@ -39,6 +41,7 @@ void GPUFixedContext::build_lightingFramebuffers(void) {
 void GPUFixedContext::ruin_lightingFramebuffers(void) {
 	for(uint32_t i = 0; i < m_surfaceFrameCount; i++) vkDestroyFramebuffer(m_logical, m_lightingFramebuffers[i], nullptr);
 	ruin_localTexture(&g_depthTexture);
+	delete[] m_lightingFramebuffers;
 }
 
 

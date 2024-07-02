@@ -16,7 +16,7 @@ extern "C" {
 #define CHECK(val) val
 #endif
 
-#define NULL_VALUE -2147483640
+#define NULL_VALUE 2147483640
 #define LENGTH_OF(array) (sizeof(array) / sizeof(array[0]))
 
 enum Transform {

@@ -12,6 +12,7 @@ GPUFixedContext::GPUFixedContext(GLFWwindow* in_surfaceWindow, GPUExtent3D in_su
 	m_localMemoryIndex(0),
 	m_sharedMemoryIndex(0),
 	m_logical(GPU_NULL_HANDLE),
+	m_queueFamilyCount(0),
 	m_graphicsQueueFamilyIndex(NULL_VALUE),
 	m_computeQueueFamilyIndex(NULL_VALUE),
 	m_deferredRenderingCommandQueue(GPU_NULL_HANDLE),

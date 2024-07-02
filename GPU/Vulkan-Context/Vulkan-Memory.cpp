@@ -38,20 +38,23 @@ void GPUFixedContext::build_stageAllocation(GPUStageAllocation* in_stage, GPUSiz
 
 void GPUFixedContext::build_sharedAllocation(GPUSharedAllocation* in_shared, GPUSize in_size, GPUBufferUsageFlags in_flags, bool in_computeIndexInclude) {
 	{
-		const uint32_t Indices[] = {
-			m_graphicsQueueFamilyIndex,
-		};
-		const VkBufferCreateInfo CreateInfo = {
-			.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
-			.pNext = nullptr,
-			.flags = 0,
-			.size = in_size,
-			.usage = in_flags,
-			.sharingMode = VK_SHARING_MODE_EXCLUSIVE,
-			.queueFamilyIndexCount = static_cast<uint32_t>(in_computeIndexInclude ? 2 : 1),
-			.pQueueFamilyIndices = Indices
-		};
-		CHECK(vkCreateBuffer(m_logical, &CreateInfo, nullptr, &in_shared->buffer))
+		{
+			const uint32_t Indices[] = {
+				m_graphicsQueueFamilyIndex,
+				m_computeQueueFamilyIndex
+			};
+			const VkBufferCreateInfo CreateInfo = {
+				.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
+				.pNext = nullptr,
+				.flags = 0,
+				.size = in_size,
+				.usage = in_flags,
+				.sharingMode = VK_SHARING_MODE_EXCLUSIVE,
+				.queueFamilyIndexCount = in_computeIndexInclude ? m_queueFamilyCount : 1,
+				.pQueueFamilyIndices = Indices
+			};
+			CHECK(vkCreateBuffer(m_logical, &CreateInfo, nullptr, &in_shared->buffer))
+		}
 	}
 	VkMemoryRequirements Requirements = {};
 	vkGetBufferMemoryRequirements(m_logical, in_shared->buffer, &Requirements);

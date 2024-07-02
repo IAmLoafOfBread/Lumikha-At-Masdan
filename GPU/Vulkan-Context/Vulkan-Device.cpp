@@ -129,6 +129,8 @@ void GPUFixedContext::build_device(GLFWwindow* in_window, GPUExtent3D in_extent)
 		}
 	}
 
+	uint32_t GraphicsQueueCount = 0;
+	uint32_t ComputeQueueIndex = 0;
 	{
 		{
 			vkGetPhysicalDeviceQueueFamilyProperties(Physical, &HelperCount, nullptr);
@@ -139,6 +141,7 @@ void GPUFixedContext::build_device(GLFWwindow* in_window, GPUExtent3D in_extent)
 				if(Properties[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) {
 					m_graphicsQueueFamilyIndex = i;
 					m_multiThreadedGraphics = Properties[i].queueCount > CASCADED_SHADOW_MAP_COUNT ? true : false;
+					GraphicsQueueCount = Properties[i].queueCount;
 					break;
 				}
 			}
@@ -148,10 +151,9 @@ void GPUFixedContext::build_device(GLFWwindow* in_window, GPUExtent3D in_extent)
 					break;
 				}
 			}
-			if(m_computeQueueFamilyIndex == NULL_VALUE) {
-				m_computeQueueFamilyIndex = m_graphicsQueueFamilyIndex;
-			}
 			delete[] Properties;
+
+			m_queueFamilyCount = m_computeQueueFamilyIndex == NULL_VALUE ? 1 : 2;
 		}
 		
 		VkPhysicalDeviceVulkan13Features Features13 = {
@@ -173,13 +175,20 @@ void GPUFixedContext::build_device(GLFWwindow* in_window, GPUExtent3D in_extent)
 			}
 		}
 		
+		HelperCount = m_multiThreadedGraphics ? GRAPHICS_THREAD_COUNT : 1;
+		HelperCount += m_computeQueueFamilyIndex == NULL_VALUE ? 1 : 0;
+		if(GraphicsQueueCount < HelperCount) {
+			HelperCount = GraphicsQueueCount;
+		} else {
+			ComputeQueueIndex = HelperCount - 1;
+		}
 		const VkDeviceQueueCreateInfo QueueInfos[] = {
 			{
 				.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
 				.pNext = nullptr,
 				.flags = 0,
 				.queueFamilyIndex = m_graphicsQueueFamilyIndex,
-				.queueCount = static_cast<uint32_t>(m_multiThreadedGraphics ? GRAPHICS_THREAD_COUNT : 1),
+				.queueCount = HelperCount,
 				.pQueuePriorities = Priorities
 			},
 			{
@@ -196,7 +205,7 @@ void GPUFixedContext::build_device(GLFWwindow* in_window, GPUExtent3D in_extent)
 			.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
 			.pNext = &FeaturesExtent,
 			.flags = 0,
-			.queueCreateInfoCount = LENGTH_OF(QueueInfos),
+			.queueCreateInfoCount = static_cast<uint32_t>(m_computeQueueFamilyIndex == NULL_VALUE ? 1 : 2),
 			.pQueueCreateInfos = QueueInfos,
 			.enabledLayerCount = 0,
 			.ppEnabledLayerNames = nullptr,
@@ -209,11 +218,11 @@ void GPUFixedContext::build_device(GLFWwindow* in_window, GPUExtent3D in_extent)
 	}
 	
 	build_commandThread(m_graphicsQueueFamilyIndex, 0, &m_deferredRenderingCommandQueue, &m_deferredRenderingCommandPool, &m_deferredRenderingCommandSet);
-		for(uint32_t i = 0; i < CASCADED_SHADOW_MAP_COUNT; i++) {
-			uint32_t Index = m_multiThreadedGraphics ? i + 1 : 0;
-			build_commandThread(m_graphicsQueueFamilyIndex, Index, &m_shadowMappingCommandQueues[i], &m_shadowMappingCommandPools[i], &m_shadowMappingCommandSets[i]);
-		}
-	build_commandThread(m_computeQueueFamilyIndex, 0, &m_lightViewingCommandQueue, &m_lightViewingCommandPool, &m_lightViewingCommandSet);
+	for(uint32_t i = 0; i < CASCADED_SHADOW_MAP_COUNT; i++) {
+		uint32_t Index = m_multiThreadedGraphics ? i + 1 : 0;
+		build_commandThread(m_graphicsQueueFamilyIndex, Index, &m_shadowMappingCommandQueues[i], &m_shadowMappingCommandPools[i], &m_shadowMappingCommandSets[i]);
+	}
+	build_commandThread(m_computeQueueFamilyIndex == NULL_VALUE ? m_graphicsQueueFamilyIndex : m_computeQueueFamilyIndex, ComputeQueueIndex, &m_lightViewingCommandQueue, &m_lightViewingCommandPool, &m_lightViewingCommandSet);
 	
 	CHECK(glfwCreateWindowSurface(g_instance, in_window, nullptr, &m_surface))
 	m_surfaceExtent = in_extent;
@@ -224,7 +233,7 @@ void GPUFixedContext::build_device(GLFWwindow* in_window, GPUExtent3D in_extent)
 		CHECK(vkGetPhysicalDeviceSurfaceFormatsKHR(Physical, m_surface, &HelperCount, nullptr))
 		auto Formats = new VkSurfaceFormatKHR[HelperCount];
 		CHECK(vkGetPhysicalDeviceSurfaceFormatsKHR(Physical, m_surface, &HelperCount, Formats))
-		for(int i = 0; i < HelperCount; i++) {
+		for(uint32_t i = 0; i < HelperCount; i++) {
 			m_surfaceFormat = Formats[i].format > m_surfaceFormat ? Formats[i].format : m_surfaceFormat;
 			m_surfaceColourSpace = Formats[i].colorSpace > m_surfaceColourSpace ? Formats[i].colorSpace : m_surfaceColourSpace;
 		}

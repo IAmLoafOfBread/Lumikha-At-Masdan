@@ -59,6 +59,7 @@ private:
 	uint32_t m_sharedMemoryIndex;
 	GPUDevice m_logical;
 	
+	uint32_t m_queueFamilyCount;
 	uint32_t m_graphicsQueueFamilyIndex;
 	uint32_t m_computeQueueFamilyIndex;
 

@@ -126,7 +126,7 @@ void invert_matrix(float4x4* in_matrix) {
 	
 	det = m[0] * inv[0] + m[1] * inv[4] + m[2] * inv[8] + m[3] * inv[12];
 	
-	det = 1.0 / det;
+	det = 1.0f / det;
 	
 	for (i = 0; i < 4; i++) {
 		in_matrix->vecs[i].x = inv[i*4] * det;

@@ -169,7 +169,7 @@ void GPUFixedContext::build_device(GLFWwindow* in_window, GPUExtent3D in_extent)
 			float Value = 1;
 			for(uint32_t i = 0; i < GRAPHICS_THREAD_COUNT; i++) {
 				Priorities[i] = Value;
-				Value -= 0.1;
+				Value -= 0.1f;
 			}
 		}
 		

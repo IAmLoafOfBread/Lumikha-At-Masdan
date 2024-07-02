@@ -72,7 +72,24 @@ GPUFixedContext::GPUFixedContext(GLFWwindow* in_surfaceWindow, GPUExtent3D in_su
 	m_cameraView{
 		.instance.position = { 0 },
 		.instance.rotation = { 0 },
-		.projection = { 0 }
+		.projection = {
+			.vecs[0].x = 0,
+			.vecs[0].y = 0,
+			.vecs[0].z = 0,
+			.vecs[0].w = 0,
+			.vecs[1].x = 0,
+			.vecs[1].y = 0,
+			.vecs[1].z = 0,
+			.vecs[1].w = 0,
+			.vecs[2].x = 0,
+			.vecs[2].y = 0,
+			.vecs[2].z = 0,
+			.vecs[2].w = 1,
+			.vecs[3].x = 0,
+			.vecs[3].y = 0,
+			.vecs[3].z = 0,
+			.vecs[3].w = 0
+		}
 	} {
 	
 	m_surfaceWindow = in_surfaceWindow;

@@ -15,7 +15,7 @@ void GPUFixedContext::transform_camera(Transform in_transform, float3 in_value) 
 
 void GPUFixedContext::update_camera(void) {
 	wait_semaphore(m_cameraSemaphore);
-	const float XY = 1 / tan(m_cameraData.fov / 2);
+	const float XY = 1.0f / tan(m_cameraData.fov / 2.0f);
 	const float Z = m_cameraData.zFar / (m_cameraData.zFar - m_cameraData.zNear);
 	m_cameraView.projection.vecs[0].x = XY * m_surfaceExtent.height / m_surfaceExtent.width;
 	m_cameraView.projection.vecs[1].y = XY;

@@ -22,16 +22,12 @@ public:
 	GPUFixedContext(GLFWwindow* in_surfaceWindow, GPUExtent3D in_surfaceExtent, const uint32_t in_meshCount, const uint32_t* in_instanceMaxCounts, const char** in_positionFiles, const char** in_normalFiles, const char** in_uvFiles, const char** in_indexFiles, const char*** in_textureFiles);
 	~GPUFixedContext();
 
-	bool m_multiThreadedGraphics = false;
+	bool m_multiThreadedGraphics;
 	
-	Instance* m_instances = nullptr;
-	Light* m_lights = nullptr;
+	Instance* m_instances;
+	Light* m_lights;
 	
-	Camera m_cameraData = {
-		.fov = 1.5707,
-		.near = 0.1,
-		.far = 100
-	};
+	Camera m_cameraData;
 	
 	void acquire_nextImage(void);
 	
@@ -54,102 +50,98 @@ public:
 	void update_camera(void);
 	
 private:
-	const GPUSize m_fixedOffset = 0;
-	uint32_t m_currentImageIndex = 0;
+	const GPUSize m_fixedOffset;
+	uint32_t m_currentImageIndex;
 	
-	GLFWwindow* m_surfaceWindow = nullptr;
+	GLFWwindow* m_surfaceWindow;
 	
-	uint32_t m_localMemoryIndex = 0;
-	uint32_t m_sharedMemoryIndex = 0;
-	GPUDevice m_logical = GPU_NULL_HANDLE;
+	uint32_t m_localMemoryIndex;
+	uint32_t m_sharedMemoryIndex;
+	GPUDevice m_logical;
 	
-	uint32_t m_graphicsQueueFamilyIndex = NULL_VALUE;
-	uint32_t m_computeQueueFamilyIndex = NULL_VALUE;
+	uint32_t m_graphicsQueueFamilyIndex;
+	uint32_t m_computeQueueFamilyIndex;
 
-	GPUCommandQueue m_deferredRenderingCommandQueue = GPU_NULL_HANDLE;
-	GPUCommandPool m_deferredRenderingCommandPool = GPU_NULL_HANDLE;
-	GPUCommandSet m_deferredRenderingCommandSet = GPU_NULL_HANDLE;
+	GPUCommandQueue m_deferredRenderingCommandQueue;
+	GPUCommandPool m_deferredRenderingCommandPool;
+	GPUCommandSet m_deferredRenderingCommandSet;
 	
-	GPUCommandQueue m_shadowMappingCommandQueues[CASCADED_SHADOW_MAP_COUNT] = { GPU_NULL_HANDLE };
-	GPUCommandPool m_shadowMappingCommandPools[CASCADED_SHADOW_MAP_COUNT] = { GPU_NULL_HANDLE };
-	GPUCommandSet m_shadowMappingCommandSets[CASCADED_SHADOW_MAP_COUNT] = { GPU_NULL_HANDLE };
+	GPUCommandQueue m_shadowMappingCommandQueues[CASCADED_SHADOW_MAP_COUNT];
+	GPUCommandPool m_shadowMappingCommandPools[CASCADED_SHADOW_MAP_COUNT];
+	GPUCommandSet m_shadowMappingCommandSets[CASCADED_SHADOW_MAP_COUNT];
 	
-	GPUCommandQueue m_lightViewingCommandQueue = GPU_NULL_HANDLE;
-	GPUCommandPool m_lightViewingCommandPool = GPU_NULL_HANDLE;
-	GPUCommandSet m_lightViewingCommandSet = GPU_NULL_HANDLE;
+	GPUCommandQueue m_lightViewingCommandQueue;
+	GPUCommandPool m_lightViewingCommandPool;
+	GPUCommandSet m_lightViewingCommandSet;
 	
-	GPUSurface m_surface = GPU_NULL_HANDLE;
-	uint32_t m_surfaceFrameCount = 0;
-	GPUExtent3D m_surfaceExtent = { 0 };
-	GPUFormat m_surfaceFormat = static_cast<GPUFormat>(0);
-	GPUColourSpace m_surfaceColourSpace = static_cast<GPUColourSpace>(0);
+	GPUSurface m_surface;
+	uint32_t m_surfaceFrameCount;
+	GPUExtent3D m_surfaceExtent;
+	GPUFormat m_surfaceFormat;
+	GPUColourSpace m_surfaceColourSpace;
 	
-	GPURenderPass m_shadowMappingPass = GPU_NULL_HANDLE;
+	GPURenderPass m_shadowMappingPass;
 	
-	GPURenderPass m_geometryPass = GPU_NULL_HANDLE;
+	GPURenderPass m_geometryPass;
 	
-	GPURenderPass m_lightingPass = GPU_NULL_HANDLE;
+	GPURenderPass m_lightingPass;
 	
-	GPUSwapchain m_swapchain = GPU_NULL_HANDLE;
-	GPUTextureView* m_presentViews = nullptr;
+	GPUSwapchain m_swapchain;
+	GPUTextureView* m_presentViews;
 	
-	GPUTextureView m_shadowMappingViews[CASCADED_SHADOW_MAP_COUNT][MAX_LIGHT_COUNT] = { { GPU_NULL_HANDLE } };
-	GPUFramebuffer m_shadowMappingFramebuffers[CASCADED_SHADOW_MAP_COUNT][MAX_LIGHT_COUNT] = { { GPU_NULL_HANDLE } };
+	GPUTextureView m_shadowMappingViews[CASCADED_SHADOW_MAP_COUNT][MAX_LIGHT_COUNT];
+	GPUFramebuffer m_shadowMappingFramebuffers[CASCADED_SHADOW_MAP_COUNT][MAX_LIGHT_COUNT];
 	
-	GPUTextureView m_geometryViews[GEOMETRY_PASS_COLOUR_ATTACHMENT_COUNT] = { GPU_NULL_HANDLE };
-	GPUFramebuffer m_geometryFramebuffer = GPU_NULL_HANDLE;
+	GPUTextureView m_geometryViews[GEOMETRY_PASS_COLOUR_ATTACHMENT_COUNT];
+	GPUFramebuffer m_geometryFramebuffer;
 
-	GPUFramebuffer* m_lightingFramebuffers = nullptr;
+	GPUFramebuffer* m_lightingFramebuffers;
 	
-	uint32_t m_meshCount = 0;
-	GPUDescriptorPool m_graphicsBindingPool = GPU_NULL_HANDLE;
+	uint32_t m_meshCount;
+	GPUDescriptorPool m_graphicsBindingPool;
 
-	GPUDescriptorLayout m_geometryDescriptorLayout = GPU_NULL_HANDLE;
-	GPUDescriptorSet m_geometryDescriptorSet = GPU_NULL_HANDLE;
+	GPUDescriptorLayout m_geometryDescriptorLayout;
+	GPUDescriptorSet m_geometryDescriptorSet;
 
-	GPUDescriptorLayout m_lightingDescriptorLayout = GPU_NULL_HANDLE;
-	GPUDescriptorSet m_lightingDescriptorSet = GPU_NULL_HANDLE;
+	GPUDescriptorLayout m_lightingDescriptorLayout;
+	GPUDescriptorSet m_lightingDescriptorSet;
 	
-	GPUComputeLayout m_lightViewingLayout = GPU_NULL_HANDLE;
-	GPUComputePipeline m_lightViewingPipeline = GPU_NULL_HANDLE;
+	GPUComputeLayout m_lightViewingLayout;
+	GPUComputePipeline m_lightViewingPipeline;
 	
-	GPUGraphicsLayout m_shadowMappingLayout = GPU_NULL_HANDLE;
-	GPUGraphicsPipeline m_shadowMappingPipelines[CASCADED_SHADOW_MAP_COUNT] = { GPU_NULL_HANDLE };
+	GPUGraphicsLayout m_shadowMappingLayout;
+	GPUGraphicsPipeline m_shadowMappingPipelines[CASCADED_SHADOW_MAP_COUNT];
 
-	GPUGraphicsLayout m_geometryLayout = GPU_NULL_HANDLE;
-	GPUGraphicsPipeline m_geometryPipeline = GPU_NULL_HANDLE;
+	GPUGraphicsLayout m_geometryLayout;
+	GPUGraphicsPipeline m_geometryPipeline;
 
-	GPUGraphicsLayout m_lightingLayout = GPU_NULL_HANDLE;
-	GPUGraphicsPipeline m_lightingPipeline = GPU_NULL_HANDLE;
+	GPUGraphicsLayout m_lightingLayout;
+	GPUGraphicsPipeline m_lightingPipeline;
 	
-	GPUBuffer m_vertexBuffer = GPU_NULL_HANDLE;
-	GPUIndirectDrawCommand* m_indirectCommands = nullptr;
-	GPUBuffer m_indirectCommandBuffer = GPU_NULL_HANDLE;
-	GPUBuffer m_instanceBuffer = GPU_NULL_HANDLE;
-	GPUTextureView* m_meshTextureViews[GEOMETRY_PASS_REQUIRED_TEXTURE_COUNT] = { nullptr };
+	GPUBuffer m_vertexBuffer;
+	GPUIndirectDrawCommand* m_indirectCommands;
+	GPUBuffer m_indirectCommandBuffer;
+	GPUBuffer m_instanceBuffer;
+	GPUTextureView* m_meshTextureViews[GEOMETRY_PASS_REQUIRED_TEXTURE_COUNT];
 	
-	uint32_t m_lightCount = 0;
-	GPUSharedAllocation m_lightAllocation = { GPU_NULL_HANDLE };
+	uint32_t m_lightCount;
+	GPUSharedAllocation m_lightAllocation;
 	
-	GPUSampler m_sampler = GPU_NULL_HANDLE;
+	GPUSampler m_sampler;
 	
-	float3 m_subFrusta[CASCADED_SHADOW_MAP_COUNT][CORNER_COUNT] = { { 0 } };
+	float3 m_subFrusta[CASCADED_SHADOW_MAP_COUNT][CORNER_COUNT];
 	
-	Semaphore m_subFrustaTransformFinishedSemaphores[CASCADED_SHADOW_MAP_COUNT] = { NULL };
-	GPUSemaphore m_imageAvailableSemaphore = GPU_NULL_HANDLE;
-	GPUSemaphore m_lightViewingsFinishedSemaphore = GPU_NULL_HANDLE;
-	GPUSemaphore m_shadowMappingsFinishedSemaphores[CASCADED_SHADOW_MAP_COUNT] = { VK_NULL_HANDLE };
-	GPUSemaphore m_renderFinishedSemaphore = GPU_NULL_HANDLE;
+	Semaphore m_subFrustaTransformFinishedSemaphores[CASCADED_SHADOW_MAP_COUNT];
+	GPUSemaphore m_imageAvailableSemaphore;
+	GPUSemaphore m_lightViewingsFinishedSemaphore;
+	GPUSemaphore m_shadowMappingsFinishedSemaphores[CASCADED_SHADOW_MAP_COUNT];
+	GPUSemaphore m_renderFinishedSemaphore;
 	
-	Semaphore m_cameraSemaphore = NULL;
-	Semaphore m_instancesSemaphore = NULL;
-	Semaphore m_lightsSemaphore = NULL;
+	Semaphore m_cameraSemaphore;
+	Semaphore m_instancesSemaphore;
+	Semaphore m_lightsSemaphore;
 	
-	View m_cameraView = {
-		.instance.position = { 0 },
-		.instance.rotation = { 0 },
-		.projection = { 0 }
-	};
+	View m_cameraView;
 	
 	void set_vertices(GPUStageAllocation* in_allocation, uint32_t in_meshCount, const char** in_positionFiles, const char** in_normalFiles, const char** in_uvFiles, const char** in_indexFiles, uint32_t* in_vertexCounts);
 	void set_texture(GPUStageAllocation* in_allocation, const char* in_file, GPUExtent3D* in_extent);

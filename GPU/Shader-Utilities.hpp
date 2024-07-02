@@ -86,8 +86,8 @@ struct Vertex {
 };
 struct Camera {
 	float fov;
-	float near;
-	float far;
+	float zNear;
+	float zFar;
 };
 
 

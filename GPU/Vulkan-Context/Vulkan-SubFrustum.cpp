@@ -17,9 +17,9 @@ void GPUFixedContext::calculate_subFrustum(float3* in_corners, View* in_view, ui
 		{ 1,-1, 1, 1}
 	};
 	
-	const float Ratio = m_cameraData.far - m_cameraData.near / CASCADED_SHADOW_MAP_COUNT;
+	const float Ratio = m_cameraData.zFar - m_cameraData.zNear / CASCADED_SHADOW_MAP_COUNT;
 	
-	const float Near = m_cameraData.near + (Ratio * (in_multiplier - 1)), Far = m_cameraData.near + (Ratio * in_multiplier);
+	const float Near = m_cameraData.zNear + (Ratio * (in_multiplier - 1)), Far = m_cameraData.zNear + (Ratio * in_multiplier);
 	
 	float4x4 Projection = in_view->projection;
 	{

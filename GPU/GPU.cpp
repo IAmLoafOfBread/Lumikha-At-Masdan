@@ -121,6 +121,8 @@ GPUFixedContext::GPUFixedContext(GLFWwindow* in_surfaceWindow, GPUExtent3D in_su
 	set_lightingBindings();
 	
 	build_semaphores();
+	
+	update_camera();
 }
 
 GPUFixedContext::~GPUFixedContext() {

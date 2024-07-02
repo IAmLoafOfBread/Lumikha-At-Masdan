@@ -113,8 +113,8 @@ void GPUFixedContext::build_shadowMappingPipelines(void) {
 			
 			MainViewports[i].x = 0;
 			MainViewports[i].y = 0;
-			MainViewports[i].width = Width;
-			MainViewports[i].height = Height;
+			MainViewports[i].width = static_cast<float>(Width);
+			MainViewports[i].height = static_cast<float>(Height);
 			MainViewports[i].minDepth = 0;
 			MainViewports[i].maxDepth = 1;
 			

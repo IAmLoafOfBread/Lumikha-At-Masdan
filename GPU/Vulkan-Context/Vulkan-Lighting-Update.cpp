@@ -5,12 +5,7 @@
 
 
 
-static const VkClearValue g_clearValue = {
-	.color.float32[0] = 0.0f,
-	.color.float32[1] = 0.0f,
-	.color.float32[2] = 0.0f,
-	.color.float32[3] = 1.0f
-};
+static const VkClearValue g_clearValue = {0.0f, 0.0f, 0.0f, 1.0f};
 static VkRenderPassBeginInfo g_renderInfo = { VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO };
 static VkPipelineStageFlags g_waitStages[CASCADED_SHADOW_MAP_COUNT] = { 0 };
 static VkSubmitInfo g_submitInfo = { VK_STRUCTURE_TYPE_SUBMIT_INFO };

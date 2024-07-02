@@ -69,28 +69,8 @@ GPUFixedContext::GPUFixedContext(GLFWwindow* in_surfaceWindow, GPUExtent3D in_su
 	m_cameraSemaphore(NULL),
 	m_instancesSemaphore(NULL),
 	m_lightsSemaphore(NULL),
-	m_cameraView{
-		.instance.position = { 0.0f },
-		.instance.rotation = { 0.0f },
-		.projection = {
-			.vecs[0].x = 0.0f,
-			.vecs[0].y = 0.0f,
-			.vecs[0].z = 0.0f,
-			.vecs[0].w = 0.0f,
-			.vecs[1].x = 0.0f,
-			.vecs[1].y = 0.0f,
-			.vecs[1].z = 0.0f,
-			.vecs[1].w = 0.0f,
-			.vecs[2].x = 0.0f,
-			.vecs[2].y = 0.0f,
-			.vecs[2].z = 0.0f,
-			.vecs[2].w = 1.0f,
-			.vecs[3].x = 0.0f,
-			.vecs[3].y = 0.0f,
-			.vecs[3].z = 0.0f,
-			.vecs[3].w = 0.0f
-		}
-	} {
+	m_cameraView{ 0.0f } {
+	m_cameraView.projection.vecs[2].w = 1.0f;
 	
 	m_surfaceWindow = in_surfaceWindow;
 	build_device(in_surfaceWindow, in_surfaceExtent);

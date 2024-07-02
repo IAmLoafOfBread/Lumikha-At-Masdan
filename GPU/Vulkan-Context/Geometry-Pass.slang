@@ -30,12 +30,11 @@ struct FSOutput {
     float roughness: SV_TARGET5;
 };
 
-[[vk::binding(0, 0)]] SamplerState g_sampler;
-[[vk::binding(0, 0)]] Texture2D<float3> g_normalTextures[];
-[[vk::binding(1, 0)]] Texture2D<float3> g_albedoTextures[];
-[[vk::binding(2, 0)]] Texture2D<float3> g_specularTextures[];
-[[vk::binding(3, 0)]] Texture2D<float> g_metalnessTextures[];
-[[vk::binding(4, 0)]] Texture2D<float> g_roughnessTextures[];
+[[vk::binding(0, 0)]] Sampler2D<float3> g_normalTextures[];
+[[vk::binding(1, 0)]] Sampler2D<float3> g_albedoTextures[];
+[[vk::binding(2, 0)]] Sampler2D<float3> g_specularTextures[];
+[[vk::binding(3, 0)]] Sampler2D<float> g_metalnessTextures[];
+[[vk::binding(4, 0)]] Sampler2D<float> g_roughnessTextures[];
 
 [[vk::push_constant]] ConstantBuffer<View> g_view;
 
@@ -54,8 +53,8 @@ struct FSOutput {
         OpCapability DrawParameters;
         result:$$uint = OpLoad builtin(DrawIndex:uint);
     };
-    Position -= g_view.position;
-    rotate_vector(Position, g_view.rotation);
+    Position -= g_view.instance.position;
+    rotate_vector(Position, g_view.instance.rotation);
     Output.viewPosition = mul(float4(Position, 1), g_view.projection);
 
     return Output;
@@ -68,14 +67,14 @@ struct FSOutput {
 
     Output.position = float4(in_vertex.worldPosition, 1);
     {
-        float3 Normal = g_normalTextures[Index].Sample(g_sampler, UV);
+        float3 Normal = g_normalTextures[Index].SampleLevel(UV, 0);
         rotate_vector(Normal, in_vertex.worldRotation);
         Output.normal = float4(Normal, 1);
     }
-    Output.albedo = float4(g_albedoTextures[Index].Sample(g_sampler, UV), 1);
-    Output.specular = float4(g_specularTextures[Index].Sample(g_sampler, UV), 1);
-    Output.metalness = g_metalnessTextures[Index].Sample(g_sampler, UV);
-    Output.roughness = g_roughnessTextures[Index].Sample(g_sampler, UV);
+    Output.albedo = float4(g_albedoTextures[Index].SampleLevel(UV, 0), 1);
+    Output.specular = float4(g_specularTextures[Index].SampleLevel(UV, 0), 1);
+    Output.metalness = g_metalnessTextures[Index].SampleLevel(UV, 0);
+    Output.roughness = g_roughnessTextures[Index].SampleLevel(UV, 0);
 
     return Output;
 }

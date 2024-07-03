@@ -19,6 +19,7 @@
 #define MAX_STRING_LENGTH 255
 
 
+
 class GPUFixedContext {
 public:
 	GPUFixedContext(uint32_t in_directoryLength, char* in_directory, GLFWwindow* in_surfaceWindow, GPUExtent3D in_surfaceExtent, const uint32_t in_meshCount, const uint32_t* in_instanceMaxCounts, const char** in_positionFiles, const char** in_normalFiles, const char** in_uvFiles, const char** in_indexFiles, const char*** in_textureFiles);
@@ -135,7 +136,7 @@ private:
 	
 	GPUSampler m_sampler;
 	
-	float3 m_subFrusta[CASCADED_SHADOW_MAP_COUNT][CORNER_COUNT];
+	GPUSharedAllocation m_subFrustumAllocation;
 	
 	Semaphore m_subFrustaTransformFinishedSemaphores[CASCADED_SHADOW_MAP_COUNT];
 	GPUSemaphore m_imageAvailableSemaphore;
@@ -220,6 +221,9 @@ private:
 	
 	void build_sampler(void);
 	void ruin_sampler(void);
+
+	void build_subFrusta(void);
+	void ruin_subFrusta(void);
 
 	void set_geometryBindings(void);
 

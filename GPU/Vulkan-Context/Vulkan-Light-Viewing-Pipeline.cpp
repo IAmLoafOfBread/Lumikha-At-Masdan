@@ -18,7 +18,7 @@ void GPUFixedContext::build_lightViewingPipeline(void) {
 		const VkPushConstantRange PushConstant = {
 			.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
 			.offset = 0,
-			.size = (sizeof(float3) * CASCADED_SHADOW_MAP_COUNT * CORNER_COUNT) + sizeof(VkDeviceAddress) + sizeof(uint32_t)
+			.size = (sizeof(VkDeviceAddress) * 2) + sizeof(uint32_t)
 		};
 		const VkPipelineLayoutCreateInfo CreateInfo = {
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,

@@ -63,7 +63,7 @@ GPUFixedContext::GPUFixedContext(uint32_t in_directoryLength, char* in_directory
 	m_lightCount(0),
 	m_lightAllocation{ GPU_NULL_HANDLE },
 	m_sampler(GPU_NULL_HANDLE),
-	m_subFrusta{ { 0.0f } },
+	m_subFrustumAllocation{ GPU_NULL_HANDLE },
 	m_subFrustaTransformFinishedSemaphores{ NULL },
 	m_imageAvailableSemaphore(GPU_NULL_HANDLE),
 	m_lightViewingsFinishedSemaphore(GPU_NULL_HANDLE),
@@ -119,7 +119,9 @@ GPUFixedContext::GPUFixedContext(uint32_t in_directoryLength, char* in_directory
 		}
 	}
 	build_lights();
+	
 	build_sampler();
+	build_subFrusta();
 	
 	set_geometryBindings();
 	set_lightingBindings();
@@ -131,6 +133,7 @@ GPUFixedContext::GPUFixedContext(uint32_t in_directoryLength, char* in_directory
 
 GPUFixedContext::~GPUFixedContext() {
 	ruin_semaphores();
+	ruin_subFrusta();
 	ruin_sampler();
 	ruin_meshes();
 	ruin_lights();

@@ -2,7 +2,9 @@
 
 
 
-GPUFixedContext::GPUFixedContext(GLFWwindow* in_surfaceWindow, GPUExtent3D in_surfaceExtent, const uint32_t in_meshCount, const uint32_t* in_instanceMaxCounts, const char** in_positionFiles, const char** in_normalFiles, const char** in_uvFiles, const char** in_indexFiles, const char*** in_textureFiles) :
+GPUFixedContext::GPUFixedContext(uint32_t in_directoryLength, char* in_directory, GLFWwindow* in_surfaceWindow, GPUExtent3D in_surfaceExtent, const uint32_t in_meshCount, const uint32_t* in_instanceMaxCounts, const char** in_positionFiles, const char** in_normalFiles, const char** in_uvFiles, const char** in_indexFiles, const char*** in_textureFiles) :
+	m_directoryLength(in_directoryLength),
+	m_directory{ 0 },
 	m_multiThreadedGraphics(false),
 	m_instances(nullptr),
 	m_lights(nullptr),
@@ -72,6 +74,10 @@ GPUFixedContext::GPUFixedContext(GLFWwindow* in_surfaceWindow, GPUExtent3D in_su
 	m_lightsSemaphore(NULL),
 	m_cameraView{ 0.0f } {
 	m_cameraView.projection.vecs[2].w = 1.0f;
+
+	for(uint32_t i = 0; i < in_directoryLength; i++) {
+		m_directory[i] = in_directory[i];
+	}
 	
 	m_surfaceWindow = in_surfaceWindow;
 	build_device(in_surfaceWindow, in_surfaceExtent);

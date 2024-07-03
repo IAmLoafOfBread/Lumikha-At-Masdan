@@ -16,11 +16,16 @@
 #include <spng.h>
 
 
+#define MAX_STRING_LENGTH 255
+
 
 class GPUFixedContext {
 public:
-	GPUFixedContext(GLFWwindow* in_surfaceWindow, GPUExtent3D in_surfaceExtent, const uint32_t in_meshCount, const uint32_t* in_instanceMaxCounts, const char** in_positionFiles, const char** in_normalFiles, const char** in_uvFiles, const char** in_indexFiles, const char*** in_textureFiles);
+	GPUFixedContext(uint32_t in_directoryLength, char* in_directory, GLFWwindow* in_surfaceWindow, GPUExtent3D in_surfaceExtent, const uint32_t in_meshCount, const uint32_t* in_instanceMaxCounts, const char** in_positionFiles, const char** in_normalFiles, const char** in_uvFiles, const char** in_indexFiles, const char*** in_textureFiles);
 	~GPUFixedContext();
+
+	uint32_t m_directoryLength;
+	char m_directory[MAX_STRING_LENGTH];
 
 	bool m_multiThreadedGraphics;
 	

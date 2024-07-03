@@ -33,7 +33,7 @@ void GPUFixedContext::build_lightViewingPipeline(void) {
 	}
 	
 	const VkComputePipelineCreateInfo CreateInfo = {
-		.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
+		.sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO,
 		.pNext = nullptr,
 		.flags = 0,
 		.stage = {

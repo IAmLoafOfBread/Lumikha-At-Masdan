@@ -6,7 +6,7 @@
 
 
 void GPUFixedContext::build_lights(void) {
-	build_sharedAllocation(&m_lightAllocation, MAX_LIGHT_COUNT * sizeof(Light), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, 0);
+	build_sharedAllocation(&m_lightAllocation, MAX_LIGHT_COUNT * sizeof(Light), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, true);
 	m_lights = static_cast<Light*>(m_lightAllocation.data);
 }
 

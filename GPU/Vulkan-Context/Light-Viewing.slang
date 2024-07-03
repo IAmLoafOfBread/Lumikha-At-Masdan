@@ -2,7 +2,7 @@
 #include "../Shader-Utilities.hpp"
 
 struct Constants {
-    float3 frustum[CASCADED_SHADOW_MAP_COUNT][CORNER_COUNT];
+    float3* subFrusta;
     Light* lights;
     uint lightCount;
 };
@@ -11,6 +11,7 @@ struct Constants {
 [shader("compute")] [numthreads(CASCADED_SHADOW_MAP_COUNT, MAX_WORKGROUP_SIZE, 1)] void view_light(const uint in_frustumIndex: SV_GroupThreadID, const uint2 in_lightID: SV_DispatchThreadID) {
     const uint LightIndex = in_lightID.y;
     if (LightIndex >= g_constants.lightCount) return;
+    const uint SubFrustumIndex = in_frustumIndex * CORNER_COUNT;
 
     Light* Light = &g_constants.lights[LightIndex];
     const float3 Position = Light->view.instance.position;
@@ -18,7 +19,7 @@ struct Constants {
 
     float3 Corners[CORNER_COUNT] = { 0 };
     for (uint i = 0; i < CORNER_COUNT; i++) {
-        Corners[i] = g_constants.frustum[in_frustumIndex][i];
+        Corners[i] = g_constants.subFrusta[SubFrustumIndex + i];
         Corners[i] -= Position;
         rotate_vector(Corners[i], -Rotation);
     }

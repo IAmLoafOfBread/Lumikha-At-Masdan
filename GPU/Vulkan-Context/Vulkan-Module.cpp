@@ -5,9 +5,18 @@
 
 
 
-
 void GPUFixedContext::build_module(GPUModule in_module, const char* in_path) {
-	File File = open_file(in_path);
+	char FullPath[MAX_STRING_LENGTH] = { 0 };
+	for(uint32_t i = 0; i < m_directoryLength; i++) {
+		FullPath[i] = m_directory[i];
+	}
+	for (uint32_t i = 0; i < MAX_STRING_LENGTH; i++) {
+		char c = in_path[i];
+		if(!c) break;
+		FullPath[m_directoryLength + i] = c;
+	}
+
+	File File = open_file(FullPath);
 	const size_t Size = get_fileSize(File);
 	FileMap Map = map_file(File);
 	void* View = view_fileMap(Map, Size);

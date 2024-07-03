@@ -5,8 +5,7 @@
 
 
 
-#define BINDING_COUNT (GEOMETRY_PASS_COLOUR_ATTACHMENT_COUNT + CASCADED_SHADOW_MAP_COUNT + 1)
-#define BINDING_LAST_INDEX (BINDING_COUNT - 1)
+#define BINDING_COUNT (GEOMETRY_PASS_COLOUR_ATTACHMENT_COUNT + CASCADED_SHADOW_MAP_COUNT)
 
 
 
@@ -16,13 +15,11 @@ void GPUFixedContext::build_lightingBindings(void) {
 		for (uint32_t i = 0; i < BINDING_COUNT; i++) {
 			Bindings[i].binding = i;
 			Bindings[i].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-			Bindings[i].descriptorCount = m_meshCount;
+			Bindings[i].descriptorCount = 1;
 			Bindings[i].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
 			Bindings[i].pImmutableSamplers = nullptr;
 		}
-		for (uint32_t i = 0; i < BINDING_COUNT; i++) Bindings[i + GEOMETRY_PASS_COLOUR_ATTACHMENT_COUNT].descriptorCount = MAX_LIGHT_COUNT;
-		Bindings[BINDING_LAST_INDEX].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-		Bindings[BINDING_LAST_INDEX].descriptorCount = 1;
+		for (uint32_t i = GEOMETRY_PASS_COLOUR_ATTACHMENT_COUNT; i < BINDING_COUNT; i++) Bindings[i].descriptorCount = MAX_LIGHT_COUNT;
 
 		const VkDescriptorSetLayoutCreateInfo CreateInfo = {
 			.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,

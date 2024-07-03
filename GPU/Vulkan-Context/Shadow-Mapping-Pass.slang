@@ -14,7 +14,7 @@ struct VSOutput {
     float4 viewPosition : SV_Position;
 };
 
-[[vk::push_constant]] ConstantBuffer<View> g_view;
+[[vk::push_constant]] View g_view;
 
 [shader("vertex")] VSOutput output_vertex(VSVertexInput in_vertex, VSInstanceInput in_instance) {
     VSOutput Output = { 0 };

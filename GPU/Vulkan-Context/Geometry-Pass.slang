@@ -36,7 +36,7 @@ struct FSOutput {
 [[vk::binding(3, 0)]] Sampler2D<float> g_metalnessTextures[];
 [[vk::binding(4, 0)]] Sampler2D<float> g_roughnessTextures[];
 
-[[vk::push_constant]] ConstantBuffer<View> g_view;
+[[vk::push_constant]] View g_view;
 
 [shader("vertex")] VSOutput output_vertex(VSVertexInput in_vertex, VSInstanceInput in_instance) {
     VSOutput Output = { 0 };

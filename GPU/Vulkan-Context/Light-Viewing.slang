@@ -6,7 +6,7 @@ struct Constants {
     Light* lights;
     uint lightCount;
 };
-[[vk::push_constant]] ConstantBuffer<Constants> g_constants;
+[[vk::push_constant]] Constants g_constants;
 
 [shader("compute")] [numthreads(CASCADED_SHADOW_MAP_COUNT, MAX_WORKGROUP_SIZE, 1)] void view_light(const uint in_frustumIndex: SV_GroupThreadID, const uint2 in_lightID: SV_DispatchThreadID) {
     const uint LightIndex = in_lightID.y;

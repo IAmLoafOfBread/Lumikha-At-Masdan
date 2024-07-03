@@ -24,7 +24,7 @@ struct Constants {
     uint lightCount;
 };
 
-[[vk::push_constant]] ConstantBuffer<Constants> g_constants;
+[[vk::push_constant]] Constants g_constants;
 
 [shader("vertex")] VSOutput output_vertex(uint in_index: SV_VertexID) {
     VSOutput Output = { 0 };

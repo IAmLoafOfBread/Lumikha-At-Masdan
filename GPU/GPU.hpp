@@ -161,7 +161,7 @@ private:
 	void build_localTexture(GPULocalTexture* in_texture, GPUStageAllocation* in_stage, GPUFormat in_format, GPUExtent3D in_extent, GPUImageUsageFlags in_flags);
 	void ruin_localTexture(GPULocalTexture* in_texture);
 	
-	void build_module(GPUModule in_module, const char* in_path);
+	void build_module(GPUModule* in_module, const char* in_path);
 	void ruin_module(GPUModule in_module);
 	
 	void calculate_subFrustum(float3* in_corners, View* in_view, uint32_t in_multiplier);

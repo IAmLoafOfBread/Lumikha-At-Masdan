@@ -12,7 +12,7 @@ static VkShaderModule g_vertexModule = VK_NULL_HANDLE;
 
 
 void GPUFixedContext::build_shadowMappingPipelines(void) {
-	build_module(g_vertexModule, VERTEX_MODULE_PATH);
+	build_module(&g_vertexModule, VERTEX_MODULE_PATH);
 	
 	{
 		const VkPushConstantRange PushConstant = {

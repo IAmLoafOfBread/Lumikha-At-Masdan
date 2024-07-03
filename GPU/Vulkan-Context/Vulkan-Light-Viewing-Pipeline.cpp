@@ -12,7 +12,7 @@ static VkShaderModule g_module = VK_NULL_HANDLE;
 
 
 void GPUFixedContext::build_lightViewingPipeline(void) {
-	build_module(g_module, MODULE_PATH);
+	build_module(&g_module, MODULE_PATH);
 	
 	{
 		const VkPushConstantRange PushConstant = {
@@ -42,7 +42,7 @@ void GPUFixedContext::build_lightViewingPipeline(void) {
 			.flags = 0,
 			.stage = VK_SHADER_STAGE_COMPUTE_BIT,
 			.module = g_module,
-			.pName = "view_light\0",
+			.pName = "main",
 			.pSpecializationInfo = nullptr
 		},
 		.layout = m_lightViewingLayout,

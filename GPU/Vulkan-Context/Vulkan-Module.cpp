@@ -5,7 +5,7 @@
 
 
 
-void GPUFixedContext::build_module(GPUModule in_module, const char* in_path) {
+void GPUFixedContext::build_module(GPUModule* in_module, const char* in_path) {
 	char FullPath[MAX_STRING_LENGTH] = { 0 };
 	for(uint32_t i = 0; i < m_directoryLength; i++) {
 		FullPath[i] = m_directory[i];
@@ -28,7 +28,7 @@ void GPUFixedContext::build_module(GPUModule in_module, const char* in_path) {
 		.codeSize = Size,
 		.pCode = static_cast<uint32_t*>(View)
 	};
-	CHECK(vkCreateShaderModule(m_logical, &CreateInfo, nullptr, &in_module))
+	CHECK(vkCreateShaderModule(m_logical, &CreateInfo, nullptr, in_module))
 
 	unview_fileMap(View, Size);
 	unmap_file(Map);

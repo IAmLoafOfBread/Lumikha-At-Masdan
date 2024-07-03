@@ -13,8 +13,8 @@ static VkShaderModule g_fragmentModule = VK_NULL_HANDLE;
 
 
 void GPUFixedContext::build_lightingPipeline(void) {
-	build_module(g_vertexModule, VERTEX_MODULE_PATH);
-	build_module(g_fragmentModule, FRAGMENT_MODULE_PATH);
+	build_module(&g_vertexModule, VERTEX_MODULE_PATH);
+	build_module(&g_fragmentModule, FRAGMENT_MODULE_PATH);
 
 	{
 		const VkPushConstantRange PushConstant = {

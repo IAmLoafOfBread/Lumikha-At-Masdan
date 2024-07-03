@@ -27,9 +27,9 @@ void GPUFixedContext::dispatch_lightViewingUpdate(void) {
 	
 	vkBeginCommandBuffer(m_lightViewingCommandSet, &G_FIXED_COMMAND_BEGIN_INFO);
 	vkCmdBindPipeline(m_lightViewingCommandSet, VK_PIPELINE_BIND_POINT_GRAPHICS, m_lightViewingPipeline);
-	vkCmdPushConstants(m_lightViewingCommandSet, m_lightViewingLayout, VK_SHADER_STAGE_COMPUTE_BIT, 0, sizeof(m_subFrusta), m_subFrusta);
-	vkCmdPushConstants(m_lightViewingCommandSet, m_lightViewingLayout, VK_SHADER_STAGE_COMPUTE_BIT, sizeof(m_subFrusta), sizeof(VkDeviceAddress), &m_lightAllocation.address);
-	vkCmdPushConstants(m_lightViewingCommandSet, m_lightViewingLayout, VK_SHADER_STAGE_COMPUTE_BIT, sizeof(m_subFrusta) + sizeof(VkDeviceAddress), sizeof(uint32_t), &m_lightCount);
+	vkCmdPushConstants(m_lightViewingCommandSet, m_lightViewingLayout, VK_SHADER_STAGE_COMPUTE_BIT, 0, sizeof(VkDeviceAddress), &m_subFrustumAllocation.address);
+	vkCmdPushConstants(m_lightViewingCommandSet, m_lightViewingLayout, VK_SHADER_STAGE_COMPUTE_BIT, sizeof(VkDeviceAddress), sizeof(VkDeviceAddress), &m_lightAllocation.address);
+	vkCmdPushConstants(m_lightViewingCommandSet, m_lightViewingLayout, VK_SHADER_STAGE_COMPUTE_BIT, sizeof(VkDeviceAddress) * 2, sizeof(uint32_t), &m_lightCount);
 	vkCmdDispatch(m_lightViewingCommandSet, 1, (m_lightCount / MAX_WORKGROUP_SIZE) + 1, 1);
 	vkEndCommandBuffer(m_lightViewingCommandSet);
 	vkQueueSubmit(m_lightViewingCommandQueue, 1, &g_submitInfo, VK_NULL_HANDLE);

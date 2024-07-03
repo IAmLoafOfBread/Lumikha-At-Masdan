@@ -5,8 +5,6 @@
 
 
 
-#define CORNER_COUNT 8
-
 #define MODULE_PATH "Light-Viewing.comp.spv"
 
 static VkShaderModule g_module = VK_NULL_HANDLE;

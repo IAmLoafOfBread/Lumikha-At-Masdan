@@ -190,7 +190,7 @@ void GPUFixedContext::build_localTexture(GPULocalTexture* in_texture, GPUStageAl
 			.arrayLayers = 1,
 			.samples = VK_SAMPLE_COUNT_1_BIT,
 			.tiling = VK_IMAGE_TILING_OPTIMAL,
-			.usage = in_flags,
+			.usage = in_flags | VK_IMAGE_USAGE_TRANSFER_DST_BIT,
 			.sharingMode = VK_SHARING_MODE_EXCLUSIVE,
 			.queueFamilyIndexCount = 1,
 			.pQueueFamilyIndices = &m_graphicsQueueFamilyIndex,

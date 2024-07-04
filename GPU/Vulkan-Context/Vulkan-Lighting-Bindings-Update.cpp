@@ -40,6 +40,7 @@ void GPUFixedContext::set_lightingBindings(void) {
 		Writes[i].dstBinding = i;
 		Writes[i].dstArrayElement = 0;
 		Writes[i].descriptorCount = 1;
+		Writes[i].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 		Writes[i].pImageInfo = nullptr;
 		Writes[i].pBufferInfo = nullptr;
 		Writes[i].pTexelBufferView = nullptr;

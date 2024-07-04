@@ -16,7 +16,7 @@ void GPUFixedContext::build_graphicsBindingPool(uint32_t in_meshCount) {
 	const VkDescriptorPoolCreateInfo CreateInfo = {
 		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
 		.pNext = nullptr,
-		.flags = 0,
+		.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT,
 		.maxSets = 2,
 		.poolSizeCount = 1,
 		.pPoolSizes = &PoolSize

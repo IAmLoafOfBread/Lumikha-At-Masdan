@@ -22,6 +22,7 @@ void GPUFixedContext::set_geometryBindings(void) {
 		Writes[i].dstBinding = i;
 		Writes[i].dstArrayElement = 0;
 		Writes[i].descriptorCount = m_meshCount;
+		Writes[i].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 		Writes[i].pImageInfo = Infos[i];
 		Writes[i].pBufferInfo = nullptr;
 		Writes[i].pTexelBufferView = nullptr;

@@ -1,24 +1,19 @@
 #define SHADER_INCLUDE
 #include "../Shader-Utilities.hpp"
 
-struct VSVertexInput {
-    [[vk::location(0)]] float3 position;
-    [[vk::location(1)]] float3 normal;
-    [[vk::location(3)]] float2 uv;
-};
 
-struct VSInstanceInput {
-    [[vk::location(4)]] float3 position;
-    [[vk::location(5)]] float3 rotation;
-};
 
-struct VSOutput {
-    float4 viewPosition : SV_POSITION;
+struct FSInput {
     [[vk::location(0)]] float3 worldPosition;
     [[vk::location(2)]] float3 worldRotation;
     [[vk::location(1)]] float3 normal;
     [[vk::location(3)]] float2 uv;
     [[vk::location(4)]] nointerpolation uint textureIndex;
+};
+
+struct VSOutput {
+    float4 viewPosition : SV_POSITION;
+    FSInput fragmentShaderInput;
 };
 
 struct FSOutput {
@@ -38,18 +33,24 @@ struct FSOutput {
 
 [[vk::push_constant]] View g_view;
 
-[shader("vertex")] VSOutput output_vertex(VSVertexInput in_vertex, VSInstanceInput in_instance) {
+[shader("vertex")] VSOutput output_vertex(
+    [[vk::location(0)]] float3 inv_position,
+    [[vk::location(1)]] float3 inv_normal,
+    [[vk::location(2)]] float2 inv_uv,
+    [[vk::location(3)]] float3 ini_position,
+    [[vk::location(4)]] float3 ini_rotation
+) {
     VSOutput Output = { 0 };
-    float3 Position = in_vertex.position;
+    float3 Position = inv_position;
     
-    rotate_vector(Position, in_instance.rotation);
-    Position += in_instance.position;
-    Output.worldPosition = Position;
-    Output.worldRotation = in_instance.rotation;
-    Output.normal = in_vertex.normal;
-    rotate_vector(Output.normal, in_instance.rotation);
-    Output.uv = (in_vertex.uv * -1) + 1;
-    Output.textureIndex = spirv_asm {
+    rotate_vector(Position, ini_rotation);
+    Position += ini_position;
+    Output.fragmentShaderInput.worldPosition = Position;
+    Output.fragmentShaderInput.worldRotation = ini_rotation;
+    Output.fragmentShaderInput.normal = inv_normal;
+    rotate_vector(Output.fragmentShaderInput.normal, ini_rotation);
+    Output.fragmentShaderInput.uv = (inv_uv * -1) + 1;
+    Output.fragmentShaderInput.textureIndex = spirv_asm {
         OpCapability DrawParameters;
         result:$$uint = OpLoad builtin(DrawIndex:uint);
     };
@@ -60,7 +61,7 @@ struct FSOutput {
     return Output;
 }
 
-[shader("fragment")] FSOutput output_fragment(VSOutput in_vertex) {
+[shader("fragment")] FSOutput output_fragment(FSInput in_vertex) {
     FSOutput Output = { 0 };
     const uint Index = in_vertex.textureIndex;
     const float2 UV = in_vertex.uv;

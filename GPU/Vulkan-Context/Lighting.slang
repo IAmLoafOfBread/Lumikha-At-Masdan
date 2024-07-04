@@ -1,10 +1,7 @@
 #define SHADER_INCLUDE
 #include "../Shader-Utilities.hpp"
 
-struct VSOutput {
-    float4 position : SV_Position;
-    float2 uv;
-};
+
 
 [[vk::binding(0, 0)]] Sampler2D<float4> g_positionInput;
 [[vk::binding(1, 0)]] Sampler2D<float4> g_normalInput;
@@ -18,24 +15,18 @@ struct VSOutput {
 [[vk::binding(8, 0)]] Sampler2D<float> g_cascadedShadowMapsDB3[];
 
 struct Constants {
-    float4 positions[4];
-    float2 uvs[4];
     Light* lights;
     uint lightCount;
 };
 
 [[vk::push_constant]] Constants g_constants;
 
-[shader("vertex")] VSOutput output_vertex(uint in_index: SV_VertexID) {
-    VSOutput Output = { 0 };
-    
-    Output.position = g_constants.positions[in_index];
-    Output.uv = g_constants.uvs[in_index];
-    
-    return Output;
+[shader("vertex")] float4 output_vertex(uint in_index: SV_VertexID) : SV_Position {
+    float4 damn;
+    return damn;
 }
 
-[shader("fragment")] float4 output_fragment(float2 in_position) {
+[shader("fragment")] float4 output_fragment(void) {
     float4 yoyo;
     return yoyo;
 }

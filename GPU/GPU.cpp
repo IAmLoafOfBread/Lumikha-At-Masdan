@@ -105,7 +105,7 @@ GPUFixedContext::GPUFixedContext(uint32_t in_directoryLength, char* in_directory
 		for(uint32_t i = 0; i < GEOMETRY_PASS_REQUIRED_TEXTURE_COUNT; i++) {
 			TextureAllocations[i] = new GPUStageAllocation[in_meshCount];
 			TextureExtents[i] = new GPUExtent3D[in_meshCount];
-			for(uint32_t j = 0; j < in_meshCount; i++) {
+			for(uint32_t j = 0; j < in_meshCount; j++) {
 				set_texture(&TextureAllocations[i][j], in_texturePaths[i][j], &TextureExtents[i][j]);
 			}
 		}

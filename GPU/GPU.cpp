@@ -2,7 +2,7 @@
 
 
 
-GPUFixedContext::GPUFixedContext(uint32_t in_directoryLength, char* in_directory, GLFWwindow* in_surfaceWindow, GPUExtent3D in_surfaceExtent, const uint32_t in_meshCount, const uint32_t* in_instanceMaxCounts, const char** in_positionFiles, const char** in_normalFiles, const char** in_uvFiles, const char** in_indexFiles, const char*** in_textureFiles) :
+GPUFixedContext::GPUFixedContext(uint32_t in_directoryLength, char* in_directory, GLFWwindow* in_surfaceWindow, GPUExtent3D in_surfaceExtent, const uint32_t in_meshCount, const uint32_t* in_instanceMaxCounts, const char** in_positionPaths, const char** in_normalPaths, const char** in_uvPaths, const char** in_indexPaths, const char*** in_texturePaths) :
 	m_directoryLength(in_directoryLength),
 	m_directory{ 0 },
 	m_multiThreadedGraphics(false),
@@ -41,7 +41,7 @@ GPUFixedContext::GPUFixedContext(uint32_t in_directoryLength, char* in_directory
 	m_geometryViews{ GPU_NULL_HANDLE },
 	m_geometryFramebuffer(GPU_NULL_HANDLE),
 	m_lightingFramebuffers(nullptr),
-	m_meshCount(0),
+	m_meshCount(in_meshCount),
 	m_graphicsBindingPool(GPU_NULL_HANDLE),
 	m_geometryDescriptorLayout(GPU_NULL_HANDLE),
 	m_geometryDescriptorSet(GPU_NULL_HANDLE),
@@ -101,12 +101,12 @@ GPUFixedContext::GPUFixedContext(uint32_t in_directoryLength, char* in_directory
 		GPUStageAllocation* TextureAllocations[GEOMETRY_PASS_REQUIRED_TEXTURE_COUNT] = { nullptr };
 		GPUExtent3D* TextureExtents[GEOMETRY_PASS_REQUIRED_TEXTURE_COUNT] = { nullptr };
 		
-		set_vertices(&VertexAllocations, in_meshCount, in_positionFiles, in_normalFiles, in_uvFiles, in_indexFiles, VertexCounts);
+		set_vertices(&VertexAllocations, in_positionPaths, in_normalPaths, in_uvPaths, in_indexPaths, VertexCounts);
 		for(uint32_t i = 0; i < GEOMETRY_PASS_REQUIRED_TEXTURE_COUNT; i++) {
 			TextureAllocations[i] = new GPUStageAllocation[in_meshCount];
 			TextureExtents[i] = new GPUExtent3D[in_meshCount];
 			for(uint32_t j = 0; j < in_meshCount; i++) {
-				set_texture(&TextureAllocations[i][j], in_textureFiles[i][j], &TextureExtents[i][j]);
+				set_texture(&TextureAllocations[i][j], in_texturePaths[i][j], &TextureExtents[i][j]);
 			}
 		}
 		

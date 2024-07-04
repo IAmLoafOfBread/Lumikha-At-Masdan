@@ -150,8 +150,8 @@ private:
 	
 	View m_cameraView;
 	
-	void set_vertices(GPUStageAllocation* in_allocation, uint32_t in_meshCount, const char** in_positionFiles, const char** in_normalFiles, const char** in_uvFiles, const char** in_indexFiles, uint32_t* in_vertexCounts);
-	void set_texture(GPUStageAllocation* in_allocation, const char* in_file, GPUExtent3D* in_extent);
+	void set_vertices(GPUStageAllocation* in_allocation, const char** in_positionPaths, const char** in_normalPaths, const char** in_uvPaths, const char** in_indexPaths, uint32_t* in_vertexCounts);
+	void set_texture(GPUStageAllocation* in_allocation, const char* in_path, GPUExtent3D* in_extent);
 	
 	void build_stageAllocation(GPUStageAllocation* in_stage, GPUSize in_size);
 	void build_sharedAllocation(GPUSharedAllocation* in_shared, GPUSize in_size, GPUBufferUsageFlags in_flags, bool in_computeIndexInclude);

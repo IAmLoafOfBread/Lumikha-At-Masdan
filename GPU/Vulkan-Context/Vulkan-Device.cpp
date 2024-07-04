@@ -160,9 +160,17 @@ void GPUFixedContext::build_device(GLFWwindow* in_window, GPUExtent3D in_extent)
 			.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES,
 			.pNext = nullptr
 		};
+		VkPhysicalDeviceVulkan12Features Features12 = {
+			.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES,
+			.pNext = &Features13
+		};
+		VkPhysicalDeviceVulkan11Features Features11 = {
+			.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES,
+			.pNext = &Features12
+		};
 		VkPhysicalDeviceFeatures2 FeaturesExtent = {
 			.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2,
-			.pNext = &Features13
+			.pNext = &Features11
 		};
 		vkGetPhysicalDeviceFeatures2(Physical, &FeaturesExtent);
 

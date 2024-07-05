@@ -33,7 +33,7 @@ void GPUFixedContext::build_device(GLFWwindow* in_window, GPUExtent3D in_extent)
 		};
 
 #if defined(RUN_DEBUG)
-		const char* Validation = "VK_LAYER_KHRONOS_validation";
+		const char* Layers[] = {"VK_LAYER_KHRONOS_validation", "VK_LAYER_LUNARG_api_dump"};
 		const VkDebugUtilsMessengerCreateInfoEXT DebugInfo = {
 			.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
 			.pNext = nullptr,
@@ -82,7 +82,7 @@ void GPUFixedContext::build_device(GLFWwindow* in_window, GPUExtent3D in_extent)
 			.pApplicationInfo = &AppInfo,
 #if defined(RUN_DEBUG)
 			.enabledLayerCount = 1,
-			.ppEnabledLayerNames = &Validation,
+			.ppEnabledLayerNames = Layers,
 #elif defined(RUN_PRODUCT)
 			.enabledLayerCount = 0,
 			.ppEnabledLayerNames = nullptr,

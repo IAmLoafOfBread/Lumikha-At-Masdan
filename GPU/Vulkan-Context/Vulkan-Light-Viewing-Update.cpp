@@ -21,10 +21,6 @@ void GPUFixedContext::initialize_lightViewingUpdateData(void) {
 }
 
 void GPUFixedContext::dispatch_lightViewingUpdate(void) {
-	for(uint32_t i = 0; i < CASCADED_SHADOW_MAP_COUNT; i++) {
-		wait_semaphore(m_subFrustaTransformFinishedSemaphores[i]);
-	}
-	
 	vkBeginCommandBuffer(m_lightViewingCommandSet, &G_FIXED_COMMAND_BEGIN_INFO);
 	vkCmdBindPipeline(m_lightViewingCommandSet, VK_PIPELINE_BIND_POINT_GRAPHICS, m_lightViewingPipeline);
 	vkCmdPushConstants(m_lightViewingCommandSet, m_lightViewingLayout, VK_SHADER_STAGE_COMPUTE_BIT, 0, sizeof(VkDeviceAddress), &m_subFrustumAllocation.address);
@@ -33,10 +29,6 @@ void GPUFixedContext::dispatch_lightViewingUpdate(void) {
 	vkCmdDispatch(m_lightViewingCommandSet, 1, (m_lightCount / MAX_WORKGROUP_SIZE) + 1, 1);
 	vkEndCommandBuffer(m_lightViewingCommandSet);
 	vkQueueSubmit(m_lightViewingCommandQueue, 1, &g_submitInfo, VK_NULL_HANDLE);
-	
-	for(uint32_t i = 0; i < CASCADED_SHADOW_MAP_COUNT; i++) {
-		signal_semaphore(m_subFrustaTransformFinishedSemaphores[i]);
-	}
 }
 
 

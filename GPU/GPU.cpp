@@ -64,7 +64,7 @@ GPUFixedContext::GPUFixedContext(uint32_t in_directoryLength, char* in_directory
 	m_lightAllocation{ GPU_NULL_HANDLE },
 	m_sampler(GPU_NULL_HANDLE),
 	m_subFrustumAllocation{ GPU_NULL_HANDLE },
-	m_subFrustaTransformFinishedSemaphores{ NULL },
+	m_subFrusta(nullptr),
 	m_imageAvailableSemaphore(GPU_NULL_HANDLE),
 	m_lightViewingsFinishedSemaphore(GPU_NULL_HANDLE),
 	m_shadowMappingsFinishedSemaphores{ VK_NULL_HANDLE },

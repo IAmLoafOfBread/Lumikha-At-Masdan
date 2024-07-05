@@ -14,9 +14,6 @@ void GPUFixedContext::build_semaphores(void) {
 		.flags = 0
 	};
 	for(uint32_t i = 0; i < CASCADED_SHADOW_MAP_COUNT; i++) {
-		char Name[] = name(m_subFrustaTransformFinishedSemaphores);
-		Name[1] = (char)(i + 48);
-		create_semaphore(&m_subFrustaTransformFinishedSemaphores[i], Name);
 		CHECK(vkCreateSemaphore(m_logical, &CreateInfo, nullptr, &m_shadowMappingsFinishedSemaphores[i]))
 	}
 	CHECK(vkCreateSemaphore(m_logical, &CreateInfo, nullptr, &m_imageAvailableSemaphore))
@@ -30,9 +27,6 @@ void GPUFixedContext::build_semaphores(void) {
 
 void GPUFixedContext::ruin_semaphores(void) {
 	for(uint32_t i = 0; i < CASCADED_SHADOW_MAP_COUNT; i++) {
-		char Name[] = name(m_subFrustaTransformFinishedSemaphores);
-		Name[1] = (char)(i + 48);
-		destroy_semaphore(m_subFrustaTransformFinishedSemaphores[i], Name);
 		vkDestroySemaphore(m_logical, m_shadowMappingsFinishedSemaphores[i], nullptr);
 	}
 	vkDestroySemaphore(m_logical, m_imageAvailableSemaphore, nullptr);

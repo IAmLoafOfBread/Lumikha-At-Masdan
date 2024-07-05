@@ -36,6 +36,8 @@ public:
 	Camera m_cameraData;
 	
 	void acquire_nextImage(void);
+
+	void calculate_subFrustum(uint32_t in_index, uint32_t in_multiplier);
 	
 	void initialize_lightViewingUpdateData(void);
 	void dispatch_lightViewingUpdate(void);
@@ -137,8 +139,8 @@ private:
 	GPUSampler m_sampler;
 	
 	GPUSharedAllocation m_subFrustumAllocation;
+	float3* m_subFrusta;
 	
-	Semaphore m_subFrustaTransformFinishedSemaphores[CASCADED_SHADOW_MAP_COUNT];
 	GPUSemaphore m_imageAvailableSemaphore;
 	GPUSemaphore m_lightViewingsFinishedSemaphore;
 	GPUSemaphore m_shadowMappingsFinishedSemaphores[CASCADED_SHADOW_MAP_COUNT];
@@ -163,8 +165,6 @@ private:
 	
 	void build_module(GPUModule* in_module, const char* in_path);
 	void ruin_module(GPUModule in_module);
-	
-	void calculate_subFrustum(float3* in_corners, View* in_view, uint32_t in_multiplier);
 	
 	void build_commandThread(uint32_t in_queueFamilyIndex, uint32_t in_queueIndex, GPUCommandQueue* in_queue, GPUCommandPool* in_pool, GPUCommandSet* in_set);
 	void ruin_commandThread(GPUCommandPool* in_pool, GPUCommandSet* in_set);

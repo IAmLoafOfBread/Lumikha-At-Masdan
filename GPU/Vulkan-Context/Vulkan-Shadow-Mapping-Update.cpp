@@ -33,11 +33,7 @@ void GPUFixedContext::initialize_shadowMappingUpdateData(uint32_t in_index, uint
 	g_submitInfos[in_index].pSignalSemaphores = &m_shadowMappingsFinishedSemaphores[in_index];
 }
 
-void GPUFixedContext::draw_shadowMappingUpdate(uint32_t in_index, uint32_t in_divisor) {
-	wait_semaphore(m_subFrustaTransformFinishedSemaphores[in_index]);
-	calculate_subFrustum(&static_cast<float3*>(m_subFrustumAllocation.data)[CORNER_COUNT * in_index], &m_cameraView, in_divisor);
-	signal_semaphore(m_subFrustaTransformFinishedSemaphores[in_index]);
-	
+void GPUFixedContext::draw_shadowMappingUpdate(uint32_t in_index, uint32_t in_divisor) {	
 	for(uint32_t i = 0; i < m_lightCount; i++) {
 		if(m_lights[i].visible) {
 			g_renderInfos[in_index].framebuffer = m_shadowMappingFramebuffers[in_index][i];

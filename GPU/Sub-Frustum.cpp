@@ -1,11 +1,8 @@
-#include "../../../Build-Info.h"
-
-#if defined(SYSTEM_LINUX) || defined(SYSTEM_WINDOWS)
-#include "../GPU.hpp"
+#include "GPU.hpp"
 
 
 
-void GPUFixedContext::calculate_subFrustum(float3* in_corners, View* in_view, uint32_t in_multiplier) {
+void GPUFixedContext::calculate_subFrustum(uint32_t in_index, uint32_t in_multiplier) {
 	float4 Corners[CORNER_COUNT] = {
 		{-1, 1, 0, 1},
 		{-1,-1, 0, 1},
@@ -21,7 +18,7 @@ void GPUFixedContext::calculate_subFrustum(float3* in_corners, View* in_view, ui
 	
 	const float Near = m_cameraData.zNear + (Ratio * (in_multiplier - 1)), Far = m_cameraData.zNear + (Ratio * in_multiplier);
 	
-	float4x4 Projection = in_view->projection;
+	float4x4 Projection = m_cameraView.projection;
 	{
 		const float Fz = Far / (Far - Near);
 		Projection.vecs[2].z = Fz;
@@ -35,12 +32,8 @@ void GPUFixedContext::calculate_subFrustum(float3* in_corners, View* in_view, ui
 		Corners[i].x /= W;
 		Corners[i].y /= W;
 		Corners[i].z /= W;
-		in_corners[i].x = Corners[i].x;
-		in_corners[i].y = Corners[i].y;
-		in_corners[i].z = Corners[i].z;
+		m_subFrusta[i * CORNER_COUNT].x = Corners[i].x;
+		m_subFrusta[i * CORNER_COUNT].y = Corners[i].y;
+		m_subFrusta[i * CORNER_COUNT].z = Corners[i].z;
 	}
 }
-
-
-
-#endif

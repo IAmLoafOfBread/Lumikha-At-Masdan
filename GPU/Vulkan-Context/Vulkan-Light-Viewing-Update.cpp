@@ -22,7 +22,7 @@ void GPUFixedContext::initialize_lightViewingUpdateData(void) {
 
 void GPUFixedContext::dispatch_lightViewingUpdate(void) {
 	vkBeginCommandBuffer(m_lightViewingCommandSet, &G_FIXED_COMMAND_BEGIN_INFO);
-	vkCmdBindPipeline(m_lightViewingCommandSet, VK_PIPELINE_BIND_POINT_GRAPHICS, m_lightViewingPipeline);
+	vkCmdBindPipeline(m_lightViewingCommandSet, VK_PIPELINE_BIND_POINT_COMPUTE, m_lightViewingPipeline);
 	vkCmdPushConstants(m_lightViewingCommandSet, m_lightViewingLayout, VK_SHADER_STAGE_COMPUTE_BIT, 0, sizeof(VkDeviceAddress), &m_subFrustumAllocation.address);
 	vkCmdPushConstants(m_lightViewingCommandSet, m_lightViewingLayout, VK_SHADER_STAGE_COMPUTE_BIT, sizeof(VkDeviceAddress), sizeof(VkDeviceAddress), &m_lightAllocation.address);
 	vkCmdPushConstants(m_lightViewingCommandSet, m_lightViewingLayout, VK_SHADER_STAGE_COMPUTE_BIT, sizeof(VkDeviceAddress) * 2, sizeof(uint32_t), &m_lightCount);

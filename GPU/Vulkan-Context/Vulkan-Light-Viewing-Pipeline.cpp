@@ -42,14 +42,14 @@ void GPUFixedContext::build_lightViewingPipeline(void) {
 			.flags = 0,
 			.stage = VK_SHADER_STAGE_COMPUTE_BIT,
 			.module = g_module,
-			.pName = "main",
+			.pName = "main\0",
 			.pSpecializationInfo = nullptr
 		},
 		.layout = m_lightViewingLayout,
 		.basePipelineHandle = VK_NULL_HANDLE,
 		.basePipelineIndex = -1
 	};
-	CHECK(vkCreateComputePipelines(m_logical, nullptr, 1, &CreateInfo, nullptr, &m_lightViewingPipeline))
+	CHECK(vkCreateComputePipelines(m_logical, VK_NULL_HANDLE, 1, &CreateInfo, nullptr, &m_lightViewingPipeline))
 }
 
 void GPUFixedContext::ruin_lightViewingPipeline(void) {

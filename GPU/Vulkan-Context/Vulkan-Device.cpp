@@ -184,12 +184,13 @@ void GPUFixedContext::build_device(GLFWwindow* in_window, GPUExtent3D in_extent)
 		}
 		
 		HelperCount = m_multiThreadedGraphics ? GRAPHICS_THREAD_COUNT : 1;
-		HelperCount += m_computeQueueFamilyIndex == NULL_VALUE ? 1 : 0;
-		if(GraphicsQueueCount < HelperCount) {
-			HelperCount = GraphicsQueueCount;
-		} else {
+		if(m_computeQueueFamilyIndex == NULL_VALUE) {
+			HelperCount++;
 			ComputeQueueIndex = HelperCount - 1;
 		}
+		if(GraphicsQueueCount < HelperCount) {
+			HelperCount = GraphicsQueueCount;
+		} 
 		const VkDeviceQueueCreateInfo QueueInfos[] = {
 			{
 				.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,

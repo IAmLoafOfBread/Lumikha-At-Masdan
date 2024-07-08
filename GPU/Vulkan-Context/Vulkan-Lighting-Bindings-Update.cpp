@@ -14,7 +14,7 @@ void GPUFixedContext::set_lightingBindings(void) {
 	VkDescriptorImageInfo InputInfos[GEOMETRY_PASS_COLOUR_ATTACHMENT_COUNT] = { 0 };
 	for (uint32_t i = 0; i < GEOMETRY_PASS_COLOUR_ATTACHMENT_COUNT; i++) {
 		InputInfos[i].sampler = m_sampler;
-		InputInfos[i].imageView = m_geometryViews[i];
+		InputInfos[i].imageView = m_geometryTextures[i].view;
 		InputInfos[i].imageLayout = VK_IMAGE_LAYOUT_READ_ONLY_OPTIMAL;
 	}
 	VkDescriptorImageInfo* ShadowInfos[CASCADED_SHADOW_MAP_COUNT] = { nullptr };

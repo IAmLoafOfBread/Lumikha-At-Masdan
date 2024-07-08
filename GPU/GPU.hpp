@@ -102,7 +102,7 @@ private:
 	GPULocalTexture m_shadowTextures[CASCADED_SHADOW_MAP_COUNT][MAX_LIGHT_COUNT];
 	GPUFramebuffer m_shadowMappingFramebuffers[CASCADED_SHADOW_MAP_COUNT][MAX_LIGHT_COUNT];
 	
-	GPULocalTexture m_geometryTextures[GEOMETRY_PASS_COLOUR_ATTACHMENT_COUNT];
+	GPULocalTexture m_geometryTextures[GEOMETRY_PASS_COLOUR_ATTACHMENT_COUNT + 1];
 	GPUFramebuffer m_geometryFramebuffer;
 
 	GPUFramebuffer* m_lightingFramebuffers;

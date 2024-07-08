@@ -99,7 +99,7 @@ private:
 	GPUSwapchain m_swapchain;
 	GPUTextureView* m_presentViews;
 	
-	GPUTextureView m_shadowMappingViews[CASCADED_SHADOW_MAP_COUNT][MAX_LIGHT_COUNT];
+	GPULocalTexture m_shadowTextures[CASCADED_SHADOW_MAP_COUNT][MAX_LIGHT_COUNT];
 	GPUFramebuffer m_shadowMappingFramebuffers[CASCADED_SHADOW_MAP_COUNT][MAX_LIGHT_COUNT];
 	
 	GPUTextureView m_geometryViews[GEOMETRY_PASS_COLOUR_ATTACHMENT_COUNT];

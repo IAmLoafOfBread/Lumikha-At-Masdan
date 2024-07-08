@@ -22,7 +22,7 @@ void GPUFixedContext::set_lightingBindings(void) {
 		ShadowInfos[i] = new VkDescriptorImageInfo[MAX_LIGHT_COUNT];
 		for (uint32_t j = 0; j < MAX_LIGHT_COUNT; j++) {
 			ShadowInfos[i][j].sampler = m_sampler;
-			ShadowInfos[i][j].imageView = m_shadowMappingViews[i][j];
+			ShadowInfos[i][j].imageView = m_shadowTextures[i][j].view;
 			ShadowInfos[i][j].imageLayout = VK_IMAGE_LAYOUT_READ_ONLY_OPTIMAL;
 		}
 	}

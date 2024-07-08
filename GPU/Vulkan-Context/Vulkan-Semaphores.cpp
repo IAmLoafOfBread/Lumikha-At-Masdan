@@ -8,16 +8,24 @@
 
 
 void GPUFixedContext::build_semaphores(void) {
-	const VkSemaphoreCreateInfo CreateInfo = {
-		.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO,
+	const VkSemaphoreTypeCreateInfo TypeInfo = {
+		.sType = VK_STRUCTURE_TYPE_SEMAPHORE_TYPE_CREATE_INFO,
 		.pNext = nullptr,
+		.semaphoreType = VK_SEMAPHORE_TYPE_TIMELINE,
+		.initialValue = 0
+	};
+	VkSemaphoreCreateInfo CreateInfo = {
+		.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO,
+		.pNext = &TypeInfo,
 		.flags = 0
 	};
+
+	CHECK(vkCreateSemaphore(m_logical, &CreateInfo, nullptr, &m_imageAvailableSemaphore))
+	CHECK(vkCreateSemaphore(m_logical, &CreateInfo, nullptr, &m_lightViewingsFinishedSemaphore))
+	CreateInfo.pNext = nullptr;
 	for(uint32_t i = 0; i < CASCADED_SHADOW_MAP_COUNT; i++) {
 		CHECK(vkCreateSemaphore(m_logical, &CreateInfo, nullptr, &m_shadowMappingsFinishedSemaphores[i]))
 	}
-	CHECK(vkCreateSemaphore(m_logical, &CreateInfo, nullptr, &m_imageAvailableSemaphore))
-	CHECK(vkCreateSemaphore(m_logical, &CreateInfo, nullptr, &m_lightViewingsFinishedSemaphore))
 	CHECK(vkCreateSemaphore(m_logical, &CreateInfo, nullptr, &m_renderFinishedSemaphore))
 	
 	create_semaphore(&m_cameraSemaphore, name(m_cameraSemaphore));
@@ -26,11 +34,11 @@ void GPUFixedContext::build_semaphores(void) {
 }
 
 void GPUFixedContext::ruin_semaphores(void) {
+	vkDestroySemaphore(m_logical, m_imageAvailableSemaphore, nullptr);
+	vkDestroySemaphore(m_logical, m_lightViewingsFinishedSemaphore, nullptr);
 	for(uint32_t i = 0; i < CASCADED_SHADOW_MAP_COUNT; i++) {
 		vkDestroySemaphore(m_logical, m_shadowMappingsFinishedSemaphores[i], nullptr);
 	}
-	vkDestroySemaphore(m_logical, m_imageAvailableSemaphore, nullptr);
-	vkDestroySemaphore(m_logical, m_lightViewingsFinishedSemaphore, nullptr);
 	vkDestroySemaphore(m_logical, m_renderFinishedSemaphore, nullptr);
 	
 	destroy_semaphore(m_cameraSemaphore, name(m_cameraSemaphore));

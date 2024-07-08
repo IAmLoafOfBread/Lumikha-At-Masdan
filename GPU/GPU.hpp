@@ -35,6 +35,7 @@ public:
 	
 	Camera m_cameraData;
 	
+	void initialize_imageAcquiring(void);
 	void acquire_nextImage(void);
 
 	void calculate_subFrustum(uint32_t in_index, uint32_t in_multiplier);
@@ -141,9 +142,14 @@ private:
 	GPUSharedAllocation m_subFrustumAllocation;
 	float3* m_subFrusta;
 	
+	uint64_t m_imageAvailableStatus;
 	GPUSemaphore m_imageAvailableSemaphore;
+
+	uint64_t m_lightViewingsFinishedStatus;
 	GPUSemaphore m_lightViewingsFinishedSemaphore;
+
 	GPUSemaphore m_shadowMappingsFinishedSemaphores[CASCADED_SHADOW_MAP_COUNT];
+
 	GPUSemaphore m_renderFinishedSemaphore;
 	
 	Semaphore m_cameraSemaphore;

@@ -65,7 +65,9 @@ GPUFixedContext::GPUFixedContext(uint32_t in_directoryLength, char* in_directory
 	m_sampler(GPU_NULL_HANDLE),
 	m_subFrustumAllocation{ GPU_NULL_HANDLE },
 	m_subFrusta(nullptr),
+	m_imageAvailableStatus(0),
 	m_imageAvailableSemaphore(GPU_NULL_HANDLE),
+	m_lightViewingsFinishedStatus(0),
 	m_lightViewingsFinishedSemaphore(GPU_NULL_HANDLE),
 	m_shadowMappingsFinishedSemaphores{ VK_NULL_HANDLE },
 	m_renderFinishedSemaphore(GPU_NULL_HANDLE),
@@ -80,6 +82,7 @@ GPUFixedContext::GPUFixedContext(uint32_t in_directoryLength, char* in_directory
 	}
 	
 	m_surfaceWindow = in_surfaceWindow;
+
 	build_device(in_surfaceWindow, in_surfaceExtent);
 	build_shadowMappingPass();
 	build_geometryPass();

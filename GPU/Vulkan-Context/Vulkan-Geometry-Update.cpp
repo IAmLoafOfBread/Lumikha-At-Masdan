@@ -7,6 +7,7 @@
 
 static VkClearValue g_clearValues[GEOMETRY_PASS_COLOUR_ATTACHMENT_COUNT + 1] = { 0 };
 static VkRenderPassBeginInfo g_renderInfo = { VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO };
+static VkTimelineSemaphoreSubmitInfo g_timelineInfo = { VK_STRUCTURE_TYPE_TIMELINE_SEMAPHORE_SUBMIT_INFO };
 static VkSubmitInfo g_submitInfo = { VK_STRUCTURE_TYPE_SUBMIT_INFO };
 
 
@@ -30,8 +31,13 @@ void GPUFixedContext::initialize_geometryUpdateData(void) {
 	g_renderInfo.clearValueCount = GEOMETRY_PASS_COLOUR_ATTACHMENT_COUNT + 1;
 	g_renderInfo.pClearValues = g_clearValues;
 	
+	g_timelineInfo.pNext = nullptr;
+	g_timelineInfo.waitSemaphoreValueCount = 1;
+	g_timelineInfo.pWaitSemaphoreValues = &m_imageAvailableStatus;
+	g_timelineInfo.signalSemaphoreValueCount = 0;
+	g_timelineInfo.pSignalSemaphoreValues = nullptr;
 	
-	g_submitInfo.pNext = nullptr;
+	g_submitInfo.pNext = &g_timelineInfo;
 	g_submitInfo.waitSemaphoreCount = 1;
 	g_submitInfo.pWaitSemaphores = &m_imageAvailableSemaphore;
 	g_submitInfo.pWaitDstStageMask = &G_FIXED_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
@@ -42,6 +48,8 @@ void GPUFixedContext::initialize_geometryUpdateData(void) {
 }
 
 void GPUFixedContext::draw_geometryUpdate(void) {
+	m_imageAvailableStatus--;
+
 	vkBeginCommandBuffer(m_deferredRenderingCommandSet, &G_FIXED_COMMAND_BEGIN_INFO);
 	vkCmdBindDescriptorSets(m_deferredRenderingCommandSet, VK_PIPELINE_BIND_POINT_GRAPHICS, m_geometryLayout, 0, 1, &m_geometryDescriptorSet, 0 , nullptr);
 	vkCmdBindPipeline(m_deferredRenderingCommandSet, VK_PIPELINE_BIND_POINT_GRAPHICS, m_geometryPipeline);
@@ -55,6 +63,7 @@ void GPUFixedContext::draw_geometryUpdate(void) {
 	
 	vkEndCommandBuffer(m_deferredRenderingCommandSet);
 	vkQueueSubmit(m_deferredRenderingCommandQueue, 1, &g_submitInfo, VK_NULL_HANDLE);
+	vkQueueWaitIdle(m_deferredRenderingCommandQueue);
 }
 
 

@@ -141,12 +141,7 @@ void GPUFixedContext::build_localAllocation(GPULocalAllocation* in_local, GPUSta
 		.dstOffset = 0,
 		.size = Requirements.size
 	};
-	const VkCommandBufferBeginInfo BeginInfo = {
-		.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
-		.pNext = nullptr,
-		.flags = 0,
-		.pInheritanceInfo = nullptr
-	};
+
 	const VkSubmitInfo SubmitInfo = {
 		.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
 		.pNext = nullptr,
@@ -158,7 +153,7 @@ void GPUFixedContext::build_localAllocation(GPULocalAllocation* in_local, GPUSta
 		.signalSemaphoreCount = 0,
 		.pSignalSemaphores = nullptr
 	};
-	CHECK(vkBeginCommandBuffer(m_deferredRenderingCommandSet, &BeginInfo))
+	CHECK(vkBeginCommandBuffer(m_deferredRenderingCommandSet, &G_FIXED_COMMAND_BEGIN_INFO))
 	vkCmdCopyBuffer(m_deferredRenderingCommandSet, in_stage->buffer, in_local->buffer, 1, &Region);
 	vkEndCommandBuffer(m_deferredRenderingCommandSet);
 	CHECK(vkQueueSubmit(m_deferredRenderingCommandQueue, 1, &SubmitInfo, VK_NULL_HANDLE))
@@ -281,12 +276,7 @@ void GPUFixedContext::build_localTexture(GPULocalTexture* in_texture, GPUStageAl
 			.layerCount = 1
 		},
 	};
-	const VkCommandBufferBeginInfo BeginInfo = {
-		.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
-		.pNext = nullptr,
-		.flags = 0,
-		.pInheritanceInfo = nullptr
-	};
+
 	const VkSubmitInfo SubmitInfo = {
 		.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
 		.pNext = nullptr,
@@ -298,7 +288,7 @@ void GPUFixedContext::build_localTexture(GPULocalTexture* in_texture, GPUStageAl
 		.signalSemaphoreCount = 0,
 		.pSignalSemaphores = nullptr
 	};
-	CHECK(vkBeginCommandBuffer(m_deferredRenderingCommandSet, &BeginInfo))
+	CHECK(vkBeginCommandBuffer(m_deferredRenderingCommandSet, &G_FIXED_COMMAND_BEGIN_INFO))
 	vkCmdPipelineBarrier(m_deferredRenderingCommandSet, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 0, nullptr, 1, &UnToDstBarrier);
 	vkCmdCopyBufferToImage(m_deferredRenderingCommandSet, in_stage->buffer, in_texture->image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &Region);
 	vkCmdPipelineBarrier(m_deferredRenderingCommandSet, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0, nullptr, 0, nullptr, 1, &DstToReadBarrier);

@@ -14,7 +14,8 @@ void GPUFixedContext::build_geometryFramebuffer(void) {
 		const VkFormat Formats[ATTACHMENT_COUNT] = {GEOMETRY_PASS_COLOUR_ATTACHMENT_FORMATS, VK_FORMAT_D32_SFLOAT};
 		for(uint32_t i = 0; i < ATTACHMENT_COUNT; i++) {
 			const VkImageUsageFlags Flags = Formats[i] != VK_FORMAT_D32_SFLOAT ? VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT : VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
-			build_localTexture(&m_geometryTextures[i], nullptr, Formats[i], m_surfaceExtent, Flags);
+			const VkImageLayout Layout = Formats[i] != VK_FORMAT_D32_SFLOAT ? VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL : VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL;
+			build_localTexture(&m_geometryTextures[i], nullptr, Formats[i], m_surfaceExtent, Flags, Layout);
 		}
 	}
 	

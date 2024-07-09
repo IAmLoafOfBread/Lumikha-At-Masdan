@@ -13,7 +13,7 @@ void GPUFixedContext::build_shadowMappingFramebuffers(void) {
 		Extent.width /= Divisor;
 		Extent.height /= Divisor;
 		for(uint32_t j = 0; j < MAX_LIGHT_COUNT; j++) {
-			build_localTexture(&m_shadowTextures[i][j], nullptr, VK_FORMAT_D32_SFLOAT, Extent, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT);
+			build_localTexture(&m_shadowTextures[i][j], nullptr, VK_FORMAT_D32_SFLOAT, Extent, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
 		}
 		Divisor++;
 	}

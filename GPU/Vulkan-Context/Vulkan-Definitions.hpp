@@ -39,6 +39,7 @@ typedef VkFormat GPUFormat;
 typedef VkColorSpaceKHR GPUColourSpace;
 typedef VkBufferUsageFlags GPUBufferUsageFlags;
 typedef VkImageUsageFlags GPUImageUsageFlags;
+typedef VkImageLayout GPUImageLayout;
 typedef VkBuffer GPUBuffer;
 struct GPUSharedAllocation {
 	VkBuffer buffer;

@@ -170,9 +170,7 @@ void GPUFixedContext::ruin_localAllocation(GPULocalAllocation* in_local) {
 
 
 
-void GPUFixedContext::build_localTexture(GPULocalTexture* in_texture, GPUStageAllocation* in_stage, GPUFormat in_format, GPUExtent3D in_extent, GPUImageUsageFlags in_flags) {
-	if(in_stage != nullptr) vkUnmapMemory(m_logical, in_stage->memory);
-	
+void GPUFixedContext::build_localTexture(GPULocalTexture* in_texture, GPUStageAllocation* in_stage, GPUFormat in_format, GPUExtent3D in_extent, GPUImageUsageFlags in_flags, GPUImageLayout in_layout) {
 	{
 		const VkImageCreateInfo CreateInfo = {
 			.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
@@ -225,57 +223,28 @@ void GPUFixedContext::build_localTexture(GPULocalTexture* in_texture, GPUStageAl
 		CHECK(vkCreateImageView(m_logical, &CreateInfo, nullptr, &in_texture->view))
 	}
 	
-	if(in_stage == nullptr) return;
-	
-	const VkBufferImageCopy Region = {
-		.bufferOffset = 0,
-		.bufferRowLength = 0,
-		.bufferImageHeight = 0,
-		.imageSubresource = {
-			.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
-			.mipLevel = 0,
-			.baseArrayLayer = 0,
-			.layerCount = 1
-		},
-			.imageOffset = { 0 },
-			.imageExtent = in_extent
-	};
-	const VkImageMemoryBarrier UnToDstBarrier = {
-		.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
-		.pNext = nullptr,
-		.srcAccessMask = 0,
-		.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT,
-		.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED,
-		.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-		.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
-		.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
-		.image = in_texture->image,
-		.subresourceRange = {
-			.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
-			.baseMipLevel = 0,
-			.levelCount = 1,
-			.baseArrayLayer = 0,
-			.layerCount = 1
-		},
-	};
-	const VkImageMemoryBarrier DstToReadBarrier = {
-		.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
-		.pNext = nullptr,
-		.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT,
-		.dstAccessMask = VK_ACCESS_SHADER_READ_BIT,
-		.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-		.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-		.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
-		.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
-		.image = in_texture->image,
-		.subresourceRange = {
-			.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
-			.baseMipLevel = 0,
-			.levelCount = 1,
-			.baseArrayLayer = 0,
-			.layerCount = 1
-		},
-	};
+	VkAccessFlags AccessFlags = 0;
+	if(in_layout == VK_IMAGE_LAYOUT_READ_ONLY_OPTIMAL) {
+		AccessFlags = VK_ACCESS_SHADER_READ_BIT;
+	}
+	if(in_layout == VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL) {
+		AccessFlags = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+	}
+	if(in_layout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL) {
+		AccessFlags = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+	}
+
+	VkPipelineStageFlags StageFlags = 0;
+	if (in_layout == VK_IMAGE_LAYOUT_READ_ONLY_OPTIMAL) {
+		StageFlags = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+	}
+	if (in_layout == VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL) {
+		StageFlags = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+	}
+	if (in_layout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL) {
+		StageFlags = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+	}
+
 
 	const VkSubmitInfo SubmitInfo = {
 		.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
@@ -288,15 +257,98 @@ void GPUFixedContext::build_localTexture(GPULocalTexture* in_texture, GPUStageAl
 		.signalSemaphoreCount = 0,
 		.pSignalSemaphores = nullptr
 	};
-	CHECK(vkBeginCommandBuffer(m_deferredRenderingCommandSet, &G_FIXED_COMMAND_BEGIN_INFO))
-	vkCmdPipelineBarrier(m_deferredRenderingCommandSet, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 0, nullptr, 1, &UnToDstBarrier);
-	vkCmdCopyBufferToImage(m_deferredRenderingCommandSet, in_stage->buffer, in_texture->image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &Region);
-	vkCmdPipelineBarrier(m_deferredRenderingCommandSet, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0, nullptr, 0, nullptr, 1, &DstToReadBarrier);
-	vkEndCommandBuffer(m_deferredRenderingCommandSet);
-	CHECK(vkQueueSubmit(m_deferredRenderingCommandQueue, 1, &SubmitInfo, VK_NULL_HANDLE))
-	CHECK(vkQueueWaitIdle(m_deferredRenderingCommandQueue))
-	vkFreeMemory(m_logical, in_stage->memory, nullptr);
-	vkDestroyBuffer(m_logical, in_stage->buffer, nullptr);
+
+	if(in_stage == nullptr) {
+		const VkImageMemoryBarrier UnToLayoutBarrier = {
+			.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
+			.pNext = nullptr,
+			.srcAccessMask = 0,
+			.dstAccessMask = AccessFlags,
+			.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED,
+			.newLayout = in_layout,
+			.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+			.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+			.image = in_texture->image,
+			.subresourceRange = {
+				.aspectMask = static_cast<VkImageAspectFlags>(in_flags & VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT ? VK_IMAGE_ASPECT_DEPTH_BIT : VK_IMAGE_ASPECT_COLOR_BIT),
+				.baseMipLevel = 0,
+				.levelCount = 1,
+				.baseArrayLayer = 0,
+				.layerCount = 1
+			},
+		};
+
+		CHECK(vkBeginCommandBuffer(m_deferredRenderingCommandSet, &G_FIXED_COMMAND_BEGIN_INFO))
+		vkCmdPipelineBarrier(m_deferredRenderingCommandSet, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, StageFlags, 0, 0, nullptr, 0, nullptr, 1, &UnToLayoutBarrier);
+		vkEndCommandBuffer(m_deferredRenderingCommandSet);
+		CHECK(vkQueueSubmit(m_deferredRenderingCommandQueue, 1, &SubmitInfo, VK_NULL_HANDLE))
+		CHECK(vkQueueWaitIdle(m_deferredRenderingCommandQueue))
+	} else {
+		vkUnmapMemory(m_logical, in_stage->memory);
+
+		const VkBufferImageCopy Region = {
+			.bufferOffset = 0,
+			.bufferRowLength = 0,
+			.bufferImageHeight = 0,
+			.imageSubresource = {
+				.aspectMask = static_cast<VkImageAspectFlags>(in_flags & VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT ? VK_IMAGE_ASPECT_DEPTH_BIT : VK_IMAGE_ASPECT_COLOR_BIT),
+				.mipLevel = 0,
+				.baseArrayLayer = 0,
+				.layerCount = 1
+			},
+				.imageOffset = { 0 },
+				.imageExtent = in_extent
+		};
+		const VkImageMemoryBarrier UnToDstBarrier = {
+			.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
+			.pNext = nullptr,
+			.srcAccessMask = 0,
+			.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT,
+			.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED,
+			.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+			.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+			.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+			.image = in_texture->image,
+			.subresourceRange = {
+				.aspectMask = static_cast<VkImageAspectFlags>(in_flags & VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT ? VK_IMAGE_ASPECT_DEPTH_BIT : VK_IMAGE_ASPECT_COLOR_BIT),
+				.baseMipLevel = 0,
+				.levelCount = 1,
+				.baseArrayLayer = 0,
+				.layerCount = 1
+			},
+		};
+
+		const VkImageMemoryBarrier DstToLayoutBarrier = {
+			.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
+			.pNext = nullptr,
+			.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT,
+			.dstAccessMask = AccessFlags,
+			.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+			.newLayout = in_layout,
+			.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+			.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+			.image = in_texture->image,
+			.subresourceRange = {
+				.aspectMask = static_cast<VkImageAspectFlags>(in_flags & VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT ? VK_IMAGE_ASPECT_DEPTH_BIT : VK_IMAGE_ASPECT_COLOR_BIT),
+				.baseMipLevel = 0,
+				.levelCount = 1,
+				.baseArrayLayer = 0,
+				.layerCount = 1
+			},
+		};
+
+		CHECK(vkBeginCommandBuffer(m_deferredRenderingCommandSet, &G_FIXED_COMMAND_BEGIN_INFO))
+		vkCmdPipelineBarrier(m_deferredRenderingCommandSet, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 0, nullptr, 1, &UnToDstBarrier);
+		vkCmdCopyBufferToImage(m_deferredRenderingCommandSet, in_stage->buffer, in_texture->image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &Region);
+		vkCmdPipelineBarrier(m_deferredRenderingCommandSet, VK_PIPELINE_STAGE_TRANSFER_BIT, StageFlags, 0, 0, nullptr, 0, nullptr, 1, &DstToLayoutBarrier);
+		vkEndCommandBuffer(m_deferredRenderingCommandSet);
+		CHECK(vkQueueSubmit(m_deferredRenderingCommandQueue, 1, &SubmitInfo, VK_NULL_HANDLE))
+		CHECK(vkQueueWaitIdle(m_deferredRenderingCommandQueue))
+		vkFreeMemory(m_logical, in_stage->memory, nullptr);
+		vkDestroyBuffer(m_logical, in_stage->buffer, nullptr);
+	}
+	
+	
 }
 
 void GPUFixedContext::ruin_localTexture(GPULocalTexture* in_texture) {

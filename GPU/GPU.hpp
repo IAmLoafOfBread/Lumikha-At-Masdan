@@ -166,7 +166,7 @@ private:
 	void ruin_sharedAllocation(GPUSharedAllocation* in_shared);
 	void build_localAllocation(GPULocalAllocation* in_local, GPUStageAllocation* in_stage, GPUBufferUsageFlags in_flags);
 	void ruin_localAllocation(GPULocalAllocation* in_local);
-	void build_localTexture(GPULocalTexture* in_texture, GPUStageAllocation* in_stage, GPUFormat in_format, GPUExtent3D in_extent, GPUImageUsageFlags in_flags);
+	void build_localTexture(GPULocalTexture* in_texture, GPUStageAllocation* in_stage, GPUFormat in_format, GPUExtent3D in_extent, GPUImageUsageFlags in_flags, GPUImageLayout in_layout);
 	void ruin_localTexture(GPULocalTexture* in_texture);
 	
 	void build_module(GPUModule* in_module, const char* in_path);

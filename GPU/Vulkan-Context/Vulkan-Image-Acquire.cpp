@@ -26,11 +26,12 @@ void GPUFixedContext::initialize_imageAcquiring(void) {
 }
 
 void GPUFixedContext::acquire_nextImage(void) {
+	m_imageAvailableStatus = 2;
+
+	vkResetFences(m_logical, 1, &g_fence);
 	vkAcquireNextImageKHR(m_logical, m_swapchain, UINT64_MAX, VK_NULL_HANDLE, g_fence, &m_currentImageIndex);
 	vkWaitForFences(m_logical, 1, &g_fence, VK_TRUE, UINT64_MAX);
 	vkSignalSemaphore(m_logical, &g_signalInfo);
-	
-	m_imageAvailableStatus = 2;
 }
 
 

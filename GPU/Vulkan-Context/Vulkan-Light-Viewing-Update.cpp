@@ -30,6 +30,7 @@ void GPUFixedContext::initialize_lightViewingUpdateData(void) {
 
 void GPUFixedContext::dispatch_lightViewingUpdate(void) {
 	m_imageAvailableStatus--;
+	m_lightViewingsFinishedStatus = g_signalValue;
 
 	vkBeginCommandBuffer(m_lightViewingCommandSet, &G_FIXED_COMMAND_BEGIN_INFO);
 	vkCmdBindPipeline(m_lightViewingCommandSet, VK_PIPELINE_BIND_POINT_COMPUTE, m_lightViewingPipeline);

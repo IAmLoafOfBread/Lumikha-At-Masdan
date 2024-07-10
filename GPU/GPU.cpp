@@ -134,7 +134,7 @@ GPUFixedContext::GPUFixedContext(uint32_t in_directoryLength, char* in_directory
 	
 	update_camera();
 
-	initialize_imageAcquiring();
+	initialize_imageAcquiringUpdateData();
 	initialize_lightViewingUpdateData();
 	for (uint32_t i = 0; i < CASCADED_SHADOW_MAP_COUNT; i++) {
 		initialize_shadowMappingUpdateData(i, i + 1);
@@ -145,6 +145,7 @@ GPUFixedContext::GPUFixedContext(uint32_t in_directoryLength, char* in_directory
 }
 
 GPUFixedContext::~GPUFixedContext() {
+	await_device();
 	ruin_semaphores();
 	ruin_subFrusta();
 	ruin_sampler();

@@ -35,6 +35,7 @@ typedef VkPipelineLayout GPUGraphicsLayout;
 typedef VkPipeline GPUComputePipeline;
 typedef VkPipelineLayout GPUComputeLayout;
 typedef VkDrawIndirectCommand GPUIndirectDrawCommand;
+typedef VkFence GPUFence;
 typedef VkSemaphore GPUSemaphore;
 typedef VkFormat GPUFormat;
 typedef VkColorSpaceKHR GPUColourSpace;

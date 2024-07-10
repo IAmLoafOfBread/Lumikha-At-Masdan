@@ -32,70 +32,81 @@ void GPUFixedContext::build_swapchain(void) {
 	
 	m_presentImages = new GPUTextureImage[m_surfaceFrameCount];
 	CHECK(vkGetSwapchainImagesKHR(m_logical, m_swapchain, &m_surfaceFrameCount, m_presentImages))
-	
-	m_presentViews = new GPUTextureView[m_surfaceFrameCount];
-	VkImageViewCreateInfo CreateInfo = {
-		.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
-		.pNext = nullptr,
-		.flags = 0,
-		.image = VK_NULL_HANDLE,
-		.viewType = VK_IMAGE_VIEW_TYPE_2D,
-		.format = m_surfaceFormat,
-		.components = { VK_COMPONENT_SWIZZLE_IDENTITY },
-		.subresourceRange = {
-			.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
-			.baseMipLevel = 0,
-			.levelCount = 1,
-			.baseArrayLayer = 0,
-			.layerCount = 1
+
+	{
+		m_presentViews = new GPUTextureView[m_surfaceFrameCount];
+		VkImageViewCreateInfo CreateInfo = {
+			.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
+			.pNext = nullptr,
+			.flags = 0,
+			.image = VK_NULL_HANDLE,
+			.viewType = VK_IMAGE_VIEW_TYPE_2D,
+			.format = m_surfaceFormat,
+			.components = { VK_COMPONENT_SWIZZLE_IDENTITY },
+			.subresourceRange = {
+				.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+				.baseMipLevel = 0,
+				.levelCount = 1,
+				.baseArrayLayer = 0,
+				.layerCount = 1
+			}
+		};
+
+		const VkSubmitInfo SubmitInfo = {
+			.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
+			.pNext = nullptr,
+			.waitSemaphoreCount = 0,
+			.pWaitSemaphores = nullptr,
+			.pWaitDstStageMask = nullptr,
+			.commandBufferCount = 1,
+			.pCommandBuffers = &m_deferredRenderingCommandSet,
+			.signalSemaphoreCount = 0,
+			.pSignalSemaphores = nullptr
+		};
+
+		VkImageMemoryBarrier Barrier = {
+			.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
+			.pNext = nullptr,
+			.srcAccessMask = 0,
+			.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
+			.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED,
+			.newLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+			.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+			.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+			.image = VK_NULL_HANDLE,
+			.subresourceRange = {
+				.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+				.baseMipLevel = 0,
+				.levelCount = 1,
+				.baseArrayLayer = 0,
+				.layerCount = 1
+			},
+		};
+
+		for(uint32_t i = 0; i < m_surfaceFrameCount; i++) {
+			CreateInfo.image = m_presentImages[i];
+			CHECK(vkCreateImageView(m_logical, &CreateInfo, nullptr, &m_presentViews[i]))
+
+			Barrier.image = m_presentImages[i];
+			CHECK(vkBeginCommandBuffer(m_deferredRenderingCommandSet, &G_FIXED_COMMAND_BEGIN_INFO))
+			vkCmdPipelineBarrier(m_deferredRenderingCommandSet, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, 0, 0, nullptr, 0, nullptr, 1, &Barrier);
+			vkEndCommandBuffer(m_deferredRenderingCommandSet);
+			CHECK(vkQueueSubmit(m_deferredRenderingCommandQueue, 1, &SubmitInfo, VK_NULL_HANDLE))
+			CHECK(vkQueueWaitIdle(m_deferredRenderingCommandQueue))
 		}
-	};
-
-	const VkSubmitInfo SubmitInfo = {
-		.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
-		.pNext = nullptr,
-		.waitSemaphoreCount = 0,
-		.pWaitSemaphores = nullptr,
-		.pWaitDstStageMask = nullptr,
-		.commandBufferCount = 1,
-		.pCommandBuffers = &m_deferredRenderingCommandSet,
-		.signalSemaphoreCount = 0,
-		.pSignalSemaphores = nullptr
-	};
-
-	VkImageMemoryBarrier Barrier = {
-		.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
-		.pNext = nullptr,
-		.srcAccessMask = 0,
-		.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
-		.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED,
-		.newLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-		.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
-		.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
-		.image = VK_NULL_HANDLE,
-		.subresourceRange = {
-			.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
-			.baseMipLevel = 0,
-			.levelCount = 1,
-			.baseArrayLayer = 0,
-			.layerCount = 1
-		},
-	};
-
-	for(uint32_t i = 0; i < m_surfaceFrameCount; i++) {
-		CreateInfo.image = m_presentImages[i];
-		CHECK(vkCreateImageView(m_logical, &CreateInfo, nullptr, &m_presentViews[i]))
-
-		Barrier.image = m_presentImages[i];
-		CHECK(vkBeginCommandBuffer(m_deferredRenderingCommandSet, &G_FIXED_COMMAND_BEGIN_INFO))
-		vkCmdPipelineBarrier(m_deferredRenderingCommandSet, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, 0, 0, nullptr, 0, nullptr, 1, &Barrier);
-		vkEndCommandBuffer(m_deferredRenderingCommandSet);
-		CHECK(vkQueueSubmit(m_deferredRenderingCommandQueue, 1, &SubmitInfo, VK_NULL_HANDLE))
-		CHECK(vkQueueWaitIdle(m_deferredRenderingCommandQueue))
 	}
+
+	const VkFenceCreateInfo CreateInfo = {
+		.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO,
+		.pNext = nullptr,
+		.flags = 0
+	};
+	CHECK(vkCreateFence(m_logical, &CreateInfo, nullptr, &m_swapchainFence))
 }
 
 void GPUFixedContext::ruin_swapchain(void) {
+	vkDestroyFence(m_logical, m_swapchainFence, nullptr);
+
 	for(uint32_t i = 0; i < m_surfaceFrameCount; i++) vkDestroyImageView(m_logical, m_presentViews[i], nullptr);
 	delete[] m_presentViews;
 	vkDestroySwapchainKHR(m_logical, m_swapchain, nullptr);

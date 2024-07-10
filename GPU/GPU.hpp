@@ -35,8 +35,8 @@ public:
 	
 	Camera m_cameraData;
 	
-	void initialize_imageAcquiring(void);
-	void acquire_nextImage(void);
+	void initialize_imageAcquiringUpdateData(void);
+	void acquire_nextImageUpdate(void);
 
 	void calculate_subFrustum(uint32_t in_index, uint32_t in_multiplier);
 	
@@ -97,6 +97,7 @@ private:
 	GPURenderPass m_lightingPass;
 	
 	GPUSwapchain m_swapchain;
+	GPUFence m_swapchainFence;
 	GPUTextureImage* m_presentImages;
 	GPUTextureView* m_presentViews;
 	
@@ -177,7 +178,9 @@ private:
 	void ruin_commandThread(GPUCommandPool* in_pool, GPUCommandSet* in_set);
 	void build_device(GLFWwindow* in_window, GPUExtent3D in_extent);
 	void ruin_device(void);
-	
+
+	void await_device(void);
+
 	void build_shadowMappingPass(void);
 	void ruin_shadowMappingPass(void);
 	

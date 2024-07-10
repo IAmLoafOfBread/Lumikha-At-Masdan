@@ -30,8 +30,8 @@ void GPUFixedContext::build_swapchain(void) {
 		CHECK(vkCreateSwapchainKHR(m_logical, &CreateInfo, nullptr, &m_swapchain));
 	}
 	
-	auto Images = new VkImage[m_surfaceFrameCount];
-	CHECK(vkGetSwapchainImagesKHR(m_logical, m_swapchain, &m_surfaceFrameCount, Images))
+	m_presentImages = new GPUTextureImage[m_surfaceFrameCount];
+	CHECK(vkGetSwapchainImagesKHR(m_logical, m_swapchain, &m_surfaceFrameCount, m_presentImages))
 	
 	m_presentViews = new GPUTextureView[m_surfaceFrameCount];
 	VkImageViewCreateInfo CreateInfo = {
@@ -82,21 +82,17 @@ void GPUFixedContext::build_swapchain(void) {
 		},
 	};
 
-
-
 	for(uint32_t i = 0; i < m_surfaceFrameCount; i++) {
-		CreateInfo.image = Images[i];
+		CreateInfo.image = m_presentImages[i];
 		CHECK(vkCreateImageView(m_logical, &CreateInfo, nullptr, &m_presentViews[i]))
 
-		Barrier.image = Images[i];
+		Barrier.image = m_presentImages[i];
 		CHECK(vkBeginCommandBuffer(m_deferredRenderingCommandSet, &G_FIXED_COMMAND_BEGIN_INFO))
 		vkCmdPipelineBarrier(m_deferredRenderingCommandSet, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, 0, 0, nullptr, 0, nullptr, 1, &Barrier);
 		vkEndCommandBuffer(m_deferredRenderingCommandSet);
 		CHECK(vkQueueSubmit(m_deferredRenderingCommandQueue, 1, &SubmitInfo, VK_NULL_HANDLE))
 		CHECK(vkQueueWaitIdle(m_deferredRenderingCommandQueue))
 	}
-	
-	delete[] Images;
 }
 
 void GPUFixedContext::ruin_swapchain(void) {

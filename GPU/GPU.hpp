@@ -97,6 +97,7 @@ private:
 	GPURenderPass m_lightingPass;
 	
 	GPUSwapchain m_swapchain;
+	GPUTextureImage* m_presentImages;
 	GPUTextureView* m_presentViews;
 	
 	GPULocalTexture m_shadowTextures[CASCADED_SHADOW_MAP_COUNT][MAX_LIGHT_COUNT];

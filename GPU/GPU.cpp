@@ -35,6 +35,7 @@ GPUFixedContext::GPUFixedContext(uint32_t in_directoryLength, char* in_directory
 	m_geometryPass(GPU_NULL_HANDLE),
 	m_lightingPass(GPU_NULL_HANDLE),
 	m_swapchain(GPU_NULL_HANDLE),
+	m_presentImages(nullptr),
 	m_presentViews(nullptr),
 	m_shadowTextures{ { GPU_NULL_HANDLE } },
 	m_shadowMappingFramebuffers{ { GPU_NULL_HANDLE } },

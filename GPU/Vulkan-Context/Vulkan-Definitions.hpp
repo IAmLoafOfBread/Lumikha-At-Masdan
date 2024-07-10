@@ -23,6 +23,7 @@ typedef VkCommandBuffer GPUCommandSet;
 typedef VkShaderModule GPUModule;
 typedef VkRenderPass GPURenderPass;
 typedef VkSwapchainKHR GPUSwapchain;
+typedef VkImage GPUTextureImage;
 typedef VkImageView GPUTextureView;
 typedef VkFramebuffer GPUFramebuffer;
 typedef VkDescriptorPool GPUDescriptorPool;

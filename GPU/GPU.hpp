@@ -55,7 +55,7 @@ public:
 	void initialize_lightViewingUpdateData(void);
 	void dispatch_lightViewingUpdate(void);
 	
-	void initialize_shadowMappingUpdateData(uint32_t in_index, uint32_t in_divisor);
+	void initialize_shadowMappingUpdateData(void);
 	void draw_shadowMappingUpdate(uint32_t in_index, uint32_t in_divisor);
 	
 	void initialize_geometryUpdateData(void);

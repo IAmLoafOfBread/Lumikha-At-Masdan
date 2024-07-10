@@ -11,34 +11,37 @@ static VkTimelineSemaphoreSubmitInfo g_timelineInfo = { VK_STRUCTURE_TYPE_TIMELI
 static VkSubmitInfo g_submitInfos[CASCADED_SHADOW_MAP_COUNT] = { { VK_STRUCTURE_TYPE_SUBMIT_INFO } };
 
 
-void GPUFixedContext::initialize_shadowMappingUpdateData(uint32_t in_index, uint32_t in_divisor) {
-	const VkExtent3D Extent = SHADOW_MAP_EXTENT;
-	g_renderInfos[in_index].sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-	g_renderInfos[in_index].pNext = nullptr;
-	g_renderInfos[in_index].renderPass = m_shadowMappingPass;
-	g_renderInfos[in_index].framebuffer = VK_NULL_HANDLE;
-	g_renderInfos[in_index].renderArea.offset.x = 0;
-	g_renderInfos[in_index].renderArea.offset.y = 0;
-	g_renderInfos[in_index].renderArea.extent.width = Extent.width / in_divisor;
-	g_renderInfos[in_index].renderArea.extent.height = Extent.height / in_divisor;
-	g_renderInfos[in_index].clearValueCount = 1;
-	g_renderInfos[in_index].pClearValues = &G_FIXED_DEPTH_CLEAR_VALUE;
-	
+void GPUFixedContext::initialize_shadowMappingUpdateData(void) {
 	g_timelineInfo.pNext = nullptr;
 	g_timelineInfo.waitSemaphoreValueCount = 1;
 	g_timelineInfo.pWaitSemaphoreValues = &m_lightViewingsFinishedStatus;
 	g_timelineInfo.signalSemaphoreValueCount = 0;
 	g_timelineInfo.pSignalSemaphoreValues = nullptr;
 
-	g_submitInfos[in_index].sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-	g_submitInfos[in_index].pNext = &g_timelineInfo;
-	g_submitInfos[in_index].waitSemaphoreCount = 1;
-	g_submitInfos[in_index].pWaitSemaphores = &m_lightViewingsFinishedSemaphore;
-	g_submitInfos[in_index].pWaitDstStageMask = &G_FIXED_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
-	g_submitInfos[in_index].commandBufferCount = 1;
-	g_submitInfos[in_index].pCommandBuffers = &m_shadowMappingCommandSets[in_index];
-	g_submitInfos[in_index].signalSemaphoreCount = 1;
-	g_submitInfos[in_index].pSignalSemaphores = &m_shadowMappingsFinishedSemaphores[in_index];
+	const VkExtent3D Extent = SHADOW_MAP_EXTENT;
+	for(uint32_t i = 0; i < CASCADED_SHADOW_MAP_COUNT; i++) {
+		g_renderInfos[i].sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+		g_renderInfos[i].pNext = nullptr;
+		g_renderInfos[i].renderPass = m_shadowMappingPass;
+		g_renderInfos[i].framebuffer = VK_NULL_HANDLE;
+		g_renderInfos[i].renderArea.offset.x = 0;
+		g_renderInfos[i].renderArea.offset.y = 0;
+		g_renderInfos[i].renderArea.extent.width = Extent.width / (i + 1);
+		g_renderInfos[i].renderArea.extent.height = Extent.height / (i + 1);
+		g_renderInfos[i].clearValueCount = 1;
+		g_renderInfos[i].pClearValues = &G_FIXED_DEPTH_CLEAR_VALUE;
+	
+
+		g_submitInfos[i].sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+		g_submitInfos[i].pNext = &g_timelineInfo;
+		g_submitInfos[i].waitSemaphoreCount = 1;
+		g_submitInfos[i].pWaitSemaphores = &m_lightViewingsFinishedSemaphore;
+		g_submitInfos[i].pWaitDstStageMask = &G_FIXED_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+		g_submitInfos[i].commandBufferCount = 1;
+		g_submitInfos[i].pCommandBuffers = &m_shadowMappingCommandSets[i];
+		g_submitInfos[i].signalSemaphoreCount = 1;
+		g_submitInfos[i].pSignalSemaphores = &m_shadowMappingsFinishedSemaphores[i];
+	}
 }
 
 void GPUFixedContext::draw_shadowMappingUpdate(uint32_t in_index, uint32_t in_divisor) {

@@ -136,9 +136,7 @@ GPUFixedContext::GPUFixedContext(uint32_t in_directoryLength, char* in_directory
 
 	initialize_imageAcquiringUpdateData();
 	initialize_lightViewingUpdateData();
-	for (uint32_t i = 0; i < CASCADED_SHADOW_MAP_COUNT; i++) {
-		initialize_shadowMappingUpdateData(i, i + 1);
-	}
+	initialize_shadowMappingUpdateData();
 	initialize_geometryUpdateData();
 	initialize_lightingUpdateData();
 	initialize_presentUpdateData();

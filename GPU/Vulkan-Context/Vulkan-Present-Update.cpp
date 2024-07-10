@@ -49,7 +49,7 @@ void GPUFixedContext::initialize_presentUpdateData(void) {
 
 void GPUFixedContext::submit_presentUpdate(void) {
 	g_barrier.image = m_presentImages[m_currentImageIndex];
-	vkQueuePresentKHR(m_deferredRenderingCommandQueue, &g_presentInfo);
+	CHECK(vkQueuePresentKHR(m_deferredRenderingCommandQueue, &g_presentInfo))
 	CHECK(vkQueueWaitIdle(m_deferredRenderingCommandQueue))
 
 	CHECK(vkBeginCommandBuffer(m_deferredRenderingCommandSet, &G_FIXED_COMMAND_BEGIN_INFO))

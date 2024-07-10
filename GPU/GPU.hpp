@@ -15,6 +15,18 @@
 #include <GLFW/glfw3.h>
 #include <spng.h>
 
+#if defined(RUN_DEBUG)
+#include <stdio.h>
+inline void TRUE_CHECK(int32_t in_value) {
+	if(in_value != 0) {
+		printf("API CHECK -> %d\n", in_value);
+	}
+}
+#define CHECK(val) TRUE_CHECK(val);
+#elif defined(RUN_PRODUCT)
+#define CHECK(val) val
+#endif
+
 
 #define MAX_STRING_LENGTH 255
 

@@ -50,7 +50,7 @@ void GPUFixedContext::initialize_geometryUpdateData(void) {
 void GPUFixedContext::draw_geometryUpdate(void) {
 	m_imageAvailableStatus--;
 
-	vkBeginCommandBuffer(m_deferredRenderingCommandSet, &G_FIXED_COMMAND_BEGIN_INFO);
+	CHECK(vkBeginCommandBuffer(m_deferredRenderingCommandSet, &G_FIXED_COMMAND_BEGIN_INFO))
 	vkCmdBindDescriptorSets(m_deferredRenderingCommandSet, VK_PIPELINE_BIND_POINT_GRAPHICS, m_geometryLayout, 0, 1, &m_geometryDescriptorSet, 0 , nullptr);
 	vkCmdBindPipeline(m_deferredRenderingCommandSet, VK_PIPELINE_BIND_POINT_GRAPHICS, m_geometryPipeline);
 	vkCmdPushConstants(m_deferredRenderingCommandSet, m_geometryLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(View), &m_cameraView);
@@ -61,9 +61,9 @@ void GPUFixedContext::draw_geometryUpdate(void) {
 	vkCmdDrawIndirect(m_deferredRenderingCommandSet, m_indirectCommandBuffer, 0, m_meshCount, sizeof(VkDrawIndirectCommand));
 	vkCmdEndRenderPass(m_deferredRenderingCommandSet);
 	
-	vkEndCommandBuffer(m_deferredRenderingCommandSet);
-	vkQueueSubmit(m_deferredRenderingCommandQueue, 1, &g_submitInfo, VK_NULL_HANDLE);
-	vkQueueWaitIdle(m_deferredRenderingCommandQueue);
+	CHECK(vkEndCommandBuffer(m_deferredRenderingCommandSet))
+	CHECK(vkQueueSubmit(m_deferredRenderingCommandQueue, 1, &g_submitInfo, VK_NULL_HANDLE))
+	CHECK(vkQueueWaitIdle(m_deferredRenderingCommandQueue))
 }
 
 

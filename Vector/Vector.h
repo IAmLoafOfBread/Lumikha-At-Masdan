@@ -9,13 +9,6 @@ extern "C" {
 
 #include <stdint.h>
 
-#if defined(RUN_DEBUG)
-#include <stdio.h>
-#define CHECK(val) printf("API CHECK -> %d   %s\n", val, #val);
-#elif defined(RUN_PRODUCT)
-#define CHECK(val) val
-#endif
-
 #define NULL_VALUE 2147483640
 #define LENGTH_OF(array) (sizeof(array) / sizeof(array[0]))
 

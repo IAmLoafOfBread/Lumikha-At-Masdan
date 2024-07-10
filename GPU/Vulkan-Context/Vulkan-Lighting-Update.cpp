@@ -80,7 +80,7 @@ void GPUFixedContext::initialize_lightingUpdateData(void) {
 void GPUFixedContext::draw_lightingUpdate(void) {
 	g_renderInfo.framebuffer = m_lightingFramebuffers[m_currentImageIndex];
 	
-	vkBeginCommandBuffer(m_deferredRenderingCommandSet, &G_FIXED_COMMAND_BEGIN_INFO);
+	CHECK(vkBeginCommandBuffer(m_deferredRenderingCommandSet, &G_FIXED_COMMAND_BEGIN_INFO))
 	vkCmdBindDescriptorSets(m_deferredRenderingCommandSet, VK_PIPELINE_BIND_POINT_GRAPHICS, m_lightingLayout, 0, 1, &m_lightingDescriptorSet, 0, nullptr);
 	vkCmdBindPipeline(m_deferredRenderingCommandSet, VK_PIPELINE_BIND_POINT_GRAPHICS, m_lightingPipeline);
 	vkCmdPushConstants(m_deferredRenderingCommandSet, m_lightingLayout, VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(uint32_t), &m_lightCount);
@@ -94,8 +94,8 @@ void GPUFixedContext::draw_lightingUpdate(void) {
 	}
 	vkCmdPipelineBarrier(m_deferredRenderingCommandSet, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, 0, 0, nullptr, 0, nullptr, GEOMETRY_PASS_COLOUR_ATTACHMENT_COUNT, g_geometryBarriers);
 	
-	vkEndCommandBuffer(m_deferredRenderingCommandSet);
-	vkQueueSubmit(m_deferredRenderingCommandQueue, 1, &g_submitInfo, VK_NULL_HANDLE);
+	CHECK(vkEndCommandBuffer(m_deferredRenderingCommandSet))
+	CHECK(vkQueueSubmit(m_deferredRenderingCommandQueue, 1, &g_submitInfo, VK_NULL_HANDLE))
 }
 
 

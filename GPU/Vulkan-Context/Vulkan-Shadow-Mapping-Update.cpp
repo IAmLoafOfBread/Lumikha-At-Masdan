@@ -48,7 +48,7 @@ void GPUFixedContext::draw_shadowMappingUpdate(uint32_t in_index, uint32_t in_di
 		if(m_lights[i].visible) {
 			g_renderInfos[in_index].framebuffer = m_shadowMappingFramebuffers[in_index][i];
 			
-			vkBeginCommandBuffer(m_shadowMappingCommandSets[in_index], &G_FIXED_COMMAND_BEGIN_INFO);
+			CHECK(vkBeginCommandBuffer(m_shadowMappingCommandSets[in_index], &G_FIXED_COMMAND_BEGIN_INFO))
 			vkCmdBindPipeline(m_shadowMappingCommandSets[in_index], VK_PIPELINE_BIND_POINT_GRAPHICS, m_shadowMappingPipelines[in_index]);
 			vkCmdBindVertexBuffers(m_shadowMappingCommandSets[in_index], 0, 1, &m_vertexBuffer, &m_fixedOffset);
 			vkCmdBindVertexBuffers(m_shadowMappingCommandSets[in_index], 1, 1, &m_instanceBuffer, &m_fixedOffset);
@@ -58,8 +58,8 @@ void GPUFixedContext::draw_shadowMappingUpdate(uint32_t in_index, uint32_t in_di
 			vkCmdDrawIndirect(m_shadowMappingCommandSets[in_index], m_indirectCommandBuffer, 0, m_meshCount, sizeof(VkDrawIndirectCommand));
 			vkCmdEndRenderPass(m_shadowMappingCommandSets[in_index]);
 			
-			vkEndCommandBuffer(m_shadowMappingCommandSets[in_index]);
-			vkQueueSubmit(m_shadowMappingCommandQueues[in_index], 1, &g_submitInfos[i], VK_NULL_HANDLE);
+			CHECK(vkEndCommandBuffer(m_shadowMappingCommandSets[in_index]))
+			CHECK(vkQueueSubmit(m_shadowMappingCommandQueues[in_index], 1, &g_submitInfos[i], VK_NULL_HANDLE))
 		}
 	}
 }

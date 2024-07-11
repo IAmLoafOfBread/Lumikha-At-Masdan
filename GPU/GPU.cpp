@@ -2,6 +2,10 @@
 
 
 
+#define name(v) "/ LaM::"#v".sem"
+
+
+
 GPUFixedContext::GPUFixedContext(uint32_t in_directoryLength, char* in_directory, GLFWwindow* in_surfaceWindow, GPUExtent3D in_surfaceExtent, const uint32_t in_meshCount, const uint32_t* in_instanceMaxCounts, const char** in_positionPaths, const char** in_normalPaths, const char** in_uvPaths, const char** in_indexPaths, const char*** in_texturePaths) :
 	m_directoryLength(in_directoryLength),
 	m_directory{ 0 },
@@ -66,12 +70,10 @@ GPUFixedContext::GPUFixedContext(uint32_t in_directoryLength, char* in_directory
 	m_sampler(GPU_NULL_HANDLE),
 	m_subFrustumAllocation{ GPU_NULL_HANDLE },
 	m_subFrusta(nullptr),
-	m_imageAvailableStatus(0),
-	m_imageAvailableSemaphore(GPU_NULL_HANDLE),
-	m_lightViewingsFinishedStatus(0),
-	m_lightViewingsFinishedSemaphore(GPU_NULL_HANDLE),
-	m_shadowMappingsFinishedSemaphores{ VK_NULL_HANDLE },
-	m_renderFinishedSemaphore(GPU_NULL_HANDLE),
+	m_lightViewingsFinishedSemaphores{ GPU_NULL_HANDLE },
+	m_shadowMappingsFinishedSemaphores{ GPU_NULL_HANDLE },
+	m_geometryFinishedSemaphore(GPU_NULL_HANDLE),
+	m_lightingFinishedSemaphores{ GPU_NULL_HANDLE },
 	m_cameraSemaphore(NULL),
 	m_instancesSemaphore(NULL),
 	m_lightsSemaphore(NULL),
@@ -131,10 +133,13 @@ GPUFixedContext::GPUFixedContext(uint32_t in_directoryLength, char* in_directory
 	set_lightingBindings();
 	
 	build_semaphores();
+
+	create_semaphore(&m_cameraSemaphore, name(m_cameraSemaphore));
+	create_semaphore(&m_instancesSemaphore, name(m_instancesSemaphore));
+	create_semaphore(&m_lightsSemaphore, name(m_lightsSemaphore));
 	
 	update_camera();
 
-	initialize_imageAcquiringUpdateData();
 	initialize_lightViewingUpdateData();
 	initialize_shadowMappingUpdateData();
 	initialize_geometryUpdateData();
@@ -144,6 +149,9 @@ GPUFixedContext::GPUFixedContext(uint32_t in_directoryLength, char* in_directory
 
 GPUFixedContext::~GPUFixedContext() {
 	await_device();
+	destroy_semaphore(m_cameraSemaphore, name(m_cameraSemaphore));
+	destroy_semaphore(m_instancesSemaphore, name(m_instancesSemaphore));
+	destroy_semaphore(m_lightsSemaphore, name(m_lightsSemaphore));
 	ruin_semaphores();
 	ruin_subFrusta();
 	ruin_sampler();

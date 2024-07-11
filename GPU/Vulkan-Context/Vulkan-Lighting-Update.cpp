@@ -8,10 +8,28 @@
 static VkImageMemoryBarrier g_shadowBarriers[CASCADED_SHADOW_MAP_COUNT][MAX_LIGHT_COUNT] = { { { VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER } } };
 static VkImageMemoryBarrier g_geometryBarriers[GEOMETRY_PASS_COLOUR_ATTACHMENT_COUNT] = { { VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER } };
 
-static const VkClearValue g_clearValue = {0.0f, 0.0f, 0.0f, 1.0f};
-static VkRenderPassBeginInfo g_renderInfo = { VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO };
-static VkPipelineStageFlags g_waitStages[CASCADED_SHADOW_MAP_COUNT] = { 0 };
-static VkSubmitInfo g_submitInfo = { VK_STRUCTURE_TYPE_SUBMIT_INFO };
+static VkRenderPassBeginInfo g_renderInfo = {
+	.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
+	.pNext = nullptr,
+	.renderPass = VK_NULL_HANDLE,
+	.framebuffer = VK_NULL_HANDLE,
+	.renderArea = { 0 },
+	.clearValueCount = 0,
+	.pClearValues = nullptr
+};
+static VkPipelineStageFlags g_waitStages[CASCADED_SHADOW_MAP_COUNT + 1] = { 0 };
+static VkSemaphore g_waitSemaphores[CASCADED_SHADOW_MAP_COUNT + 1] = { VK_NULL_HANDLE };
+static VkSubmitInfo g_submitInfo = {
+	.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
+	.pNext = nullptr,
+	.waitSemaphoreCount = CASCADED_SHADOW_MAP_COUNT + 1,
+	.pWaitSemaphores = g_waitSemaphores,
+	.pWaitDstStageMask = g_waitStages,
+	.commandBufferCount = 1,
+	.pCommandBuffers = nullptr,
+	.signalSemaphoreCount = 2,
+	.pSignalSemaphores = nullptr
+};
 
 
 
@@ -33,6 +51,7 @@ void GPUFixedContext::initialize_lightingUpdateData(void) {
 			g_shadowBarriers[i][j].subresourceRange.baseArrayLayer = 0;
 			g_shadowBarriers[i][j].subresourceRange.layerCount = 1;
 		}
+		g_waitSemaphores[i] = m_shadowMappingsFinishedSemaphores[i];
 	}
 
 	for (uint32_t i = 0; i < GEOMETRY_PASS_COLOUR_ATTACHMENT_COUNT; i++) {
@@ -52,32 +71,21 @@ void GPUFixedContext::initialize_lightingUpdateData(void) {
 		g_geometryBarriers[i].subresourceRange.layerCount = 1;
 	}
 
-	g_renderInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-	g_renderInfo.pNext = nullptr;
 	g_renderInfo.renderPass = m_lightingPass;
-	g_renderInfo.framebuffer = VK_NULL_HANDLE;
-	g_renderInfo.renderArea.offset.x = 0;
-	g_renderInfo.renderArea.offset.y = 0;
 	g_renderInfo.renderArea.extent.width = m_surfaceExtent.width;
 	g_renderInfo.renderArea.extent.height = m_surfaceExtent.height;
-	g_renderInfo.clearValueCount = 1;
-	g_renderInfo.pClearValues = &g_clearValue;
 	
-	for(uint32_t i = 0; i < CASCADED_SHADOW_MAP_COUNT; i++) {
+	for(uint32_t i = 0; i < CASCADED_SHADOW_MAP_COUNT + 1; i++) {
 		g_waitStages[i] = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
 	}
+	g_waitSemaphores[CASCADED_SHADOW_MAP_COUNT] = m_geometryFinishedSemaphore;
 	
-	g_submitInfo.pNext = nullptr;
-	g_submitInfo.waitSemaphoreCount = CASCADED_SHADOW_MAP_COUNT;
-	g_submitInfo.pWaitSemaphores = m_shadowMappingsFinishedSemaphores;
-	g_submitInfo.pWaitDstStageMask = g_waitStages;
-	g_submitInfo.commandBufferCount = 1;
 	g_submitInfo.pCommandBuffers = &m_deferredRenderingCommandSet;
-	g_submitInfo.signalSemaphoreCount = 1;
-	g_submitInfo.pSignalSemaphores = &m_renderFinishedSemaphore;
+	g_submitInfo.pSignalSemaphores = m_lightingFinishedSemaphores;
 }
 
 void GPUFixedContext::draw_lightingUpdate(void) {
+	CHECK(vkWaitForFences(m_logical, 1, &m_swapchainFence, VK_TRUE, UINT64_MAX))
 	g_renderInfo.framebuffer = m_lightingFramebuffers[m_currentImageIndex];
 	
 	CHECK(vkBeginCommandBuffer(m_deferredRenderingCommandSet, &G_FIXED_COMMAND_BEGIN_INFO))
@@ -93,8 +101,8 @@ void GPUFixedContext::draw_lightingUpdate(void) {
 		vkCmdPipelineBarrier(m_deferredRenderingCommandSet, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT, 0, 0, nullptr, 0, nullptr, m_lightCount, g_shadowBarriers[i]);
 	}
 	vkCmdPipelineBarrier(m_deferredRenderingCommandSet, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, 0, 0, nullptr, 0, nullptr, GEOMETRY_PASS_COLOUR_ATTACHMENT_COUNT, g_geometryBarriers);
-	
 	CHECK(vkEndCommandBuffer(m_deferredRenderingCommandSet))
+
 	CHECK(vkQueueSubmit(m_deferredRenderingCommandQueue, 1, &g_submitInfo, VK_NULL_HANDLE))
 }
 

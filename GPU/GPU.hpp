@@ -47,24 +47,13 @@ public:
 	
 	Camera m_cameraData;
 	
-	void initialize_imageAcquiringUpdateData(void);
 	void acquire_nextImageUpdate(void);
 
 	void calculate_subFrustum(uint32_t in_index, uint32_t in_multiplier);
-	
-	void initialize_lightViewingUpdateData(void);
 	void dispatch_lightViewingUpdate(void);
-	
-	void initialize_shadowMappingUpdateData(void);
 	void draw_shadowMappingUpdate(uint32_t in_index, uint32_t in_divisor);
-	
-	void initialize_geometryUpdateData(void);
 	void draw_geometryUpdate(void);
-	
-	void initialize_lightingUpdateData(void);
 	void draw_lightingUpdate(void);
-	
-	void initialize_presentUpdateData(void);
 	void submit_presentUpdate(void);
 	
 	void transform_camera(Transform in_transform, float3 in_value);
@@ -156,15 +145,10 @@ private:
 	GPUSharedAllocation m_subFrustumAllocation;
 	float3* m_subFrusta;
 	
-	uint64_t m_imageAvailableStatus;
-	GPUSemaphore m_imageAvailableSemaphore;
-
-	uint64_t m_lightViewingsFinishedStatus;
-	GPUSemaphore m_lightViewingsFinishedSemaphore;
-
+	GPUSemaphore m_lightViewingsFinishedSemaphores[CASCADED_SHADOW_MAP_COUNT];
 	GPUSemaphore m_shadowMappingsFinishedSemaphores[CASCADED_SHADOW_MAP_COUNT];
-
-	GPUSemaphore m_renderFinishedSemaphore;
+	GPUSemaphore m_geometryFinishedSemaphore;
+	GPUSemaphore m_lightingFinishedSemaphores[2];
 	
 	Semaphore m_cameraSemaphore;
 	Semaphore m_instancesSemaphore;
@@ -253,6 +237,12 @@ private:
 	
 	void build_semaphores(void);
 	void ruin_semaphores(void);
+
+	void initialize_lightViewingUpdateData(void);
+	void initialize_shadowMappingUpdateData(void);
+	void initialize_geometryUpdateData(void);
+	void initialize_lightingUpdateData(void);
+	void initialize_presentUpdateData(void);
 	
 	void add_instance(uint32_t in_type, Instance* in_instance);
 	void rid_instance(uint32_t in_type, uint32_t in_index);

@@ -4,46 +4,31 @@
 #include "../GPU.hpp"
 
 
-#define name(v) "/ LaM::"#v".sem"
-
 
 void GPUFixedContext::build_semaphores(void) {
-	const VkSemaphoreTypeCreateInfo TypeInfo = {
-		.sType = VK_STRUCTURE_TYPE_SEMAPHORE_TYPE_CREATE_INFO,
-		.pNext = nullptr,
-		.semaphoreType = VK_SEMAPHORE_TYPE_TIMELINE,
-		.initialValue = 0
-	};
-	VkSemaphoreCreateInfo CreateInfo = {
+	const VkSemaphoreCreateInfo CreateInfo = {
 		.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO,
-		.pNext = &TypeInfo,
+		.pNext = nullptr,
 		.flags = 0
 	};
 
-	CHECK(vkCreateSemaphore(m_logical, &CreateInfo, nullptr, &m_imageAvailableSemaphore))
-	CHECK(vkCreateSemaphore(m_logical, &CreateInfo, nullptr, &m_lightViewingsFinishedSemaphore))
-	CreateInfo.pNext = nullptr;
 	for(uint32_t i = 0; i < CASCADED_SHADOW_MAP_COUNT; i++) {
+		CHECK(vkCreateSemaphore(m_logical, &CreateInfo, nullptr, &m_lightViewingsFinishedSemaphores[i]))
 		CHECK(vkCreateSemaphore(m_logical, &CreateInfo, nullptr, &m_shadowMappingsFinishedSemaphores[i]))
 	}
-	CHECK(vkCreateSemaphore(m_logical, &CreateInfo, nullptr, &m_renderFinishedSemaphore))
-	
-	create_semaphore(&m_cameraSemaphore, name(m_cameraSemaphore));
-	create_semaphore(&m_instancesSemaphore, name(m_instancesSemaphore));
-	create_semaphore(&m_lightsSemaphore, name(m_lightsSemaphore));
+	CHECK(vkCreateSemaphore(m_logical, &CreateInfo, nullptr, &m_geometryFinishedSemaphore))
+	CHECK(vkCreateSemaphore(m_logical, &CreateInfo, nullptr, &m_lightingFinishedSemaphores[0]))
+	CHECK(vkCreateSemaphore(m_logical, &CreateInfo, nullptr, &m_lightingFinishedSemaphores[1]))
 }
 
 void GPUFixedContext::ruin_semaphores(void) {
-	vkDestroySemaphore(m_logical, m_imageAvailableSemaphore, nullptr);
-	vkDestroySemaphore(m_logical, m_lightViewingsFinishedSemaphore, nullptr);
 	for(uint32_t i = 0; i < CASCADED_SHADOW_MAP_COUNT; i++) {
+		vkDestroySemaphore(m_logical, m_lightViewingsFinishedSemaphores[i], nullptr);
 		vkDestroySemaphore(m_logical, m_shadowMappingsFinishedSemaphores[i], nullptr);
 	}
-	vkDestroySemaphore(m_logical, m_renderFinishedSemaphore, nullptr);
-	
-	destroy_semaphore(m_cameraSemaphore, name(m_cameraSemaphore));
-	destroy_semaphore(m_instancesSemaphore, name(m_instancesSemaphore));
-	destroy_semaphore(m_lightsSemaphore, name(m_lightsSemaphore));
+	vkDestroySemaphore(m_logical, m_geometryFinishedSemaphore, nullptr);
+	vkDestroySemaphore(m_logical, m_lightingFinishedSemaphores[0], nullptr);
+	vkDestroySemaphore(m_logical, m_lightingFinishedSemaphores[1], nullptr);
 }
 
 

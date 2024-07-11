@@ -5,10 +5,27 @@
 
 
 
-static VkClearValue g_clearValues[GEOMETRY_PASS_COLOUR_ATTACHMENT_COUNT + 1] = { 0 };
-static VkRenderPassBeginInfo g_renderInfo = { VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO };
-static VkTimelineSemaphoreSubmitInfo g_timelineInfo = { VK_STRUCTURE_TYPE_TIMELINE_SEMAPHORE_SUBMIT_INFO };
-static VkSubmitInfo g_submitInfo = { VK_STRUCTURE_TYPE_SUBMIT_INFO };
+static VkClearValue g_clearValues[GEOMETRY_PASS_COLOUR_ATTACHMENT_COUNT + 1] = { { 0 } };
+static VkRenderPassBeginInfo g_renderInfo = {  
+	.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
+	.pNext = nullptr,
+	.renderPass = VK_NULL_HANDLE,
+	.framebuffer = VK_NULL_HANDLE,
+	.renderArea = { 0 },
+	.clearValueCount = GEOMETRY_PASS_COLOUR_ATTACHMENT_COUNT + 1,
+	.pClearValues = g_clearValues
+};
+static VkSubmitInfo g_submitInfo = {
+	.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
+	.pNext = nullptr,
+	.waitSemaphoreCount = 0,
+	.pWaitSemaphores = nullptr,
+	.pWaitDstStageMask = nullptr,
+	.commandBufferCount = 1,
+	.pCommandBuffers = nullptr,
+	.signalSemaphoreCount = 1,
+	.pSignalSemaphores = nullptr
+};
 
 
 
@@ -21,35 +38,16 @@ void GPUFixedContext::initialize_geometryUpdateData(void) {
 	}
 	g_clearValues[GEOMETRY_PASS_COLOUR_ATTACHMENT_COUNT] = G_FIXED_DEPTH_CLEAR_VALUE;
 	
-	g_renderInfo.pNext = nullptr;
 	g_renderInfo.renderPass = m_geometryPass;
 	g_renderInfo.framebuffer = m_geometryFramebuffer;
-	g_renderInfo.renderArea.offset.x = 0;
-	g_renderInfo.renderArea.offset.y = 0;
 	g_renderInfo.renderArea.extent.width = m_surfaceExtent.width;
 	g_renderInfo.renderArea.extent.height = m_surfaceExtent.height;
-	g_renderInfo.clearValueCount = GEOMETRY_PASS_COLOUR_ATTACHMENT_COUNT + 1;
-	g_renderInfo.pClearValues = g_clearValues;
 	
-	g_timelineInfo.pNext = nullptr;
-	g_timelineInfo.waitSemaphoreValueCount = 1;
-	g_timelineInfo.pWaitSemaphoreValues = &m_imageAvailableStatus;
-	g_timelineInfo.signalSemaphoreValueCount = 0;
-	g_timelineInfo.pSignalSemaphoreValues = nullptr;
-	
-	g_submitInfo.pNext = &g_timelineInfo;
-	g_submitInfo.waitSemaphoreCount = 1;
-	g_submitInfo.pWaitSemaphores = &m_imageAvailableSemaphore;
-	g_submitInfo.pWaitDstStageMask = &G_FIXED_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
-	g_submitInfo.commandBufferCount = 1;
 	g_submitInfo.pCommandBuffers = &m_deferredRenderingCommandSet;
-	g_submitInfo.signalSemaphoreCount = 0;
-	g_submitInfo.pSignalSemaphores = nullptr;
+	g_submitInfo.pSignalSemaphores = &m_geometryFinishedSemaphore;
 }
 
 void GPUFixedContext::draw_geometryUpdate(void) {
-	m_imageAvailableStatus--;
-
 	CHECK(vkBeginCommandBuffer(m_deferredRenderingCommandSet, &G_FIXED_COMMAND_BEGIN_INFO))
 	vkCmdBindDescriptorSets(m_deferredRenderingCommandSet, VK_PIPELINE_BIND_POINT_GRAPHICS, m_geometryLayout, 0, 1, &m_geometryDescriptorSet, 0 , nullptr);
 	vkCmdBindPipeline(m_deferredRenderingCommandSet, VK_PIPELINE_BIND_POINT_GRAPHICS, m_geometryPipeline);
@@ -60,10 +58,10 @@ void GPUFixedContext::draw_geometryUpdate(void) {
 	vkCmdBeginRenderPass(m_deferredRenderingCommandSet, &g_renderInfo, VK_SUBPASS_CONTENTS_INLINE);
 	vkCmdDrawIndirect(m_deferredRenderingCommandSet, m_indirectCommandBuffer, 0, m_meshCount, sizeof(VkDrawIndirectCommand));
 	vkCmdEndRenderPass(m_deferredRenderingCommandSet);
-	
 	CHECK(vkEndCommandBuffer(m_deferredRenderingCommandSet))
+
+	CHECK(vkWaitForFences(m_logical, 1, &m_swapchainFence, VK_TRUE, UINT64_MAX))
 	CHECK(vkQueueSubmit(m_deferredRenderingCommandQueue, 1, &g_submitInfo, VK_NULL_HANDLE))
-	CHECK(vkQueueWaitIdle(m_deferredRenderingCommandQueue))
 }
 
 

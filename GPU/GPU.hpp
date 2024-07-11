@@ -67,11 +67,13 @@ private:
 	
 	uint32_t m_localMemoryIndex;
 	uint32_t m_sharedMemoryIndex;
-	GPUDevice m_logical;
-	
 	uint32_t m_queueFamilyCount;
 	uint32_t m_graphicsQueueFamilyIndex;
 	uint32_t m_computeQueueFamilyIndex;
+	uint32_t m_computeQueueIndex;
+	GPUContext m_context;
+	GPUPhysical m_physical;
+	GPULogical m_logical;
 	
 	GPUCommandQueue m_lightViewingCommandQueue;
 	GPUCommandPool m_lightViewingCommandPool;
@@ -176,10 +178,20 @@ private:
 	
 	void build_commandThread(uint32_t in_familyIndex, GPUCommandPool* in_pool, GPUCommandSet* in_set);
 	void ruin_commandThread(GPUCommandPool* in_pool, GPUCommandSet* in_set);
-	void build_device(GLFWwindow* in_window, GPUExtent3D in_extent);
-	void ruin_device(void);
 
-	void await_device(void);
+	void build_context(void);
+	void ruin_context(void);
+
+	void obtain_physical(void);
+
+	void build_logical(void);
+	void ruin_logical(void);
+
+	void build_commandThreads(void);
+	void ruin_commandThreads(void);
+
+	void build_surface(void);
+	void ruin_surface(void);
 
 	void build_shadowMappingPass(void);
 	void ruin_shadowMappingPass(void);
@@ -247,6 +259,8 @@ private:
 	void initialize_geometryUpdateData(void);
 	void initialize_lightingUpdateData(void);
 	void initialize_presentUpdateData(void);
+
+	void await_device(void);
 	
 	void add_instance(uint32_t in_type, Instance* in_instance);
 	void rid_instance(uint32_t in_type, uint32_t in_index);

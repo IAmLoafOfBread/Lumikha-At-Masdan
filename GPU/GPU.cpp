@@ -14,13 +14,16 @@ GPUFixedContext::GPUFixedContext(uint32_t in_directoryLength, char* in_directory
 	m_lights(nullptr),
 	m_fixedOffset(0),
 	m_currentImageIndex(0),
-	m_surfaceWindow(nullptr),
+	m_surfaceWindow(in_surfaceWindow),
 	m_localMemoryIndex(0),
 	m_sharedMemoryIndex(0),
-	m_logical(GPU_NULL_HANDLE),
 	m_queueFamilyCount(0),
 	m_graphicsQueueFamilyIndex(NULL_VALUE),
 	m_computeQueueFamilyIndex(NULL_VALUE),
+	m_computeQueueIndex(0),
+	m_context(GPU_NULL_HANDLE),
+	m_physical(GPU_NULL_HANDLE),
+	m_logical(GPU_NULL_HANDLE),
 	m_lightViewingCommandQueue(GPU_NULL_HANDLE),
 	m_lightViewingCommandPool(GPU_NULL_HANDLE),
 	m_lightViewingCommandSet(GPU_NULL_HANDLE),
@@ -36,7 +39,7 @@ GPUFixedContext::GPUFixedContext(uint32_t in_directoryLength, char* in_directory
 	m_presentCommandSet(GPU_NULL_HANDLE),
 	m_surface(GPU_NULL_HANDLE),
 	m_surfaceFrameCount(0),
-	m_surfaceExtent{ 0 },
+	m_surfaceExtent(in_surfaceExtent),
 	m_surfaceFormat(static_cast<GPUFormat>(0)),
 	m_surfaceColourSpace(static_cast<GPUColourSpace>(0)),
 	m_shadowMappingPass(GPU_NULL_HANDLE),
@@ -87,10 +90,12 @@ GPUFixedContext::GPUFixedContext(uint32_t in_directoryLength, char* in_directory
 	for(uint32_t i = 0; i < in_directoryLength; i++) {
 		m_directory[i] = in_directory[i];
 	}
-	
-	m_surfaceWindow = in_surfaceWindow;
 
-	build_device(in_surfaceWindow, in_surfaceExtent);
+	build_context();
+	obtain_physical();
+	build_logical();
+	build_commandThreads();
+	build_surface();
 	build_shadowMappingPass();
 	build_geometryPass();
 	build_lightingPass();
@@ -175,6 +180,8 @@ GPUFixedContext::~GPUFixedContext() {
 	ruin_shadowMappingPass();
 	ruin_geometryPass();
 	ruin_lightingPass();
-	ruin_device();
-
+	ruin_surface();
+	ruin_commandThreads();
+	ruin_logical();
+	ruin_context();
 }

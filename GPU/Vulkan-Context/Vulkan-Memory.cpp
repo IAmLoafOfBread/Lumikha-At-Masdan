@@ -149,13 +149,13 @@ void GPUFixedContext::build_localAllocation(GPULocalAllocation* in_local, GPUSta
 		.pWaitSemaphores = nullptr,
 		.pWaitDstStageMask = nullptr,
 		.commandBufferCount = 1,
-		.pCommandBuffers = &m_deferredRenderingCommandSet,
+		.pCommandBuffers = &m_presentCommandSet,
 		.signalSemaphoreCount = 0,
 		.pSignalSemaphores = nullptr
 	};
-	CHECK(vkBeginCommandBuffer(m_deferredRenderingCommandSet, &G_FIXED_COMMAND_BEGIN_INFO))
-	vkCmdCopyBuffer(m_deferredRenderingCommandSet, in_stage->buffer, in_local->buffer, 1, &Region);
-	vkEndCommandBuffer(m_deferredRenderingCommandSet);
+	CHECK(vkBeginCommandBuffer(m_presentCommandSet, &G_FIXED_COMMAND_BEGIN_INFO))
+	vkCmdCopyBuffer(m_presentCommandSet, in_stage->buffer, in_local->buffer, 1, &Region);
+	vkEndCommandBuffer(m_presentCommandSet);
 	CHECK(vkQueueSubmit(m_deferredRenderingCommandQueue, 1, &SubmitInfo, VK_NULL_HANDLE))
 	CHECK(vkQueueWaitIdle(m_deferredRenderingCommandQueue))
 	
@@ -253,7 +253,7 @@ void GPUFixedContext::build_localTexture(GPULocalTexture* in_texture, GPUStageAl
 		.pWaitSemaphores = nullptr,
 		.pWaitDstStageMask = nullptr,
 		.commandBufferCount = 1,
-		.pCommandBuffers = &m_deferredRenderingCommandSet,
+		.pCommandBuffers = &m_presentCommandSet,
 		.signalSemaphoreCount = 0,
 		.pSignalSemaphores = nullptr
 	};
@@ -278,9 +278,9 @@ void GPUFixedContext::build_localTexture(GPULocalTexture* in_texture, GPUStageAl
 			},
 		};
 
-		CHECK(vkBeginCommandBuffer(m_deferredRenderingCommandSet, &G_FIXED_COMMAND_BEGIN_INFO))
-		vkCmdPipelineBarrier(m_deferredRenderingCommandSet, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, StageFlags, 0, 0, nullptr, 0, nullptr, 1, &UnToLayoutBarrier);
-		vkEndCommandBuffer(m_deferredRenderingCommandSet);
+		CHECK(vkBeginCommandBuffer(m_presentCommandSet, &G_FIXED_COMMAND_BEGIN_INFO))
+		vkCmdPipelineBarrier(m_presentCommandSet, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, StageFlags, 0, 0, nullptr, 0, nullptr, 1, &UnToLayoutBarrier);
+		vkEndCommandBuffer(m_presentCommandSet);
 		CHECK(vkQueueSubmit(m_deferredRenderingCommandQueue, 1, &SubmitInfo, VK_NULL_HANDLE))
 		CHECK(vkQueueWaitIdle(m_deferredRenderingCommandQueue))
 	} else {
@@ -337,11 +337,11 @@ void GPUFixedContext::build_localTexture(GPULocalTexture* in_texture, GPUStageAl
 			},
 		};
 
-		CHECK(vkBeginCommandBuffer(m_deferredRenderingCommandSet, &G_FIXED_COMMAND_BEGIN_INFO))
-		vkCmdPipelineBarrier(m_deferredRenderingCommandSet, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 0, nullptr, 1, &UnToDstBarrier);
-		vkCmdCopyBufferToImage(m_deferredRenderingCommandSet, in_stage->buffer, in_texture->image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &Region);
-		vkCmdPipelineBarrier(m_deferredRenderingCommandSet, VK_PIPELINE_STAGE_TRANSFER_BIT, StageFlags, 0, 0, nullptr, 0, nullptr, 1, &DstToLayoutBarrier);
-		vkEndCommandBuffer(m_deferredRenderingCommandSet);
+		CHECK(vkBeginCommandBuffer(m_presentCommandSet, &G_FIXED_COMMAND_BEGIN_INFO))
+		vkCmdPipelineBarrier(m_presentCommandSet, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 0, nullptr, 1, &UnToDstBarrier);
+		vkCmdCopyBufferToImage(m_presentCommandSet, in_stage->buffer, in_texture->image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &Region);
+		vkCmdPipelineBarrier(m_presentCommandSet, VK_PIPELINE_STAGE_TRANSFER_BIT, StageFlags, 0, 0, nullptr, 0, nullptr, 1, &DstToLayoutBarrier);
+		vkEndCommandBuffer(m_presentCommandSet);
 		CHECK(vkQueueSubmit(m_deferredRenderingCommandQueue, 1, &SubmitInfo, VK_NULL_HANDLE))
 		CHECK(vkQueueWaitIdle(m_deferredRenderingCommandQueue))
 		vkFreeMemory(m_logical, in_stage->memory, nullptr);

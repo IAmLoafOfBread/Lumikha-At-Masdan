@@ -80,7 +80,7 @@ void GPUFixedContext::initialize_lightingUpdateData(void) {
 	}
 	g_waitSemaphores[CASCADED_SHADOW_MAP_COUNT] = m_geometryFinishedSemaphore;
 	
-	g_submitInfo.pCommandBuffers = &m_deferredRenderingCommandSet;
+	g_submitInfo.pCommandBuffers = &m_lightingCommandSet;
 	g_submitInfo.pSignalSemaphores = m_lightingFinishedSemaphores;
 }
 
@@ -88,20 +88,20 @@ void GPUFixedContext::draw_lightingUpdate(void) {
 	CHECK(vkWaitForFences(m_logical, 1, &m_swapchainFence, VK_TRUE, UINT64_MAX))
 	g_renderInfo.framebuffer = m_lightingFramebuffers[m_currentImageIndex];
 	
-	CHECK(vkBeginCommandBuffer(m_deferredRenderingCommandSet, &G_FIXED_COMMAND_BEGIN_INFO))
-	vkCmdBindDescriptorSets(m_deferredRenderingCommandSet, VK_PIPELINE_BIND_POINT_GRAPHICS, m_lightingLayout, 0, 1, &m_lightingDescriptorSet, 0, nullptr);
-	vkCmdBindPipeline(m_deferredRenderingCommandSet, VK_PIPELINE_BIND_POINT_GRAPHICS, m_lightingPipeline);
-	vkCmdPushConstants(m_deferredRenderingCommandSet, m_lightingLayout, VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(uint32_t), &m_lightCount);
+	CHECK(vkBeginCommandBuffer(m_lightingCommandSet, &G_FIXED_COMMAND_BEGIN_INFO))
+	vkCmdBindDescriptorSets(m_lightingCommandSet, VK_PIPELINE_BIND_POINT_GRAPHICS, m_lightingLayout, 0, 1, &m_lightingDescriptorSet, 0, nullptr);
+	vkCmdBindPipeline(m_lightingCommandSet, VK_PIPELINE_BIND_POINT_GRAPHICS, m_lightingPipeline);
+	vkCmdPushConstants(m_lightingCommandSet, m_lightingLayout, VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(uint32_t), &m_lightCount);
 	
-	vkCmdBeginRenderPass(m_deferredRenderingCommandSet, &g_renderInfo, VK_SUBPASS_CONTENTS_INLINE);
-	vkCmdDraw(m_deferredRenderingCommandSet, 4, 1, 0, 0);
-	vkCmdEndRenderPass(m_deferredRenderingCommandSet);
+	vkCmdBeginRenderPass(m_lightingCommandSet, &g_renderInfo, VK_SUBPASS_CONTENTS_INLINE);
+	vkCmdDraw(m_lightingCommandSet, 4, 1, 0, 0);
+	vkCmdEndRenderPass(m_lightingCommandSet);
 	
 	for(uint32_t i = 0; i < CASCADED_SHADOW_MAP_COUNT; i++) {
-		vkCmdPipelineBarrier(m_deferredRenderingCommandSet, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT, 0, 0, nullptr, 0, nullptr, m_lightCount, g_shadowBarriers[i]);
+		vkCmdPipelineBarrier(m_lightingCommandSet, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT, 0, 0, nullptr, 0, nullptr, m_lightCount, g_shadowBarriers[i]);
 	}
-	vkCmdPipelineBarrier(m_deferredRenderingCommandSet, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, 0, 0, nullptr, 0, nullptr, GEOMETRY_PASS_COLOUR_ATTACHMENT_COUNT, g_geometryBarriers);
-	CHECK(vkEndCommandBuffer(m_deferredRenderingCommandSet))
+	vkCmdPipelineBarrier(m_lightingCommandSet, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, 0, 0, nullptr, 0, nullptr, GEOMETRY_PASS_COLOUR_ATTACHMENT_COUNT, g_geometryBarriers);
+	CHECK(vkEndCommandBuffer(m_lightingCommandSet))
 
 	CHECK(vkQueueSubmit(m_deferredRenderingCommandQueue, 1, &g_submitInfo, VK_NULL_HANDLE))
 }

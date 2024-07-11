@@ -43,22 +43,22 @@ void GPUFixedContext::initialize_geometryUpdateData(void) {
 	g_renderInfo.renderArea.extent.width = m_surfaceExtent.width;
 	g_renderInfo.renderArea.extent.height = m_surfaceExtent.height;
 	
-	g_submitInfo.pCommandBuffers = &m_deferredRenderingCommandSet;
+	g_submitInfo.pCommandBuffers = &m_geometryCommandSet;
 	g_submitInfo.pSignalSemaphores = &m_geometryFinishedSemaphore;
 }
 
 void GPUFixedContext::draw_geometryUpdate(void) {
-	CHECK(vkBeginCommandBuffer(m_deferredRenderingCommandSet, &G_FIXED_COMMAND_BEGIN_INFO))
-	vkCmdBindDescriptorSets(m_deferredRenderingCommandSet, VK_PIPELINE_BIND_POINT_GRAPHICS, m_geometryLayout, 0, 1, &m_geometryDescriptorSet, 0 , nullptr);
-	vkCmdBindPipeline(m_deferredRenderingCommandSet, VK_PIPELINE_BIND_POINT_GRAPHICS, m_geometryPipeline);
-	vkCmdPushConstants(m_deferredRenderingCommandSet, m_geometryLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(View), &m_cameraView);
-	vkCmdBindVertexBuffers(m_deferredRenderingCommandSet, 0, 1, &m_vertexBuffer, &m_fixedOffset);
-	vkCmdBindVertexBuffers(m_deferredRenderingCommandSet, 1, 1, &m_instanceBuffer, &m_fixedOffset);
+	CHECK(vkBeginCommandBuffer(m_geometryCommandSet, &G_FIXED_COMMAND_BEGIN_INFO))
+	vkCmdBindDescriptorSets(m_geometryCommandSet, VK_PIPELINE_BIND_POINT_GRAPHICS, m_geometryLayout, 0, 1, &m_geometryDescriptorSet, 0 , nullptr);
+	vkCmdBindPipeline(m_geometryCommandSet, VK_PIPELINE_BIND_POINT_GRAPHICS, m_geometryPipeline);
+	vkCmdPushConstants(m_geometryCommandSet, m_geometryLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(View), &m_cameraView);
+	vkCmdBindVertexBuffers(m_geometryCommandSet, 0, 1, &m_vertexBuffer, &m_fixedOffset);
+	vkCmdBindVertexBuffers(m_geometryCommandSet, 1, 1, &m_instanceBuffer, &m_fixedOffset);
 	
-	vkCmdBeginRenderPass(m_deferredRenderingCommandSet, &g_renderInfo, VK_SUBPASS_CONTENTS_INLINE);
-	vkCmdDrawIndirect(m_deferredRenderingCommandSet, m_indirectCommandBuffer, 0, m_meshCount, sizeof(VkDrawIndirectCommand));
-	vkCmdEndRenderPass(m_deferredRenderingCommandSet);
-	CHECK(vkEndCommandBuffer(m_deferredRenderingCommandSet))
+	vkCmdBeginRenderPass(m_geometryCommandSet, &g_renderInfo, VK_SUBPASS_CONTENTS_INLINE);
+	vkCmdDrawIndirect(m_geometryCommandSet, m_indirectCommandBuffer, 0, m_meshCount, sizeof(VkDrawIndirectCommand));
+	vkCmdEndRenderPass(m_geometryCommandSet);
+	CHECK(vkEndCommandBuffer(m_geometryCommandSet))
 
 	CHECK(vkWaitForFences(m_logical, 1, &m_swapchainFence, VK_TRUE, UINT64_MAX))
 	CHECK(vkQueueSubmit(m_deferredRenderingCommandQueue, 1, &g_submitInfo, VK_NULL_HANDLE))

@@ -6,14 +6,13 @@
 
 
 
-void GPUFixedContext::build_commandThread(uint32_t in_queueFamilyIndex, uint32_t in_queueIndex, GPUCommandQueue* in_queue, GPUCommandPool* in_pool, GPUCommandSet* in_set) {
-	vkGetDeviceQueue(m_logical, in_queueFamilyIndex, in_queueIndex, in_queue);
+void GPUFixedContext::build_commandThread(uint32_t in_familyIndex, GPUCommandPool* in_pool, GPUCommandSet* in_set) {
 	{
 		const VkCommandPoolCreateInfo CreateInfo = {
 			.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
 			.pNext = nullptr,
 			.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT,
-			.queueFamilyIndex = in_queueFamilyIndex
+			.queueFamilyIndex = in_familyIndex
 		};
 		CHECK(vkCreateCommandPool(m_logical, &CreateInfo, nullptr, in_pool))
 	}

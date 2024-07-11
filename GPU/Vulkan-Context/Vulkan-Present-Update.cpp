@@ -49,7 +49,7 @@ void GPUFixedContext::initialize_presentUpdateData(void) {
 	g_barrier.subresourceRange.layerCount = 1;
 
 	g_submitInfo.pWaitSemaphores = &m_lightingFinishedSemaphores[0];
-	g_submitInfo.pCommandBuffers = &m_deferredRenderingCommandSet;
+	g_submitInfo.pCommandBuffers = &m_presentCommandSet;
 
 	g_presentInfo.pWaitSemaphores = &m_lightingFinishedSemaphores[1];
 	g_presentInfo.pSwapchains = &m_swapchain;
@@ -60,9 +60,9 @@ void GPUFixedContext::submit_presentUpdate(void) {
 	CHECK(vkWaitForFences(m_logical, 1, &m_swapchainFence, VK_TRUE, UINT64_MAX))
 	g_barrier.image = m_presentImages[m_currentImageIndex];
 
-	CHECK(vkBeginCommandBuffer(m_deferredRenderingCommandSet, &G_FIXED_COMMAND_BEGIN_INFO))
-	vkCmdPipelineBarrier(m_deferredRenderingCommandSet, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, 0, 0, nullptr, 0, nullptr, 1, &g_barrier);
-	vkEndCommandBuffer(m_deferredRenderingCommandSet);
+	CHECK(vkBeginCommandBuffer(m_presentCommandSet, &G_FIXED_COMMAND_BEGIN_INFO))
+	vkCmdPipelineBarrier(m_presentCommandSet, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, 0, 0, nullptr, 0, nullptr, 1, &g_barrier);
+	vkEndCommandBuffer(m_presentCommandSet);
 
 	CHECK(vkQueueSubmit(m_deferredRenderingCommandQueue, 1, &g_submitInfo, VK_NULL_HANDLE))
 

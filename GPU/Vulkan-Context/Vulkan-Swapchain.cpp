@@ -59,7 +59,7 @@ void GPUFixedContext::build_swapchain(void) {
 			.pWaitSemaphores = nullptr,
 			.pWaitDstStageMask = nullptr,
 			.commandBufferCount = 1,
-			.pCommandBuffers = &m_deferredRenderingCommandSet,
+			.pCommandBuffers = &m_presentCommandSet,
 			.signalSemaphoreCount = 0,
 			.pSignalSemaphores = nullptr
 		};
@@ -88,9 +88,9 @@ void GPUFixedContext::build_swapchain(void) {
 			CHECK(vkCreateImageView(m_logical, &CreateInfo, nullptr, &m_presentViews[i]))
 
 			Barrier.image = m_presentImages[i];
-			CHECK(vkBeginCommandBuffer(m_deferredRenderingCommandSet, &G_FIXED_COMMAND_BEGIN_INFO))
-			vkCmdPipelineBarrier(m_deferredRenderingCommandSet, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, 0, 0, nullptr, 0, nullptr, 1, &Barrier);
-			vkEndCommandBuffer(m_deferredRenderingCommandSet);
+			CHECK(vkBeginCommandBuffer(m_presentCommandSet, &G_FIXED_COMMAND_BEGIN_INFO))
+			vkCmdPipelineBarrier(m_presentCommandSet, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, 0, 0, nullptr, 0, nullptr, 1, &Barrier);
+			vkEndCommandBuffer(m_presentCommandSet);
 			CHECK(vkQueueSubmit(m_deferredRenderingCommandQueue, 1, &SubmitInfo, VK_NULL_HANDLE))
 			CHECK(vkQueueWaitIdle(m_deferredRenderingCommandQueue))
 		}

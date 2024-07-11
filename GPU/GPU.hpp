@@ -72,18 +72,22 @@ private:
 	uint32_t m_queueFamilyCount;
 	uint32_t m_graphicsQueueFamilyIndex;
 	uint32_t m_computeQueueFamilyIndex;
-
-	GPUCommandQueue m_deferredRenderingCommandQueue;
-	GPUCommandPool m_deferredRenderingCommandPool;
-	GPUCommandSet m_deferredRenderingCommandSet;
-	
-	GPUCommandQueue m_shadowMappingCommandQueues[CASCADED_SHADOW_MAP_COUNT];
-	GPUCommandPool m_shadowMappingCommandPools[CASCADED_SHADOW_MAP_COUNT];
-	GPUCommandSet m_shadowMappingCommandSets[CASCADED_SHADOW_MAP_COUNT];
 	
 	GPUCommandQueue m_lightViewingCommandQueue;
 	GPUCommandPool m_lightViewingCommandPool;
 	GPUCommandSet m_lightViewingCommandSet;
+	
+	GPUCommandQueue m_shadowMappingCommandQueues[CASCADED_SHADOW_MAP_COUNT];
+	GPUCommandPool m_shadowMappingCommandPools[CASCADED_SHADOW_MAP_COUNT];
+	GPUCommandSet m_shadowMappingCommandSets[CASCADED_SHADOW_MAP_COUNT];
+
+	GPUCommandQueue m_deferredRenderingCommandQueue;
+	GPUCommandPool m_geometryCommandPool;
+	GPUCommandSet m_geometryCommandSet;
+	GPUCommandPool m_lightingCommandPool;
+	GPUCommandSet m_lightingCommandSet;
+	GPUCommandPool m_presentCommandPool;
+	GPUCommandSet m_presentCommandSet;
 	
 	GPUSurface m_surface;
 	uint32_t m_surfaceFrameCount;
@@ -170,7 +174,7 @@ private:
 	void build_module(GPUModule* in_module, const char* in_path);
 	void ruin_module(GPUModule in_module);
 	
-	void build_commandThread(uint32_t in_queueFamilyIndex, uint32_t in_queueIndex, GPUCommandQueue* in_queue, GPUCommandPool* in_pool, GPUCommandSet* in_set);
+	void build_commandThread(uint32_t in_familyIndex, GPUCommandPool* in_pool, GPUCommandSet* in_set);
 	void ruin_commandThread(GPUCommandPool* in_pool, GPUCommandSet* in_set);
 	void build_device(GLFWwindow* in_window, GPUExtent3D in_extent);
 	void ruin_device(void);

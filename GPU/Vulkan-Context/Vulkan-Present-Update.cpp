@@ -70,10 +70,11 @@ void GPUFixedContext::submit_presentUpdate(void) {
 	vkCmdPipelineBarrier(m_presentCommandSet, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, 0, 0, nullptr, 0, nullptr, 1, &g_barrier);
 	vkEndCommandBuffer(m_presentCommandSet);
 
+	CHECK(vkQueuePresentKHR(m_deferredRenderingCommandQueue, &g_presentInfo))
+	CHECK(vkQueueWaitIdle(m_deferredRenderingCommandQueue))
+
 	CHECK(vkResetFences(m_logical, 1, &m_presentFinishedFence))
 	CHECK(vkQueueSubmit(m_deferredRenderingCommandQueue, 1, &g_submitInfo, m_presentFinishedFence))
-
-	CHECK(vkQueuePresentKHR(m_deferredRenderingCommandQueue, &g_presentInfo))
 }
 
 

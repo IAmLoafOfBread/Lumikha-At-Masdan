@@ -20,7 +20,7 @@ GPUFixedContext::GPUFixedContext(uint32_t in_directoryLength, char* in_directory
 	m_queueFamilyCount(NULL_VALUE),
 	m_graphicsQueueFamilyIndex(NULL_VALUE),
 	m_computeQueueFamilyIndex(NULL_VALUE),
-	m_computeQueueIndex(NULL_VALUE),
+	m_computeQueueIndex(0),
 	m_context(GPU_NULL_HANDLE),
 	m_physical(GPU_NULL_HANDLE),
 	m_logical(GPU_NULL_HANDLE),

@@ -5,6 +5,8 @@
 
 
 
+static VkFence g_fences[2] = { VK_NULL_HANDLE };
+
 static VkImageMemoryBarrier g_shadowBarriers[CASCADED_SHADOW_MAP_COUNT][MAX_LIGHT_COUNT] = { { { VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER } } };
 static VkImageMemoryBarrier g_geometryBarriers[GEOMETRY_PASS_COLOUR_ATTACHMENT_COUNT] = { { VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER } };
 
@@ -34,6 +36,9 @@ static VkSubmitInfo g_submitInfo = {
 
 
 void GPUFixedContext::initialize_lightingUpdateData(void) {
+	g_fences[0] = m_swapchainFence;
+	g_fences[1] = m_lightingFinishedFence;
+
 	for(uint32_t i = 0; i < CASCADED_SHADOW_MAP_COUNT; i++) {
 		for(uint32_t j = 0; j < MAX_LIGHT_COUNT; j++) {
 			g_shadowBarriers[i][j].sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -85,7 +90,7 @@ void GPUFixedContext::initialize_lightingUpdateData(void) {
 }
 
 void GPUFixedContext::draw_lightingUpdate(void) {
-	CHECK(vkWaitForFences(m_logical, 1, &m_swapchainFence, VK_TRUE, UINT64_MAX))
+	CHECK(vkWaitForFences(m_logical, LENGTH_OF(g_fences), g_fences, VK_TRUE, UINT64_MAX))
 	g_renderInfo.framebuffer = m_lightingFramebuffers[m_currentImageIndex];
 	
 	CHECK(vkBeginCommandBuffer(m_lightingCommandSet, &G_FIXED_COMMAND_BEGIN_INFO))
@@ -103,7 +108,8 @@ void GPUFixedContext::draw_lightingUpdate(void) {
 	vkCmdPipelineBarrier(m_lightingCommandSet, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, 0, 0, nullptr, 0, nullptr, GEOMETRY_PASS_COLOUR_ATTACHMENT_COUNT, g_geometryBarriers);
 	CHECK(vkEndCommandBuffer(m_lightingCommandSet))
 
-	CHECK(vkQueueSubmit(m_deferredRenderingCommandQueue, 1, &g_submitInfo, VK_NULL_HANDLE))
+	CHECK(vkResetFences(m_logical, 1, &m_lightingFinishedFence))
+	CHECK(vkQueueSubmit(m_deferredRenderingCommandQueue, 1, &g_submitInfo, m_lightingFinishedFence))
 }
 
 

@@ -25,6 +25,8 @@ void GPUFixedContext::initialize_lightViewingUpdateData(void) {
 }
 
 void GPUFixedContext::dispatch_lightViewingUpdate(void) {
+	CHECK(vkWaitForFences(m_logical, 1, &m_lightViewingsFinishedFence, VK_TRUE, UINT64_MAX))
+
 	CHECK(vkBeginCommandBuffer(m_lightViewingCommandSet, &G_FIXED_COMMAND_BEGIN_INFO))
 	vkCmdBindPipeline(m_lightViewingCommandSet, VK_PIPELINE_BIND_POINT_COMPUTE, m_lightViewingPipeline);
 	vkCmdPushConstants(m_lightViewingCommandSet, m_lightViewingLayout, VK_SHADER_STAGE_COMPUTE_BIT, 0, sizeof(VkDeviceAddress), &m_subFrustumAllocation.address);
@@ -34,7 +36,8 @@ void GPUFixedContext::dispatch_lightViewingUpdate(void) {
 	CHECK(vkEndCommandBuffer(m_lightViewingCommandSet))
 	
 	CHECK(vkWaitForFences(m_logical, 1, &m_swapchainFence, VK_TRUE, UINT64_MAX))
-	CHECK(vkQueueSubmit(m_lightViewingCommandQueue, 1, &g_submitInfo, VK_NULL_HANDLE))
+	CHECK(vkResetFences(m_logical, 1, &m_lightViewingsFinishedFence))
+	CHECK(vkQueueSubmit(m_lightViewingCommandQueue, 1, &g_submitInfo, m_lightViewingsFinishedFence))
 }
 
 

@@ -151,6 +151,11 @@ private:
 	GPUSharedAllocation m_subFrustumAllocation;
 	float3* m_subFrusta;
 	
+	GPUFence m_lightViewingsFinishedFence;
+	GPUFence m_shadowMappingsFinishedFences[CASCADED_SHADOW_MAP_COUNT];
+	GPUFence m_geometryFinishedFence;
+	GPUFence m_lightingFinishedFence;
+	GPUFence m_presentFinishedFence;
 	GPUSemaphore m_lightViewingsFinishedSemaphores[CASCADED_SHADOW_MAP_COUNT];
 	GPUSemaphore m_shadowMappingsFinishedSemaphores[CASCADED_SHADOW_MAP_COUNT];
 	GPUSemaphore m_geometryFinishedSemaphore;
@@ -251,8 +256,8 @@ private:
 
 	void set_lightingBindings(void);
 	
-	void build_semaphores(void);
-	void ruin_semaphores(void);
+	void build_synchronizations(void);
+	void ruin_synchronizations(void);
 
 	void initialize_lightViewingUpdateData(void);
 	void initialize_shadowMappingUpdateData(void);

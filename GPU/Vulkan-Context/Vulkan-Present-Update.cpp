@@ -5,6 +5,8 @@
 
 
 
+static VkFence g_fences[2] = { VK_NULL_HANDLE };
+
 static VkImageMemoryBarrier g_barrier = {
 	.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
 	.pNext = nullptr,
@@ -45,6 +47,9 @@ static VkPresentInfoKHR g_presentInfo = {
 
 
 void GPUFixedContext::initialize_presentUpdateData(void) {
+	g_fences[0] = m_swapchainFence;
+	g_fences[1] = m_presentFinishedFence;
+
 	g_barrier.subresourceRange.levelCount = 1;
 	g_barrier.subresourceRange.layerCount = 1;
 
@@ -57,14 +62,16 @@ void GPUFixedContext::initialize_presentUpdateData(void) {
 }
 
 void GPUFixedContext::submit_presentUpdate(void) {
-	CHECK(vkWaitForFences(m_logical, 1, &m_swapchainFence, VK_TRUE, UINT64_MAX))
+	CHECK(vkWaitForFences(m_logical, LENGTH_OF(g_fences), g_fences, VK_TRUE, UINT64_MAX))
+
 	g_barrier.image = m_presentImages[m_currentImageIndex];
 
 	CHECK(vkBeginCommandBuffer(m_presentCommandSet, &G_FIXED_COMMAND_BEGIN_INFO))
 	vkCmdPipelineBarrier(m_presentCommandSet, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, 0, 0, nullptr, 0, nullptr, 1, &g_barrier);
 	vkEndCommandBuffer(m_presentCommandSet);
 
-	CHECK(vkQueueSubmit(m_deferredRenderingCommandQueue, 1, &g_submitInfo, VK_NULL_HANDLE))
+	CHECK(vkResetFences(m_logical, 1, &m_presentFinishedFence))
+	CHECK(vkQueueSubmit(m_deferredRenderingCommandQueue, 1, &g_submitInfo, m_presentFinishedFence))
 
 	CHECK(vkQueuePresentKHR(m_deferredRenderingCommandQueue, &g_presentInfo))
 }

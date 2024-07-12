@@ -48,6 +48,8 @@ void GPUFixedContext::initialize_geometryUpdateData(void) {
 }
 
 void GPUFixedContext::draw_geometryUpdate(void) {
+	CHECK(vkWaitForFences(m_logical, 1, &m_geometryFinishedFence, VK_TRUE, UINT64_MAX))
+
 	CHECK(vkBeginCommandBuffer(m_geometryCommandSet, &G_FIXED_COMMAND_BEGIN_INFO))
 	vkCmdBindDescriptorSets(m_geometryCommandSet, VK_PIPELINE_BIND_POINT_GRAPHICS, m_geometryLayout, 0, 1, &m_geometryDescriptorSet, 0 , nullptr);
 	vkCmdBindPipeline(m_geometryCommandSet, VK_PIPELINE_BIND_POINT_GRAPHICS, m_geometryPipeline);
@@ -61,7 +63,8 @@ void GPUFixedContext::draw_geometryUpdate(void) {
 	CHECK(vkEndCommandBuffer(m_geometryCommandSet))
 
 	CHECK(vkWaitForFences(m_logical, 1, &m_swapchainFence, VK_TRUE, UINT64_MAX))
-	CHECK(vkQueueSubmit(m_deferredRenderingCommandQueue, 1, &g_submitInfo, VK_NULL_HANDLE))
+	CHECK(vkResetFences(m_logical, 1, &m_geometryFinishedFence))
+	CHECK(vkQueueSubmit(m_deferredRenderingCommandQueue, 1, &g_submitInfo, m_geometryFinishedFence))
 }
 
 

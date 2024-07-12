@@ -77,6 +77,11 @@ GPUFixedContext::GPUFixedContext(uint32_t in_directoryLength, char* in_directory
 	m_sampler(GPU_NULL_HANDLE),
 	m_subFrustumAllocation{ GPU_NULL_HANDLE },
 	m_subFrusta(nullptr),
+	m_lightViewingsFinishedFence(GPU_NULL_HANDLE),
+	m_shadowMappingsFinishedFences{ GPU_NULL_HANDLE },
+	m_geometryFinishedFence(GPU_NULL_HANDLE),
+	m_lightingFinishedFence(GPU_NULL_HANDLE),
+	m_presentFinishedFence(GPU_NULL_HANDLE),
 	m_lightViewingsFinishedSemaphores{ GPU_NULL_HANDLE },
 	m_shadowMappingsFinishedSemaphores{ GPU_NULL_HANDLE },
 	m_geometryFinishedSemaphore(GPU_NULL_HANDLE),
@@ -141,7 +146,7 @@ GPUFixedContext::GPUFixedContext(uint32_t in_directoryLength, char* in_directory
 	set_geometryBindings();
 	set_lightingBindings();
 	
-	build_semaphores();
+	build_synchronizations();
 
 	create_semaphore(&m_cameraSemaphore, name(m_cameraSemaphore));
 	create_semaphore(&m_instancesSemaphore, name(m_instancesSemaphore));
@@ -161,7 +166,7 @@ GPUFixedContext::~GPUFixedContext() {
 	destroy_semaphore(m_cameraSemaphore, name(m_cameraSemaphore));
 	destroy_semaphore(m_instancesSemaphore, name(m_instancesSemaphore));
 	destroy_semaphore(m_lightsSemaphore, name(m_lightsSemaphore));
-	ruin_semaphores();
+	ruin_synchronizations();
 	ruin_subFrusta();
 	ruin_sampler();
 	ruin_meshes();

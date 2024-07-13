@@ -16,7 +16,7 @@ void GPUFixedContext::build_meshes(uint32_t* in_vertexCounts, GPUStageAllocation
 	build_localAllocation(&g_vertexAllocation, in_vertexAllocation, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
 	m_vertexBuffer = g_vertexAllocation.buffer;
 	
-	build_sharedAllocation(&g_indirectCommandAllocation, m_meshCount * sizeof(*m_indirectCommands), VK_BUFFER_USAGE_INDIRECT_BUFFER_BIT, 0);
+	build_sharedAllocation(&g_indirectCommandAllocation, m_meshCount * sizeof(*m_indirectCommands), VK_BUFFER_USAGE_INDIRECT_BUFFER_BIT, false);
 	m_indirectCommands = static_cast<GPUIndirectDrawCommand*>(g_indirectCommandAllocation.data);
 	m_indirectCommandBuffer = g_indirectCommandAllocation.buffer;
 	
@@ -31,7 +31,7 @@ void GPUFixedContext::build_meshes(uint32_t* in_vertexCounts, GPUStageAllocation
 		InstanceCount += in_maxInstanceCounts[i];
 	}
 	
-	build_sharedAllocation(&g_instanceAllocation, InstanceCount * sizeof(Instance), VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, 1);
+	build_sharedAllocation(&g_instanceAllocation, InstanceCount * sizeof(Instance), VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, false);
 	m_instanceBuffer = g_instanceAllocation.buffer;
 	m_instances = static_cast<Instance*>(g_instanceAllocation.data);
 	

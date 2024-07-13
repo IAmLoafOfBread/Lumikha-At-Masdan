@@ -25,6 +25,8 @@ void GPUFixedContext::initialize_lightViewingUpdateData(void) {
 }
 
 void GPUFixedContext::dispatch_lightViewingUpdate(void) {
+	wait_semaphore(m_lightsSemaphore);
+
 	CHECK(vkWaitForFences(m_logical, 1, &m_lightViewingsFinishedFence, VK_TRUE, UINT64_MAX))
 
 	CHECK(vkBeginCommandBuffer(m_lightViewingCommandSet, &G_FIXED_COMMAND_BEGIN_INFO))
@@ -38,6 +40,8 @@ void GPUFixedContext::dispatch_lightViewingUpdate(void) {
 	CHECK(vkWaitForFences(m_logical, 1, &m_swapchainFence, VK_TRUE, UINT64_MAX))
 	CHECK(vkResetFences(m_logical, 1, &m_lightViewingsFinishedFence))
 	CHECK(vkQueueSubmit(m_lightViewingCommandQueue, 1, &g_submitInfo, m_lightViewingsFinishedFence))
+
+	signal_semaphore(m_lightsSemaphore);
 }
 
 

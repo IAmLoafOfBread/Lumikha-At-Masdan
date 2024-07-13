@@ -3,6 +3,8 @@
 
 
 void GPUFixedContext::calculate_subFrustum(uint32_t in_index, uint32_t in_multiplier) {
+	wait_semaphore(m_cameraSemaphore);
+
 	float4 Corners[CORNER_COUNT] = {
 		{-1, 1, 0, 1},
 		{-1,-1, 0, 1},
@@ -36,4 +38,6 @@ void GPUFixedContext::calculate_subFrustum(uint32_t in_index, uint32_t in_multip
 		m_subFrusta[i * CORNER_COUNT].y = Corners[i].y;
 		m_subFrusta[i * CORNER_COUNT].z = Corners[i].z;
 	}
+
+	signal_semaphore(m_cameraSemaphore);
 }

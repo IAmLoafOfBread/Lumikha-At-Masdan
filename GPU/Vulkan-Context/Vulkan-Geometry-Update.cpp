@@ -48,6 +48,10 @@ void GPUFixedContext::initialize_geometryUpdateData(void) {
 }
 
 void GPUFixedContext::draw_geometryUpdate(void) {
+	wait_semaphore(m_cameraSemaphore);
+	wait_semaphore(m_instancesSemaphore);
+	wait_semaphore(m_lightsSemaphore);
+
 	CHECK(vkWaitForFences(m_logical, 1, &m_geometryFinishedFence, VK_TRUE, UINT64_MAX))
 
 	CHECK(vkBeginCommandBuffer(m_geometryCommandSet, &G_FIXED_COMMAND_BEGIN_INFO))
@@ -65,6 +69,10 @@ void GPUFixedContext::draw_geometryUpdate(void) {
 	CHECK(vkWaitForFences(m_logical, 1, &m_swapchainFence, VK_TRUE, UINT64_MAX))
 	CHECK(vkResetFences(m_logical, 1, &m_geometryFinishedFence))
 	CHECK(vkQueueSubmit(m_deferredRenderingCommandQueue, 1, &g_submitInfo, m_geometryFinishedFence))
+
+	signal_semaphore(m_cameraSemaphore);
+	signal_semaphore(m_instancesSemaphore);
+	signal_semaphore(m_lightsSemaphore);
 }
 
 

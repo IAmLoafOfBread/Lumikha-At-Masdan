@@ -265,6 +265,9 @@ private:
 	void build_synchronizations(void);
 	void ruin_synchronizations(void);
 
+	void initialize_instanceUpdateData(void);
+	void initialize_lightUpdateData(void);
+
 	void initialize_lightViewingUpdateData(void);
 	void initialize_shadowMappingUpdateData(void);
 	void initialize_geometryUpdateData(void);

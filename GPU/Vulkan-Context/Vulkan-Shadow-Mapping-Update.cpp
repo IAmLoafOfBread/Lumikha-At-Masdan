@@ -40,6 +40,9 @@ void GPUFixedContext::initialize_shadowMappingUpdateData(void) {
 }
 
 void GPUFixedContext::draw_shadowMappingUpdate(uint32_t in_index, uint32_t in_divisor) {
+	wait_semaphore(m_instancesSemaphore);
+	wait_semaphore(m_lightsSemaphore);
+
 	CHECK(vkWaitForFences(m_logical, 1, &m_shadowMappingsFinishedFences[in_index], VK_TRUE, UINT64_MAX))
 
 	CHECK(vkBeginCommandBuffer(m_shadowMappingCommandSets[in_index], &G_FIXED_COMMAND_BEGIN_INFO))
@@ -58,6 +61,9 @@ void GPUFixedContext::draw_shadowMappingUpdate(uint32_t in_index, uint32_t in_di
 
 	CHECK(vkResetFences(m_logical, 1, &m_shadowMappingsFinishedFences[in_index]))
 	CHECK(vkQueueSubmit(m_shadowMappingCommandQueues[in_index], 1, &g_submitInfos[in_index], m_shadowMappingsFinishedFences[in_index]))
+
+	signal_semaphore(m_instancesSemaphore);
+	signal_semaphore(m_lightsSemaphore);
 }
 
 

@@ -90,6 +90,8 @@ void GPUFixedContext::initialize_lightingUpdateData(void) {
 }
 
 void GPUFixedContext::draw_lightingUpdate(void) {
+	wait_semaphore(m_lightsSemaphore);
+
 	CHECK(vkWaitForFences(m_logical, LENGTH_OF(g_fences), g_fences, VK_TRUE, UINT64_MAX))
 	g_renderInfo.framebuffer = m_lightingFramebuffers[m_currentImageIndex];
 	
@@ -110,6 +112,8 @@ void GPUFixedContext::draw_lightingUpdate(void) {
 
 	CHECK(vkResetFences(m_logical, 1, &m_lightingFinishedFence))
 	CHECK(vkQueueSubmit(m_deferredRenderingCommandQueue, 1, &g_submitInfo, m_lightingFinishedFence))
+
+	signal_semaphore(m_lightsSemaphore);
 }
 
 

@@ -154,6 +154,9 @@ GPUFixedContext::GPUFixedContext(uint32_t in_directoryLength, char* in_directory
 	
 	update_camera();
 
+	initialize_instanceUpdateData();
+	initialize_lightUpdateData();
+
 	initialize_lightViewingUpdateData();
 	initialize_shadowMappingUpdateData();
 	initialize_geometryUpdateData();

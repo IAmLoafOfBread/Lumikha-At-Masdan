@@ -58,6 +58,12 @@ public:
 	
 	void transform_camera(Transform in_transform, float3 in_value);
 	void update_camera(void);
+
+	void add_instance(uint32_t in_type, Instance* in_instance);
+	void rid_instance(uint32_t in_type, uint32_t in_index);
+
+	void add_light(Light* in_light);
+	void rid_light(uint32_t in_index);
 	
 private:
 	const GPUSize m_fixedOffset;
@@ -266,12 +272,6 @@ private:
 	void initialize_presentUpdateData(void);
 
 	void await_device(void);
-	
-	void add_instance(uint32_t in_type, Instance* in_instance);
-	void rid_instance(uint32_t in_type, uint32_t in_index);
-	
-	void add_light(Light* in_light);
-	void rid_light(uint32_t in_index);
 };
 
 

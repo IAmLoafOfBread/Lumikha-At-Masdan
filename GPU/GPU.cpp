@@ -12,6 +12,7 @@ GPUFixedContext::GPUFixedContext(uint32_t in_directoryLength, char* in_directory
 	m_multiThreadedGraphics(false),
 	m_instances(nullptr),
 	m_lights(nullptr),
+	m_cameraData{1.5f, 0.1f, 100.0f},
 	m_fixedOffset(0),
 	m_currentImageIndex(NULL_VALUE),
 	m_surfaceWindow(in_surfaceWindow),

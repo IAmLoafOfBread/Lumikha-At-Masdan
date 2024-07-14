@@ -78,7 +78,8 @@ const VkCommandBufferBeginInfo G_FIXED_COMMAND_BEGIN_INFO = {
 };
 const VkClearValue G_FIXED_DEPTH_CLEAR_VALUE = {
 	.depthStencil = {
-		.depth = 0
+		.depth = 0,
+		.stencil = 0
 	}
 };
 const VkPipelineStageFlags G_FIXED_PIPELINE_STAGE_TOP_OF_PIPE_BIT = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;

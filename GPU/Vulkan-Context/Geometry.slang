@@ -12,17 +12,17 @@ struct FSInput {
 };
 
 struct VSOutput {
-    float4 viewPosition : SV_POSITION;
+    float4 viewPosition : SV_Postion;
     FSInput fragmentShaderInput;
 };
 
 struct FSOutput {
-    float4 position: SV_TARGET0;
-    float4 normal: SV_TARGET1;
-    float4 albedo: SV_TARGET2;
-    float4 specular: SV_TARGET3;
-    float metalness: SV_TARGET4;
-    float roughness: SV_TARGET5;
+    float4 position: SV_Target0;
+    float4 normal: SV_Target1;
+    float4 albedo: SV_Target2;
+    float4 specular: SV_Target3;
+    float metalness: SV_Target4;
+    float roughness: SV_Target5;
 };
 
 [[vk::binding(0, 0)]] Sampler2D<float4> g_normalTextures[];

@@ -4,7 +4,7 @@
 
 
 struct VSOutput {
-    float4 position : SV_POSITION;
+    float4 position : SV_Position;
     [[vk_location(0)]] float2 uv;
 };
 

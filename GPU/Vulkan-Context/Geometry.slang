@@ -49,7 +49,9 @@ struct FSOutput {
     Output.fragmentShaderInput.worldRotation = ini_rotation;
     Output.fragmentShaderInput.normal = inv_normal;
     rotate_vector(Output.fragmentShaderInput.normal, ini_rotation);
-    Output.fragmentShaderInput.uv = (inv_uv * -1) + 1;
+    Output.fragmentShaderInput.uv = inv_uv;
+    Output.fragmentShaderInput.uv.y *= -1.0f;
+    Output.fragmentShaderInput.uv.y += 1.0f;
     Output.fragmentShaderInput.textureIndex = spirv_asm {
         OpCapability DrawParameters;
         result:$$uint = OpLoad builtin(DrawIndex:uint);

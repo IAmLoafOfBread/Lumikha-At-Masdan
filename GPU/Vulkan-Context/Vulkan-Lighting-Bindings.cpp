@@ -19,7 +19,9 @@ void GPUFixedContext::build_lightingBindings(void) {
 			Bindings[i].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
 			Bindings[i].pImmutableSamplers = nullptr;
 		}
-		for (uint32_t i = GEOMETRY_PASS_COLOUR_ATTACHMENT_COUNT; i < BINDING_COUNT; i++) Bindings[i].descriptorCount = MAX_LIGHT_COUNT;
+		for (uint32_t i = GEOMETRY_PASS_COLOUR_ATTACHMENT_COUNT; i < BINDING_COUNT; i++) {
+			Bindings[i].descriptorCount = MAX_LIGHT_COUNT;
+		}
 
 		const VkDescriptorSetLayoutCreateInfo CreateInfo = {
 			.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,

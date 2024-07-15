@@ -5,38 +5,31 @@
 
 
 
-#define BINDING_COUNT (GEOMETRY_PASS_COLOUR_ATTACHMENT_COUNT + CASCADED_SHADOW_MAP_COUNT + 1)
-#define BUFFER_INDEX (BINDING_COUNT - 1)
+#define BINDING_COUNT (GEOMETRY_PASS_COLOUR_ATTACHMENT_COUNT + CASCADED_SHADOW_MAP_COUNT)
 
 
 
 void GPUFixedContext::set_lightingBindings(void) {
-	VkDescriptorImageInfo InputInfos[GEOMETRY_PASS_COLOUR_ATTACHMENT_COUNT] = { 0 };
+	VkDescriptorImageInfo GeometryInfos[GEOMETRY_PASS_COLOUR_ATTACHMENT_COUNT] = { { VK_NULL_HANDLE } };
 	for (uint32_t i = 0; i < GEOMETRY_PASS_COLOUR_ATTACHMENT_COUNT; i++) {
-		InputInfos[i].sampler = m_sampler;
-		InputInfos[i].imageView = m_geometryTextures[i].view;
-		InputInfos[i].imageLayout = VK_IMAGE_LAYOUT_READ_ONLY_OPTIMAL;
+		GeometryInfos[i].sampler = m_sampler;
+		GeometryInfos[i].imageView = m_geometryTextures[i].view;
+		GeometryInfos[i].imageLayout = VK_IMAGE_LAYOUT_READ_ONLY_OPTIMAL;
 	}
-	VkDescriptorImageInfo* ShadowInfos[CASCADED_SHADOW_MAP_COUNT] = { nullptr };
+	VkDescriptorImageInfo ShadowInfos[CASCADED_SHADOW_MAP_COUNT][MAX_LIGHT_COUNT] = { { { VK_NULL_HANDLE } } };
 	for (uint32_t i = 0; i < CASCADED_SHADOW_MAP_COUNT; i++) {
-		ShadowInfos[i] = new VkDescriptorImageInfo[MAX_LIGHT_COUNT];
 		for (uint32_t j = 0; j < MAX_LIGHT_COUNT; j++) {
 			ShadowInfos[i][j].sampler = m_sampler;
 			ShadowInfos[i][j].imageView = m_shadowTextures[i][j].view;
 			ShadowInfos[i][j].imageLayout = VK_IMAGE_LAYOUT_READ_ONLY_OPTIMAL;
 		}
 	}
-	const VkDescriptorBufferInfo BufferInfo = {
-		.buffer = m_lightAllocation.buffer,
-		.offset = 0,
-		.range = VK_WHOLE_SIZE
-	};
 
-	VkWriteDescriptorSet Writes[BINDING_COUNT] = { };
+	VkWriteDescriptorSet Writes[BINDING_COUNT] = { VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET };
 	for (uint32_t i = 0; i < BINDING_COUNT; i++) {
 		Writes[i].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 		Writes[i].pNext = nullptr;
-		Writes[i].dstSet = m_geometryDescriptorSet;
+		Writes[i].dstSet = m_lightingDescriptorSet;
 		Writes[i].dstBinding = i;
 		Writes[i].dstArrayElement = 0;
 		Writes[i].descriptorCount = 1;
@@ -45,18 +38,15 @@ void GPUFixedContext::set_lightingBindings(void) {
 		Writes[i].pBufferInfo = nullptr;
 		Writes[i].pTexelBufferView = nullptr;
 	}
-	for (uint32_t i = 0; i < GEOMETRY_PASS_COLOUR_ATTACHMENT_COUNT; i++) Writes[i].pImageInfo = &InputInfos[i];
-	for (uint32_t i = GEOMETRY_PASS_COLOUR_ATTACHMENT_COUNT; i < BUFFER_INDEX; i++) {
-		Writes[i].descriptorCount = MAX_LIGHT_COUNT;
-		Writes[i].pImageInfo = ShadowInfos[i];
+	for (uint32_t i = 0; i < GEOMETRY_PASS_COLOUR_ATTACHMENT_COUNT; i++) {
+		Writes[i].pImageInfo = &GeometryInfos[i];
 	}
-	Writes[BUFFER_INDEX].descriptorCount = 1;
-	Writes[BUFFER_INDEX].pBufferInfo = &BufferInfo;
-	vkUpdateDescriptorSets(m_logical, GEOMETRY_PASS_REQUIRED_TEXTURE_COUNT, Writes, 0, nullptr);
-
 	for (uint32_t i = 0; i < CASCADED_SHADOW_MAP_COUNT; i++) {
-		delete[] ShadowInfos[i];
+		Writes[i + GEOMETRY_PASS_COLOUR_ATTACHMENT_COUNT].descriptorCount = MAX_LIGHT_COUNT;
+		Writes[i + GEOMETRY_PASS_COLOUR_ATTACHMENT_COUNT].pImageInfo = ShadowInfos[i];
 	}
+
+	vkUpdateDescriptorSets(m_logical, BINDING_COUNT, Writes, 0, nullptr);
 }
 
 

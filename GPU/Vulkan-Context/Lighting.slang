@@ -3,6 +3,11 @@
 
 
 
+struct VSOutput {
+    float4 position : SV_POSITION;
+    [[vk_location(0)]] float2 uv;
+};
+
 [[vk::binding(0, 0)]] Sampler2D<float4> g_positionInput;
 [[vk::binding(1, 0)]] Sampler2D<float4> g_normalInput;
 [[vk::binding(2, 0)]] Sampler2D<float4> g_albedoInput;
@@ -21,19 +26,21 @@ struct Constants {
 
 [[vk::push_constant]] Constants g_constants;
 
-[shader("vertex")] float4 output_vertex(uint in_index: SV_VertexID) : SV_Position {
-    float4 Output[] = {
-        float4(-1.0f, 1.0f, 0.0f, 1.0f),
-        float4(-1.0f, -1.0f, 0.0f, 1.0f),
-        float4(1.0f, 1.0f, 0.0f, 1.0f),
-        float4(1.0f, -1.0f, 0.0f, 1.0f)
+[shader("vertex")] VSOutput output_vertex(uint in_index: SV_VertexID) {
+    VSOutput Output[] = {
+        float4(-1.0f, 1.0f, 0.0f, 1.0f), float2(0.0f, 1.0f),
+        float4(-1.0f, -1.0f, 0.0f, 1.0f), float2(0.0f, 0.0f),
+        float4(1.0f, 1.0f, 0.0f, 1.0f), float2(1.0f, 1.0f),
+        float4(1.0f, -1.0f, 0.0f, 1.0f), float2(1.0f, 0.0f)
     };
     return Output[in_index];
 }
 
-[shader("fragment")] float4 output_fragment(void) : SV_Target0 {
+[shader("fragment")] float4 output_fragment(
+    [[vk::location(0)]] float2 in_uv
+) : SV_Target0 {
     float4 Output = float4(0, 0, 0, 1);
-    Output.b = 1;
+    Output = g_albedoInput.SampleLevel(in_uv, 0);
     return Output;
 }
 

@@ -22,12 +22,18 @@ struct Constants {
 [[vk::push_constant]] Constants g_constants;
 
 [shader("vertex")] float4 output_vertex(uint in_index: SV_VertexID) : SV_Position {
-    float4 damn;
-    return damn;
+    float4 Output[] = {
+        float4(-1.0f, 1.0f, 0.0f, 1.0f),
+        float4(-1.0f, -1.0f, 0.0f, 1.0f),
+        float4(1.0f, 1.0f, 0.0f, 1.0f),
+        float4(1.0f, -1.0f, 0.0f, 1.0f)
+    };
+    return Output[in_index];
 }
 
-[shader("fragment")] float4 output_fragment(void) {
-    float4 yoyo;
-    return yoyo;
+[shader("fragment")] float4 output_fragment(void) : SV_Target0 {
+    float4 Output = float4(0, 0, 0, 1);
+    Output.b = 1;
+    return Output;
 }
 

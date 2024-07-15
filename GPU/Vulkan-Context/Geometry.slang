@@ -69,11 +69,7 @@ struct FSOutput {
     const float2 UV = in_vertex.uv;
 
     Output.position = float4(in_vertex.worldPosition, 1);
-    {
-        float3 Normal = g_normalTextures[Index].SampleLevel(UV, 0).xyz;
-        rotate_vector(Normal, in_vertex.worldRotation);
-        Output.normal = float4(Normal, 1);
-    }
+    Output.normal = g_normalTextures[Index].SampleLevel(UV, 0);
     Output.albedo = float4(g_albedoTextures[Index].SampleLevel(UV, 0));
     Output.specular = float4(g_specularTextures[Index].SampleLevel(UV, 0));
     Output.metalness = g_metalnessTextures[Index].SampleLevel(UV, 0);

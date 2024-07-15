@@ -48,8 +48,9 @@ void GPUFixedContext::set_vertices(GPUStageAllocation* in_allocation, const char
 		
 		{
 			uint32_t VertexIndex = 0;
+			uint32_t VertexCount = IndexCount / 3;
 			auto VertexBuffer = &static_cast<Vertex*>(in_allocation->data)[VertexOffset];
-			for(uint32_t j = 0; j < IndexCount; j++) {
+			for(uint32_t j = 0; j < VertexCount; j++) {
 				VertexBuffer[j + VertexOffset].position = PositionBuffer[IndexBuffer[VertexIndex]];
 				VertexIndex++;
 				VertexBuffer[j + VertexOffset].normal = NormalBuffer[IndexBuffer[VertexIndex]];
@@ -57,7 +58,6 @@ void GPUFixedContext::set_vertices(GPUStageAllocation* in_allocation, const char
 				VertexBuffer[j + VertexOffset].uv = UVBuffer[IndexBuffer[VertexIndex]];
 				VertexIndex++;
 			}
-			uint32_t VertexCount = IndexCount / 3;
 			VertexOffset += VertexCount;
 			in_vertexCounts[i] = VertexCount;
 		}

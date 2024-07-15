@@ -57,7 +57,7 @@ struct FSOutput {
         result:$$uint = OpLoad builtin(DrawIndex:uint);
     };
     Position -= g_view.instance.position;
-    rotate_vector(Position, g_view.instance.rotation);
+    rotate_vector(Position, -g_view.instance.rotation);
     Output.viewPosition = mul(float4(Position, 1), g_view.projection);
 
     return Output;

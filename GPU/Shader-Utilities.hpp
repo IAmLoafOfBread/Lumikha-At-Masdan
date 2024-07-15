@@ -28,7 +28,7 @@ void rotate_vector(inout float3 in_vector, float3 in_rotation) {
     const float3x3 Matrix = float3x3(
         float3(CosY * CosZ, CosY * -SinZ, SinY),
         float3((SinX_SinY * CosZ) + (CosX * SinZ), (SinX_SinY * -SinZ) + (CosX * CosZ), -SinX * CosY),
-        float3((CosX_SinY * CosZ) + (SinX * SinZ), (CosX_SinY * -SinZ) + (SinZ * CosZ), CosX * CosY)
+        float3((CosX_SinY * CosZ) + (SinX * SinZ), (CosX_SinY * -SinZ) + (SinX * CosZ), CosX * CosY)
     );
     in_vector = mul(in_vector, Matrix);
 }

@@ -4,7 +4,7 @@
 
 
 struct VSOutput {
-    float4 position : SV_Position;
+    float4 position : SV_POSITION;
     [[vk_location(0)]] float2 uv;
 };
 
@@ -26,7 +26,7 @@ struct Constants {
 
 [[vk::push_constant]] Constants g_constants;
 
-[shader("vertex")] VSOutput output_vertex(uint in_index: SV_VertexID) {
+[shader("vertex")] VSOutput output_vertex(uint in_index: SV_VERTEXID) {
     VSOutput Output[] = {
         float4(-1.0f, 1.0f, 0.0f, 1.0f), float2(0.0f, 1.0f),
         float4(-1.0f, -1.0f, 0.0f, 1.0f), float2(0.0f, 0.0f),
@@ -38,7 +38,7 @@ struct Constants {
 
 [shader("fragment")] float4 output_fragment(
     [[vk::location(0)]] float2 in_uv
-) : SV_Target0 {
+) : SV_TARGET0 {
     float4 Output = float4(0, 0, 0, 1);
     Output = g_albedoInput.SampleLevel(in_uv, 0);
     return Output;

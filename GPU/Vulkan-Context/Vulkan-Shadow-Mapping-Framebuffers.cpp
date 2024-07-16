@@ -6,19 +6,20 @@
 
 
 void GPUFixedContext::build_shadowMappingFramebuffers(void) {
-	VkExtent3D Extent = SHADOW_MAP_EXTENT;
+	const VkExtent3D ConstExtent = SHADOW_MAP_EXTENT;
+	
+	VkExtent3D Extent = ConstExtent;
 	uint32_t Divisor = 1;
-
 	for(uint32_t i = 0; i < CASCADED_SHADOW_MAP_COUNT; i++) {
-		Extent.width /= Divisor;
-		Extent.height /= Divisor;
+		Extent.width = ConstExtent.width / Divisor;
+		Extent.height = ConstExtent.height / Divisor;
 		for(uint32_t j = 0; j < MAX_LIGHT_COUNT; j++) {
 			build_localTexture(&m_shadowTextures[i][j], nullptr, VK_FORMAT_D32_SFLOAT, Extent, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
 		}
 		Divisor++;
 	}
 	
-	Extent = SHADOW_MAP_EXTENT;
+	Extent = ConstExtent;
 	VkFramebufferCreateInfo CreateInfo = {
 		.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
 		.pNext = nullptr,
@@ -33,8 +34,8 @@ void GPUFixedContext::build_shadowMappingFramebuffers(void) {
 	
 	Divisor = 1;
 	for(uint32_t i = 0; i < CASCADED_SHADOW_MAP_COUNT; i++) {
-		CreateInfo.width /= Divisor;
-		CreateInfo.height /= Divisor;
+		CreateInfo.width = ConstExtent.width / Divisor;
+		CreateInfo.height = ConstExtent.height / Divisor;
 		for(uint32_t j = 0; j < MAX_LIGHT_COUNT; j++) {
 			CreateInfo.pAttachments = &m_shadowTextures[i][j].view;
 			CHECK(vkCreateFramebuffer(m_logical, &CreateInfo, nullptr, &m_shadowMappingFramebuffers[i][j]))

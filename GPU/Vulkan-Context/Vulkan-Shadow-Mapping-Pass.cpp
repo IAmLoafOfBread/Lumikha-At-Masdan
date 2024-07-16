@@ -15,7 +15,7 @@ void GPUFixedContext::build_shadowMappingPass(void) {
 		.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
 		.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
 		.initialLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
-		.finalLayout = VK_IMAGE_LAYOUT_READ_ONLY_OPTIMAL
+		.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL
 	};
 	const VkAttachmentReference Reference = {
 		.attachment = 0,

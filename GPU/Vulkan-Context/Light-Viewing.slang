@@ -9,7 +9,7 @@ struct Constants {
 [[vk::push_constant]] Constants g_constants;
 
 [shader("compute")] [numthreads(CASCADED_SHADOW_MAP_COUNT, MAX_WORKGROUP_SIZE, 1)] void view_light(const uint in_frustumIndex: SV_GroupThreadID, const uint2 in_lightID: SV_DispatchThreadID) {
-    const uint LightIndex = in_lightID.y;
+/*    const uint LightIndex = in_lightID.y;
     if (LightIndex >= g_constants.lightCount) return;
     const uint SubFrustumIndex = in_frustumIndex * CORNER_COUNT;
 
@@ -53,5 +53,5 @@ struct Constants {
         float4(     0,       2 / Height,       0,      0),
         float4(     0,            0,     1 / Maxes.z,  0),
         float4(-Midpoint.x,  Midpoint.y,       0,      1)
-    );
+    );*/
 }

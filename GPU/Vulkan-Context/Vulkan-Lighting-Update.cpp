@@ -45,12 +45,12 @@ void GPUFixedContext::initialize_lightingUpdateData(void) {
 			g_shadowBarriers[i][j].pNext = nullptr;
 			g_shadowBarriers[i][j].srcAccessMask = VK_ACCESS_SHADER_READ_BIT;
 			g_shadowBarriers[i][j].dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
-			g_shadowBarriers[i][j].oldLayout = VK_IMAGE_LAYOUT_READ_ONLY_OPTIMAL;
+			g_shadowBarriers[i][j].oldLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
 			g_shadowBarriers[i][j].newLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 			g_shadowBarriers[i][j].srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
 			g_shadowBarriers[i][j].dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
 			g_shadowBarriers[i][j].image = m_shadowTextures[i][j].image;
-			g_shadowBarriers[i][j].subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+			g_shadowBarriers[i][j].subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
 			g_shadowBarriers[i][j].subresourceRange.baseMipLevel = 0;
 			g_shadowBarriers[i][j].subresourceRange.levelCount = 1;
 			g_shadowBarriers[i][j].subresourceRange.baseArrayLayer = 0;
@@ -98,7 +98,9 @@ void GPUFixedContext::draw_lightingUpdate(void) {
 	CHECK(vkBeginCommandBuffer(m_lightingCommandSet, &G_FIXED_COMMAND_BEGIN_INFO))
 	vkCmdBindDescriptorSets(m_lightingCommandSet, VK_PIPELINE_BIND_POINT_GRAPHICS, m_lightingLayout, 0, 1, &m_lightingDescriptorSet, 0, nullptr);
 	vkCmdBindPipeline(m_lightingCommandSet, VK_PIPELINE_BIND_POINT_GRAPHICS, m_lightingPipeline);
-	vkCmdPushConstants(m_lightingCommandSet, m_lightingLayout, VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(uint32_t), &m_lightCount);
+	vkCmdPushConstants(m_lightingCommandSet, m_lightingLayout, VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(float3), &m_cameraView.instance.position);
+	vkCmdPushConstants(m_lightingCommandSet, m_lightingLayout, VK_SHADER_STAGE_FRAGMENT_BIT, sizeof(float3), sizeof(uint32_t), &m_lightCount);
+	vkCmdPushConstants(m_lightingCommandSet, m_lightingLayout, VK_SHADER_STAGE_FRAGMENT_BIT, sizeof(float3) + sizeof(uint32_t), sizeof(VkDeviceAddress), &m_lightAllocation.address);
 	
 	vkCmdBeginRenderPass(m_lightingCommandSet, &g_renderInfo, VK_SUBPASS_CONTENTS_INLINE);
 	vkCmdDraw(m_lightingCommandSet, 4, 1, 0, 0);

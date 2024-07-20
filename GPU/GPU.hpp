@@ -46,6 +46,7 @@ public:
 	Light* m_lights;
 	
 	Camera m_cameraData;
+	View m_cameraView;
 	
 	void acquire_nextImageUpdate(void);
 
@@ -170,8 +171,6 @@ private:
 	Semaphore m_cameraSemaphore;
 	Semaphore m_instancesSemaphore;
 	Semaphore m_lightsSemaphore;
-	
-	View m_cameraView;
 	
 	void set_vertices(GPUStageAllocation* in_allocation, const char** in_positionPaths, const char** in_normalPaths, const char** in_uvPaths, const char** in_indexPaths, uint32_t* in_vertexCounts);
 	void set_texture(GPUStageAllocation* in_allocation, const char* in_path, GPUExtent3D* in_extent);

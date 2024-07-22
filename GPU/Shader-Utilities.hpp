@@ -82,6 +82,7 @@ struct Light {
 struct Vertex {
 	float3 position;
 	float3 normal;
+	float3 tangent;
 	float2 uv;
 };
 struct Camera {

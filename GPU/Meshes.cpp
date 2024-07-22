@@ -58,6 +58,42 @@ void GPUFixedContext::set_vertices(GPUStageAllocation* in_allocation, const char
 				VertexBuffer[j + VertexOffset].uv = UVBuffer[IndexBuffer[VertexIndex]];
 				VertexIndex++;
 			}
+			for(uint32_t j = 0; j < VertexCount; j += 3) {
+				uint32_t J = j + VertexOffset;
+				
+				float3 Positions[3] = { 0 };
+				float2 UVs[3] = { 0 };
+				for(uint32_t k = 0; k < 3; k++) {
+					Positions[k] = VertexBuffer[J + k].position;
+					UVs[k] = VertexBuffer[J + k].uv;
+				}
+
+				float3 PositionEdges[2] = { 0 };
+				float2 UVEdges[2] = { 0 };
+				for(uint32_t k = 0; k < 2; k++) {
+					PositionEdges[k].x = Positions[k + 1].x - Positions[0].x;
+					PositionEdges[k].y = Positions[k + 1].y - Positions[0].y;
+					PositionEdges[k].z = Positions[k + 1].z - Positions[0].z;
+					UVEdges[k].u = UVs[k + 1].u - UVs[0].u;
+					UVEdges[k].v = UVs[k + 1].v - UVs[0].v;
+				}
+
+				float invDet = 1 / ((UVEdges[0].u * UVEdges[1].v) - (UVEdges[1].u * UVEdges[0].v));
+
+				float3 Tangent = { 0 };
+				Tangent.x = invDet * ((UVEdges[1].v * PositionEdges[0].x) - (UVEdges[0].v * PositionEdges[1].x));
+				Tangent.y = invDet * ((UVEdges[1].v * PositionEdges[0].y) - (UVEdges[0].v * PositionEdges[1].y));
+				Tangent.z = invDet * ((UVEdges[1].v * PositionEdges[0].z) - (UVEdges[0].v * PositionEdges[1].z));
+
+				float Length = sqrtf(powf(Tangent.x, 2) + powf(Tangent.y, 2) + powf(Tangent.z, 2));
+				Tangent.x /= Length;
+				Tangent.y /= Length;
+				Tangent.z /= Length;
+
+				for(uint32_t k = 0; k < 3; k++) {
+					VertexBuffer[J + k].tangent = Tangent;
+				}
+			}
 			VertexOffset += VertexCount;
 			in_vertexCounts[i] = VertexCount;
 		}

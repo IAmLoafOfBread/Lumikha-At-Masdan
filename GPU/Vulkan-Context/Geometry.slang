@@ -4,9 +4,9 @@
 
 
 struct FSInput {
-    [[vk::location(0)]] float3 worldPosition;
-    [[vk::location(2)]] float3 worldRotation;
+    [[vk::location(0)]] float3 position;
     [[vk::location(1)]] float3 normal;
+    [[vk::location(2)]] float3 tangent;
     [[vk::location(3)]] float2 uv;
     [[vk::location(4)]] nointerpolation uint textureIndex;
 };
@@ -36,19 +36,24 @@ struct FSOutput {
 [shader("vertex")] VSOutput output_vertex(
     [[vk::location(0)]] float3 inv_position,
     [[vk::location(1)]] float3 inv_normal,
-    [[vk::location(2)]] float2 inv_uv,
-    [[vk::location(3)]] float3 ini_position,
-    [[vk::location(4)]] float3 ini_rotation
+    [[vk::location(2)]] float3 inv_tangent,
+    [[vk::location(3)]] float2 inv_uv,
+    [[vk::location(4)]] float3 ini_position,
+    [[vk::location(5)]] float3 ini_rotation
 ) {
     VSOutput Output = { 0 };
     float3 Position = inv_position;
     
     rotate_vector(Position, ini_rotation);
     Position += ini_position;
-    Output.fragmentShaderInput.worldPosition = Position;
-    Output.fragmentShaderInput.worldRotation = ini_rotation;
+    Output.fragmentShaderInput.position = Position;
     Output.fragmentShaderInput.normal = inv_normal;
-    rotate_vector(Output.fragmentShaderInput.normal, ini_rotation);
+    Output.fragmentShaderInput.tangent = inv_tangent;
+    //rotate_vector(Output.fragmentShaderInput.normal, ini_rotation);
+    //rotate_vector(Output.fragmentShaderInput.tangent, ini_rotation);
+    Output.fragmentShaderInput.normal += ini_position;
+    Output.fragmentShaderInput.tangent += ini_position;
+
     Output.fragmentShaderInput.uv = inv_uv;
     Output.fragmentShaderInput.uv.y *= -1.0f;
     Output.fragmentShaderInput.uv.y += 1.0f;
@@ -67,11 +72,20 @@ struct FSOutput {
     FSOutput Output = { 0 };
     const uint Index = in_vertex.textureIndex;
     const float2 UV = in_vertex.uv;
-
-    Output.position = float4(in_vertex.worldPosition, 1);
-    Output.normal = g_normalTextures[Index].SampleLevel(UV, 0);
-    Output.albedo = float4(g_albedoTextures[Index].SampleLevel(UV, 0));
-    Output.specular = float4(g_specularTextures[Index].SampleLevel(UV, 0));
+    
+    Output.position = float4(in_vertex.position, 1.0f);
+    {
+        float3x3 TBN = float3x3(
+            in_vertex.tangent,
+            cross(in_vertex.normal, in_vertex.tangent),
+            in_vertex.normal
+        );
+        float3 Normal = (g_normalTextures[Index].SampleLevel(UV, 0).xyz * 2) - 1;
+        Normal = normalize(mul(Normal, TBN));
+        Output.normal = float4((Normal + 1) / 2, 1.0f);
+    }
+    Output.albedo = g_albedoTextures[Index].SampleLevel(UV, 0);
+    Output.specular = g_specularTextures[Index].SampleLevel(UV, 0);
     Output.metalness = g_metalnessTextures[Index].SampleLevel(UV, 0);
     Output.roughness = g_roughnessTextures[Index].SampleLevel(UV, 0);
 

@@ -10,6 +10,8 @@ void GPUFixedContext::build_surface(void) {
 
 	VkSurfaceCapabilitiesKHR Caps = { 0 };
 	CHECK(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(m_physical, m_surface, &Caps))
+	m_surfaceExtent.width = Caps.currentExtent.width;
+	m_surfaceExtent.height = Caps.currentExtent.height;
 	m_surfaceFrameCount = Caps.minImageCount + 1;
 	uint32_t FormatCount = 0;
 	CHECK(vkGetPhysicalDeviceSurfaceFormatsKHR(m_physical, m_surface, &FormatCount, nullptr))

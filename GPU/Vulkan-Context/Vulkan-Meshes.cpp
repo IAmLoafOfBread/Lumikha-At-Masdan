@@ -40,7 +40,7 @@ void GPUFixedContext::build_meshes(uint32_t* in_vertexCounts, GPUStageAllocation
 		g_textures[i] = new GPULocalTexture[m_meshCount];
 		m_meshTextureViews[i] = new GPUTextureView[m_meshCount];
 		for(uint32_t j = 0; j < m_meshCount; j++) {
-			build_localTexture(&g_textures[i][j], &in_textureAllocations[i][j], Formats[i], in_extents[i][j], VK_IMAGE_USAGE_SAMPLED_BIT, VK_IMAGE_LAYOUT_READ_ONLY_OPTIMAL);
+			build_localTexture(&g_textures[i][j], &in_textureAllocations[i][j], Formats[i], in_extents[i][j], VK_IMAGE_USAGE_SAMPLED_BIT, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 			m_meshTextureViews[i][j] = g_textures[i][j].view;
 		}
 	}

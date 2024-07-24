@@ -224,7 +224,7 @@ void GPUFixedContext::build_localTexture(GPULocalTexture* in_texture, GPUStageAl
 	}
 	
 	VkAccessFlags AccessFlags = 0;
-	if(in_layout == VK_IMAGE_LAYOUT_READ_ONLY_OPTIMAL) {
+	if(in_layout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) {
 		AccessFlags = VK_ACCESS_SHADER_READ_BIT;
 	}
 	if(in_layout == VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL) {
@@ -235,7 +235,7 @@ void GPUFixedContext::build_localTexture(GPULocalTexture* in_texture, GPUStageAl
 	}
 
 	VkPipelineStageFlags StageFlags = 0;
-	if (in_layout == VK_IMAGE_LAYOUT_READ_ONLY_OPTIMAL) {
+	if (in_layout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) {
 		StageFlags = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
 	}
 	if (in_layout == VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL) {

@@ -14,14 +14,14 @@ void GPUFixedContext::set_lightingBindings(void) {
 	for (uint32_t i = 0; i < GEOMETRY_PASS_COLOUR_ATTACHMENT_COUNT; i++) {
 		GeometryInfos[i].sampler = m_sampler;
 		GeometryInfos[i].imageView = m_geometryTextures[i].view;
-		GeometryInfos[i].imageLayout = VK_IMAGE_LAYOUT_READ_ONLY_OPTIMAL;
+		GeometryInfos[i].imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 	}
 	VkDescriptorImageInfo ShadowInfos[CASCADED_SHADOW_MAP_COUNT][MAX_LIGHT_COUNT] = { { { VK_NULL_HANDLE } } };
 	for (uint32_t i = 0; i < CASCADED_SHADOW_MAP_COUNT; i++) {
 		for (uint32_t j = 0; j < MAX_LIGHT_COUNT; j++) {
 			ShadowInfos[i][j].sampler = m_sampler;
 			ShadowInfos[i][j].imageView = m_shadowTextures[i][j].view;
-			ShadowInfos[i][j].imageLayout = VK_IMAGE_LAYOUT_READ_ONLY_OPTIMAL;
+			ShadowInfos[i][j].imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 		}
 	}
 

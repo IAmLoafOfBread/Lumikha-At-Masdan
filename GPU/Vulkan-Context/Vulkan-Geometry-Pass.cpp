@@ -23,7 +23,7 @@ void GPUFixedContext::build_geometryPass(void) {
 				Descriptions[i].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
 				Descriptions[i].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
 				Descriptions[i].initialLayout = Formats[i] != VK_FORMAT_D32_SFLOAT ? VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL : VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-				Descriptions[i].finalLayout = Formats[i] != VK_FORMAT_D32_SFLOAT ? VK_IMAGE_LAYOUT_READ_ONLY_OPTIMAL : VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;;
+				Descriptions[i].finalLayout = Formats[i] != VK_FORMAT_D32_SFLOAT ? VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL : VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;;
 			}
 		}
 		

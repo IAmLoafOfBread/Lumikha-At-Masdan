@@ -64,7 +64,7 @@ void GPUFixedContext::initialize_lightingUpdateData(void) {
 		g_geometryBarriers[i].pNext = nullptr;
 		g_geometryBarriers[i].srcAccessMask = VK_ACCESS_SHADER_READ_BIT;
 		g_geometryBarriers[i].dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-		g_geometryBarriers[i].oldLayout = VK_IMAGE_LAYOUT_READ_ONLY_OPTIMAL;
+		g_geometryBarriers[i].oldLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 		g_geometryBarriers[i].newLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 		g_geometryBarriers[i].srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
 		g_geometryBarriers[i].dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;

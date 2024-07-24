@@ -42,7 +42,7 @@ void GPUFixedContext::build_geometryPipeline(void) {
 			.flags = 0,
 			.stage = VK_SHADER_STAGE_VERTEX_BIT,
 			.module = g_vertexModule,
-			.pName = "main\0",
+			.pName = "main",
 			.pSpecializationInfo = nullptr
 		},
 		{
@@ -51,7 +51,7 @@ void GPUFixedContext::build_geometryPipeline(void) {
 			.flags = 0,
 			.stage = VK_SHADER_STAGE_FRAGMENT_BIT,
 			.module = g_fragmentModule,
-			.pName = "main\0",
+			.pName = "main",
 			.pSpecializationInfo = nullptr
 		}
 	};

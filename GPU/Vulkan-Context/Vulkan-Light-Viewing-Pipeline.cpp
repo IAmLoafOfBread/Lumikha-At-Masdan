@@ -42,7 +42,7 @@ void GPUFixedContext::build_lightViewingPipeline(void) {
 			.flags = 0,
 			.stage = VK_SHADER_STAGE_COMPUTE_BIT,
 			.module = g_module,
-			.pName = "main\0",
+			.pName = "main",
 			.pSpecializationInfo = nullptr
 		},
 		.layout = m_lightViewingLayout,

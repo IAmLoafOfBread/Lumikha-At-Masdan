@@ -35,7 +35,7 @@ void rotate_vector(inout float3 in_vector, float3 in_rotation) {
 
 #endif
 
-#define MAX_LIGHT_COUNT 5
+#define MAX_LIGHT_COUNT 3
 #define MAX_WORKGROUP_SIZE 64
 #define CASCADED_SHADOW_MAP_COUNT 3
 

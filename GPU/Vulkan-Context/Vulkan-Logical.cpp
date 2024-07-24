@@ -17,8 +17,7 @@ void GPUFixedContext::build_logical(void) {
 		.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES,
 		.pNext = &Features12,
 		.variablePointersStorageBuffer = VK_TRUE,
-		.variablePointers = VK_TRUE,
-		.shaderDrawParameters = VK_TRUE
+		.variablePointers = VK_TRUE
 	};
 	VkPhysicalDeviceFeatures2 FeaturesExtent = {
 		.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2,

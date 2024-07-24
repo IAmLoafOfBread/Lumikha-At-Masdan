@@ -63,7 +63,7 @@ float G1(float3 N, float3 X, float k) {
     for (uint i = 0; i < g_constants.lightCount; i++) {
         Light CurrentLight = g_constants.lights[i];
         //if (CurrentLight.visible) {
-            float3 LightPosition = CurrentLight.view.instance.position;
+            float3 LightPosition = CurrentLight.view.position;
 
             float3 L = normalize(LightPosition - PointPosition);
             float3 H = normalize(V + L);

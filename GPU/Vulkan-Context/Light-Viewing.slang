@@ -14,8 +14,8 @@ struct Constants {
     const uint SubFrustumIndex = in_frustumIndex * CORNER_COUNT;
 
     Light* Light = &g_constants.lights[LightIndex];
-    const float3 Position = Light->view.instance.position;
-    const float3 Rotation = Light->view.instance.rotation;
+    const float3 Position = Light->view.position;
+    const float3 Rotation = Light->view.rotation;
 
     float3 Corners[CORNER_COUNT] = { 0 };
     for (uint i = 0; i < CORNER_COUNT; i++) {

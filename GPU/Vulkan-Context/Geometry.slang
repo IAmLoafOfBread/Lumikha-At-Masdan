@@ -39,7 +39,8 @@ struct FSOutput {
     [[vk::location(2)]] float3 inv_tangent,
     [[vk::location(3)]] float2 inv_uv,
     [[vk::location(4)]] float3 ini_position,
-    [[vk::location(5)]] float3 ini_rotation
+    [[vk::location(5)]] float3 ini_rotation,
+    [[vk::location(6)]] uint ini_textureIndex
 ) {
     VSOutput Output = { 0 };
     float3 Position = inv_position;
@@ -51,18 +52,15 @@ struct FSOutput {
     Output.fragmentShaderInput.tangent = inv_tangent;
     //rotate_vector(Output.fragmentShaderInput.normal, ini_rotation);
     //rotate_vector(Output.fragmentShaderInput.tangent, ini_rotation);
-    Output.fragmentShaderInput.normal += ini_position;
-    Output.fragmentShaderInput.tangent += ini_position;
+    //Output.fragmentShaderInput.normal += ini_position;
+    //Output.fragmentShaderInput.tangent += ini_position;
 
     Output.fragmentShaderInput.uv = inv_uv;
     Output.fragmentShaderInput.uv.y *= -1.0f;
     Output.fragmentShaderInput.uv.y += 1.0f;
-    Output.fragmentShaderInput.textureIndex = spirv_asm {
-        OpCapability DrawParameters;
-        result:$$uint = OpLoad builtin(DrawIndex:uint);
-    };
-    Position -= g_view.instance.position;
-    rotate_vector(Position, -g_view.instance.rotation);
+    Output.fragmentShaderInput.textureIndex = ini_textureIndex;
+    Position -= g_view.position;
+    rotate_vector(Position, -g_view.rotation);
     Output.viewPosition = mul(float4(Position, 1), g_view.projection);
 
     return Output;

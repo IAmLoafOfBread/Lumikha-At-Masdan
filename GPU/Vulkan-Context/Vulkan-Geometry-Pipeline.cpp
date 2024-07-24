@@ -100,6 +100,11 @@ void GPUFixedContext::build_geometryPipeline(void) {
 			.format = VK_FORMAT_R32G32B32_SFLOAT,
 			.offset = offsetof(Instance, rotation)
 		},
+		{
+			.binding = 1,
+			.format = VK_FORMAT_R32_UINT,
+			.offset = offsetof(Instance, dataIndex)
+		}
 	};
 	for(uint32_t i = 0; i < LENGTH_OF(Attributes); i++) {
 		Attributes[i].location = i;

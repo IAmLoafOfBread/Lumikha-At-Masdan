@@ -6,9 +6,9 @@ void GPUFixedContext::transform_camera(Transform in_transform, float3 in_value) 
 	wait_semaphore(m_cameraSemaphore);
 	switch(in_transform) {
 		case POSITION:
-			m_cameraView.instance.position = in_value;
+			m_cameraView.position = in_value;
 		case ROTATION:
-			m_cameraView.instance.rotation = in_value;
+			m_cameraView.rotation = in_value;
 	}
 	signal_semaphore(m_cameraSemaphore);
 }

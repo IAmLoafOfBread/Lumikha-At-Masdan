@@ -14,8 +14,8 @@
 
     rotate_vector(Position, ini_rotation);
     Position += ini_position;
-    Position -= g_view.instance.position;
-    rotate_vector(Position, -g_view.instance.rotation);
+    Position -= g_view.position;
+    rotate_vector(Position, -g_view.rotation);
     
     float4 ViewPosition = mul(float4(Position.xyz, 1), g_view.projection);
     return ViewPosition;

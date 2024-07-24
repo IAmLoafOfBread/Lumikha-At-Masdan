@@ -68,9 +68,11 @@ void rotate_vector(inout float3 in_vector, float3 in_rotation) {
 struct Instance {
 	float3 position;
 	float3 rotation;
+	uint32_t dataIndex;
 };
 struct View {
-	Instance instance;
+	float3 position;
+	float3 rotation;
 	float4x4 projection;
 };
 struct Light {

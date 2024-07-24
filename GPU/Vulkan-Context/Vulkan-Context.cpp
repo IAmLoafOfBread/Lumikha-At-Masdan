@@ -2,6 +2,7 @@
 
 #if defined(SYSTEM_LINUX) || defined(SYSTEM_WINDOWS)
 #include "../GPU.hpp"
+#include <string.h>
 
 
 
@@ -24,7 +25,7 @@ void GPUFixedContext::build_context(void) {
 		.applicationVersion = VK_VERSION_1_0,
 		.pEngineName = "TemperLogic",
 		.engineVersion = VK_VERSION_1_0,
-		.apiVersion = VK_API_VERSION_1_3
+		.apiVersion = VK_API_VERSION_1_2
 	};
 
 #if defined(RUN_DEBUG)

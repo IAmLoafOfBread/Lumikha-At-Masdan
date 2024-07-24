@@ -2,19 +2,13 @@
 
 #if defined(SYSTEM_LINUX) || defined(SYSTEM_WINDOWS)
 #include "../GPU.hpp"
-#include <string.h>
 
 
 
 void GPUFixedContext::build_logical(void) {
-	VkPhysicalDeviceVulkan13Features Features13 = {
-		.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES,
-		.pNext = nullptr,
-		.synchronization2 = VK_TRUE
-	};
 	VkPhysicalDeviceVulkan12Features Features12 = {
 		.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES,
-		.pNext = &Features13,
+		.pNext = nullptr,
 		.runtimeDescriptorArray = VK_TRUE,
 		.scalarBlockLayout = VK_TRUE,
 		.bufferDeviceAddress = VK_TRUE
@@ -40,7 +34,7 @@ void GPUFixedContext::build_logical(void) {
 		}
 	}
 	
-	uint32_t GraphicsQueueCount = GRAPHICS_THREAD_COUNT;
+	uint32_t GraphicsQueueCount = m_multiThreadedGraphics ? GRAPHICS_THREAD_COUNT : 1;
 	if(m_computeQueueFamilyIndex == m_graphicsQueueFamilyIndex) {
 		GraphicsQueueCount += m_computeQueueIndex == NULL_VALUE ? 0 : 1;
 	}

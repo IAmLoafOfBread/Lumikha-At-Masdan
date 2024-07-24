@@ -2,7 +2,6 @@
 
 #if defined(SYSTEM_LINUX) || defined(SYSTEM_WINDOWS)
 #include "../GPU.hpp"
-#include <string.h>
 
 
 

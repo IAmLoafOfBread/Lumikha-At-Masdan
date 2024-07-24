@@ -62,7 +62,7 @@ float G1(float3 N, float3 X, float k) {
 
     for (uint i = 0; i < g_constants.lightCount; i++) {
         Light CurrentLight = g_constants.lights[i];
-        //if (CurrentLight.visible) {
+        if (CurrentLight.visible) {
             float3 LightPosition = CurrentLight.view.position;
 
             float3 L = normalize(LightPosition - PointPosition);
@@ -76,18 +76,18 @@ float G1(float3 N, float3 X, float k) {
             float3 F0 = float3(0.2f);
             float3 Ks = F0 + ((float(1.0f) - F0) * pow(1 - dot(V, H), 5));
 
+			float3 Kd = (1 - Ks) * (1 - g_metalnessInput.SampleLevel(in_uv, 0));
+
             float3 Fs = (D * G * Ks) / (4 * VN * NL);
-            float3 Fd = (Albedo / PI) * NL;
+            float3 Fd = Kd * (Albedo / PI) * NL;
 
-            float3 Fr = ((float3(1.0f) - Ks) * Fd) + Fs;
-
-            float VR = dot(V, reflect(L, PointNormal));
-            float3 S = max(VR, 0.0f) * Specular;
+            float3 Fr = Fd + Fs;
 
             float LightDistance = distance(LightPosition, PointPosition);
             LightDistance *= LightDistance;
-            Output.xyz += Fr * (CurrentLight.colour / LightDistance) + S;
-        //}
+            Output.xyz += Fr * (CurrentLight.colour * Specular / LightDistance);
+            Output.xyz = g_cascadedShadowMapsDB1[i].SampleLevel(in_uv, 0);
+        }
     }
 
     return Output;

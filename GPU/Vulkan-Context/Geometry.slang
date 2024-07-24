@@ -52,8 +52,6 @@ struct FSOutput {
     Output.fragmentShaderInput.tangent = inv_tangent;
     //rotate_vector(Output.fragmentShaderInput.normal, ini_rotation);
     //rotate_vector(Output.fragmentShaderInput.tangent, ini_rotation);
-    //Output.fragmentShaderInput.normal += ini_position;
-    //Output.fragmentShaderInput.tangent += ini_position;
 
     Output.fragmentShaderInput.uv = inv_uv;
     Output.fragmentShaderInput.uv.y *= -1.0f;

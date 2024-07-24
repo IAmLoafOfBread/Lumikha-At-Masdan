@@ -17,12 +17,12 @@
 
 #if defined(RUN_DEBUG)
 #include <stdio.h>
-inline void TRUE_CHECK(int32_t in_value) {
+inline void TRUE_CHECK(int32_t in_value, const char* in_name) {
 	if(in_value != 0) {
-		printf("API CHECK -> %d\n", in_value);
+		printf("API CHECK -> %d   %s\n", in_value, in_name);
 	}
 }
-#define CHECK(val) TRUE_CHECK(val);
+#define CHECK(val) TRUE_CHECK(val, #val);
 #elif defined(RUN_PRODUCT)
 #define CHECK(val) val
 #endif

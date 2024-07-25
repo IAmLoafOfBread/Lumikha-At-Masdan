@@ -12,6 +12,7 @@ void GPUFixedContext::build_synchronizations(void) {
 			.pNext = nullptr,
 			.flags = VK_FENCE_CREATE_SIGNALED_BIT
 		};
+		CHECK(vkCreateFence(m_logical, &CreateInfo, nullptr, &m_swapchainFence))
 		CHECK(vkCreateFence(m_logical, &CreateInfo, nullptr, &m_lightViewingsFinishedFence))
 		for(uint32_t i = 0; i < CASCADED_SHADOW_MAP_COUNT; i++) {
 			CHECK(vkCreateFence(m_logical, &CreateInfo, nullptr, &m_shadowMappingsFinishedFences[i]))
@@ -48,6 +49,7 @@ void GPUFixedContext::ruin_synchronizations(void) {
 	}
 	vkDestroyFence(m_logical, m_geometryFinishedFence, nullptr);
 	vkDestroyFence(m_logical, m_lightingFinishedFence, nullptr);
+	vkDestroyFence(m_logical, m_swapchainFence, nullptr);
 }
 
 

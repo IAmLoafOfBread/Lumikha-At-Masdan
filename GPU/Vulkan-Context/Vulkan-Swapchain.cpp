@@ -56,18 +56,9 @@ void GPUFixedContext::build_swapchain(void) {
 			CHECK(vkCreateImageView(m_logical, &CreateInfo, nullptr, &m_presentViews[i]))
 		}
 	}
-
-	const VkFenceCreateInfo CreateInfo = {
-		.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO,
-		.pNext = nullptr,
-		.flags = 0
-	};
-	CHECK(vkCreateFence(m_logical, &CreateInfo, nullptr, &m_swapchainFence))
 }
 
 void GPUFixedContext::ruin_swapchain(void) {
-	vkDestroyFence(m_logical, m_swapchainFence, nullptr);
-
 	for(uint32_t i = 0; i < m_surfaceFrameCount; i++) vkDestroyImageView(m_logical, m_presentViews[i], nullptr);
 	delete[] m_presentViews;
 	vkDestroySwapchainKHR(m_logical, m_swapchain, nullptr);

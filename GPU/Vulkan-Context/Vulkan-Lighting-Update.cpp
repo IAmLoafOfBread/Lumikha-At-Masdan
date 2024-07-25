@@ -29,7 +29,7 @@ static VkSubmitInfo g_submitInfo = {
 	.pWaitDstStageMask = g_waitStages,
 	.commandBufferCount = 1,
 	.pCommandBuffers = nullptr,
-	.signalSemaphoreCount = 2,
+	.signalSemaphoreCount = 1,
 	.pSignalSemaphores = nullptr
 };
 
@@ -86,7 +86,7 @@ void GPUFixedContext::initialize_lightingUpdateData(void) {
 	g_waitSemaphores[CASCADED_SHADOW_MAP_COUNT] = m_geometryFinishedSemaphore;
 	
 	g_submitInfo.pCommandBuffers = &m_lightingCommandSet;
-	g_submitInfo.pSignalSemaphores = m_lightingFinishedSemaphores;
+	g_submitInfo.pSignalSemaphores = &m_lightingFinishedSemaphore;
 }
 
 void GPUFixedContext::draw_lightingUpdate(void) {

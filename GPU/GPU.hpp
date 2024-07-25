@@ -162,11 +162,10 @@ private:
 	GPUFence m_shadowMappingsFinishedFences[CASCADED_SHADOW_MAP_COUNT];
 	GPUFence m_geometryFinishedFence;
 	GPUFence m_lightingFinishedFence;
-	GPUFence m_presentFinishedFence;
 	GPUSemaphore m_lightViewingsFinishedSemaphores[CASCADED_SHADOW_MAP_COUNT];
 	GPUSemaphore m_shadowMappingsFinishedSemaphores[CASCADED_SHADOW_MAP_COUNT];
 	GPUSemaphore m_geometryFinishedSemaphore;
-	GPUSemaphore m_lightingFinishedSemaphores[2];
+	GPUSemaphore m_lightingFinishedSemaphore;
 	
 	Semaphore m_cameraSemaphore;
 	Semaphore m_instancesSemaphore;

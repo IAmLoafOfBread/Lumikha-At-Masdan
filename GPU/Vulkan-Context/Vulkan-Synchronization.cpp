@@ -18,7 +18,6 @@ void GPUFixedContext::build_synchronizations(void) {
 		}
 		CHECK(vkCreateFence(m_logical, &CreateInfo, nullptr, &m_geometryFinishedFence))
 		CHECK(vkCreateFence(m_logical, &CreateInfo, nullptr, &m_lightingFinishedFence))
-		CHECK(vkCreateFence(m_logical, &CreateInfo, nullptr, &m_presentFinishedFence))
 	}
 
 	const VkSemaphoreCreateInfo CreateInfo = {
@@ -32,8 +31,7 @@ void GPUFixedContext::build_synchronizations(void) {
 		CHECK(vkCreateSemaphore(m_logical, &CreateInfo, nullptr, &m_shadowMappingsFinishedSemaphores[i]))
 	}
 	CHECK(vkCreateSemaphore(m_logical, &CreateInfo, nullptr, &m_geometryFinishedSemaphore))
-	CHECK(vkCreateSemaphore(m_logical, &CreateInfo, nullptr, &m_lightingFinishedSemaphores[0]))
-	CHECK(vkCreateSemaphore(m_logical, &CreateInfo, nullptr, &m_lightingFinishedSemaphores[1]))
+	CHECK(vkCreateSemaphore(m_logical, &CreateInfo, nullptr, &m_lightingFinishedSemaphore))
 }
 
 void GPUFixedContext::ruin_synchronizations(void) {
@@ -42,8 +40,7 @@ void GPUFixedContext::ruin_synchronizations(void) {
 		vkDestroySemaphore(m_logical, m_shadowMappingsFinishedSemaphores[i], nullptr);
 	}
 	vkDestroySemaphore(m_logical, m_geometryFinishedSemaphore, nullptr);
-	vkDestroySemaphore(m_logical, m_lightingFinishedSemaphores[0], nullptr);
-	vkDestroySemaphore(m_logical, m_lightingFinishedSemaphores[1], nullptr);
+	vkDestroySemaphore(m_logical, m_lightingFinishedSemaphore, nullptr);
 
 	vkDestroyFence(m_logical, m_lightViewingsFinishedFence, nullptr);
 	for(uint32_t i = 0; i < CASCADED_SHADOW_MAP_COUNT; i++) {
@@ -51,7 +48,6 @@ void GPUFixedContext::ruin_synchronizations(void) {
 	}
 	vkDestroyFence(m_logical, m_geometryFinishedFence, nullptr);
 	vkDestroyFence(m_logical, m_lightingFinishedFence, nullptr);
-	vkDestroyFence(m_logical, m_presentFinishedFence, nullptr);
 }
 
 

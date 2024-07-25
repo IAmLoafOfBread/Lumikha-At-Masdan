@@ -17,12 +17,10 @@ void GPUFixedContext::build_lightingPass(void) {
 		.initialLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
 		.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
 	};
-
 	const VkAttachmentReference Reference = {
 		.attachment = 0,
 		.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
 	};
-
 	const VkSubpassDescription Subpass = {
 		.flags = 0,
 		.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS,
@@ -35,7 +33,15 @@ void GPUFixedContext::build_lightingPass(void) {
 		.preserveAttachmentCount = 0,
 		.pPreserveAttachments = nullptr
 	};
-
+	const VkSubpassDependency Dependency = {
+		.srcSubpass = VK_SUBPASS_EXTERNAL,
+		.dstSubpass = 0,
+		.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT,
+		.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+		.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
+		.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
+		.dependencyFlags = 0
+	};
 	const VkRenderPassCreateInfo CreateInfo = {
 		.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,
 		.pNext = nullptr,
@@ -44,8 +50,8 @@ void GPUFixedContext::build_lightingPass(void) {
 		.pAttachments = &Description,
 		.subpassCount = 1,
 		.pSubpasses = &Subpass,
-		.dependencyCount = 0,
-		.pDependencies = nullptr
+		.dependencyCount = 1,
+		.pDependencies = &Dependency
 	};
 	CHECK(vkCreateRenderPass(m_logical, &CreateInfo, nullptr, &m_lightingPass))
 }

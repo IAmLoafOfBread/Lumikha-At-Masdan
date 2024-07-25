@@ -15,7 +15,7 @@ void GPUFixedContext::build_shadowMappingPass(void) {
 		.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
 		.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
 		.initialLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
-		.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL
+		.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
 	};
 	const VkAttachmentReference Reference = {
 		.attachment = 0,
@@ -33,6 +33,15 @@ void GPUFixedContext::build_shadowMappingPass(void) {
 		.preserveAttachmentCount = 0,
 		.pPreserveAttachments = nullptr
 	};
+	const VkSubpassDependency Dependency = {
+		.srcSubpass = VK_SUBPASS_EXTERNAL,
+		.dstSubpass = 0,
+		.srcStageMask = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+		.dstStageMask = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT,
+		.srcAccessMask = VK_ACCESS_SHADER_READ_BIT,
+		.dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
+		.dependencyFlags = 0
+	};
 	const VkRenderPassCreateInfo CreateInfo = {
 		.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,
 		.pNext = nullptr,
@@ -41,8 +50,8 @@ void GPUFixedContext::build_shadowMappingPass(void) {
 		.pAttachments = &Description,
 		.subpassCount = 1,
 		.pSubpasses = &Subpass,
-		.dependencyCount = 0,
-		.pDependencies = nullptr
+		.dependencyCount = 1,
+		.pDependencies = &Dependency
 	};
 	CHECK(vkCreateRenderPass(m_logical, &CreateInfo, nullptr, &m_shadowMappingPass))
 }

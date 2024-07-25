@@ -34,7 +34,7 @@ inline void TRUE_CHECK(int32_t in_value, const char* in_name) {
 
 class GPUFixedContext {
 public:
-	GPUFixedContext(uint32_t in_directoryLength, char* in_directory, GLFWwindow* in_surfaceWindow, GPUExtent3D in_surfaceExtent, const uint32_t in_meshCount, const uint32_t* in_instanceMaxCounts, const char** in_positionFiles, const char** in_normalFiles, const char** in_uvFiles, const char** in_indexFiles, const char*** in_textureFiles);
+	GPUFixedContext(uint32_t in_directoryLength, char* in_directory, GLFWwindow* in_surfaceWindow, const uint32_t in_meshCount, const uint32_t* in_instanceMaxCounts, const char** in_positionFiles, const char** in_normalFiles, const char** in_uvFiles, const char** in_indexFiles, const char*** in_textureFiles);
 	~GPUFixedContext();
 
 	uint32_t m_directoryLength;
@@ -49,13 +49,14 @@ public:
 	View m_cameraView;
 	
 	void acquire_nextImageUpdate(void);
-
 	void calculate_subFrustum(uint32_t in_index, uint32_t in_multiplier);
 	void dispatch_lightViewingUpdate(void);
 	void draw_shadowMappingUpdate(uint32_t in_index, uint32_t in_divisor);
 	void draw_geometryUpdate(void);
 	void draw_lightingUpdate(void);
 	void submit_presentUpdate(void);
+	
+	void resize_surfaceUpdate(void);
 	
 	void transform_camera(Transform in_transform, float3 in_value);
 	void update_camera(void);

@@ -6,7 +6,7 @@
 
 
 
-GPUFixedContext::GPUFixedContext(uint32_t in_directoryLength, char* in_directory, GLFWwindow* in_surfaceWindow, GPUExtent3D in_surfaceExtent, const uint32_t in_meshCount, const uint32_t* in_instanceMaxCounts, const char** in_positionPaths, const char** in_normalPaths, const char** in_uvPaths, const char** in_indexPaths, const char*** in_texturePaths) :
+GPUFixedContext::GPUFixedContext(uint32_t in_directoryLength, char* in_directory, GLFWwindow* in_surfaceWindow, const uint32_t in_meshCount, const uint32_t* in_instanceMaxCounts, const char** in_positionPaths, const char** in_normalPaths, const char** in_uvPaths, const char** in_indexPaths, const char*** in_texturePaths) :
 	m_directoryLength(in_directoryLength),
 	m_directory{ 0 },
 	m_multiThreadedGraphics(false),

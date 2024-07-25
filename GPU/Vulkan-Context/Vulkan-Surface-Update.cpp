@@ -1,8 +1,32 @@
-//
-//  Vulkan-Surface-Update.cpp
-//  Toasting
-//
-//  Created by Bread Loaf on 7/26/24.
-//
+#include "../../../Build-Info.h"
 
-#include <stdio.h>
+#if defined(SYSTEM_LINUX) || defined(SYSTEM_WINDOWS)
+#include "../GPU.hpp"
+
+
+
+void GPUFixedContext::resize_surfaceUpdate(void) {
+	vkDeviceWaitIdle(m_logical);
+	
+	ruin_geometryFramebuffer();
+	ruin_lightingFramebuffers();
+	ruin_geometryPipeline();
+	ruin_lightingPipeline();
+	ruin_swapchain();
+	ruin_surface();
+
+	build_surface();
+	build_swapchain();
+	build_geometryPipeline();
+	build_lightingPipeline();
+	build_geometryFramebuffer();
+	build_lightingFramebuffers();
+	set_lightingBindings();
+	initialize_geometryUpdateData();
+	initialize_lightingUpdateData();
+	update_camera();
+}
+
+
+
+#endif

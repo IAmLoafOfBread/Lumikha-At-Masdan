@@ -86,8 +86,8 @@ float G1(float3 N, float3 X, float k) {
             float LightDistance = distance(LightPosition, PointPosition);
             LightDistance *= LightDistance;
             Output.xyz += Fr * (CurrentLight.colour * Specular / LightDistance);
-            //Output.xyz = g_cascadedShadowMapsDB1[i].SampleLevel(in_uv, 0);
         }
+            //Output.xyz = g_cascadedShadowMapsDB1[0].SampleLevel(in_uv, 0);
     }
 
     return Output;

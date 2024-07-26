@@ -8,14 +8,14 @@ struct Constants {
 };
 [[vk::push_constant]] Constants g_constants;
 
-[shader("compute")] [numthreads(CASCADED_SHADOW_MAP_COUNT, MAX_WORKGROUP_SIZE, 1)] void view_light(const uint in_frustumIndex: SV_GroupThreadID, const uint2 in_lightID: SV_DispatchThreadID) {
-/*    const uint LightIndex = in_lightID.y;
-    if (LightIndex >= g_constants.lightCount) return;
-    const uint SubFrustumIndex = in_frustumIndex * CORNER_COUNT;
+[shader("compute")] [numthreads(CASCADED_SHADOW_MAP_COUNT, MAX_WORKGROUP_SIZE, 1)] void view_light(const uint2 in_mapID: SV_DISPATCHTHREADID) {
+	uint LightID = in_mapID.y;
+    if (LightID >= g_constants.lightCount) return;
+    const uint SubFrustumIndex = in_mapID.x * CORNER_COUNT;
 
-    Light* Light = &g_constants.lights[LightIndex];
-    const float3 Position = Light->view.position;
-    const float3 Rotation = Light->view.rotation;
+    Light IndexedLight = g_constants.lights[LightID];
+    const float3 Position = IndexedLight.view.position;
+    const float3 Rotation = IndexedLight.view.rotation;
 
     float3 Corners[CORNER_COUNT] = { 0 };
     for (uint i = 0; i < CORNER_COUNT; i++) {
@@ -40,7 +40,7 @@ struct Constants {
     Mins.y = -SHADOW_VIEW_SIZE > Mins.y ? -SHADOW_VIEW_SIZE : Mins.y;
 
     if (Mins.x >= Maxes.x || Mins.y >= Maxes.y) {
-        Light->visible = false;
+        IndexedLight.visible = false;
         return;
     }
 
@@ -48,10 +48,13 @@ struct Constants {
     const float Width = distance(Maxes.x, Mins.x);
     const float Height = distance(Maxes.y, Mins.y);
 
-    Light->view.projection = float4x4(
+    IndexedLight.view.projection = float4x4(
         float4( 2 / Width,        0,           0,      0),
         float4(     0,       2 / Height,       0,      0),
         float4(     0,            0,     1 / Maxes.z,  0),
         float4(-Midpoint.x,  Midpoint.y,       0,      1)
-    );*/
+    );
+    IndexedLight.view.position.x += 1.1f;
+    g_constants.lights[LightID] = IndexedLight;
+    
 }

@@ -2,7 +2,7 @@
 #include "../Shader-Utilities.hpp"
 
 struct Constants {
-    float3* subFrusta;
+    float* subFrusta;
     Light* lights;
     uint lightCount;
 };
@@ -19,7 +19,7 @@ struct Constants {
 
     float3 Corners[CORNER_COUNT] = { 0 };
     for (uint i = 0; i < CORNER_COUNT; i++) {
-        Corners[i] = g_constants.subFrusta[SubFrustumIndex + i];
+        Corners[i] = (float3)(g_constants.subFrusta[(SubFrustumIndex * CORNER_COUNT) + (i * 3)]);
         Corners[i] -= Position;
         rotate_vector(Corners[i], -Rotation);
     }
@@ -39,10 +39,12 @@ struct Constants {
     Mins.x = -SHADOW_VIEW_SIZE > Mins.x ? -SHADOW_VIEW_SIZE : Mins.x;
     Mins.y = -SHADOW_VIEW_SIZE > Mins.y ? -SHADOW_VIEW_SIZE : Mins.y;
 
-    if (Mins.x >= Maxes.x || Mins.y >= Maxes.y) {
-        IndexedLight.visible = false;
+    if (Mins.x >= Maxes.x || Mins.y >= Maxes.y || Maxes.z <= 0) {
+        g_constants.lights[LightID].visible = false;
         return;
     }
+    
+    IndexedLight.visible = true;
 
     const float2 Midpoint = float2((Maxes.xy + Mins) / 2);
     const float Width = distance(Maxes.x, Mins.x);
@@ -52,9 +54,7 @@ struct Constants {
         float4( 2 / Width,        0,           0,      0),
         float4(     0,       2 / Height,       0,      0),
         float4(     0,            0,     1 / Maxes.z,  0),
-        float4(-Midpoint.x,  Midpoint.y,       0,      1)
+        float4(       -Midpoint    ,           0,      1)
     );
-    IndexedLight.view.position.x += 1.1f;
     g_constants.lights[LightID] = IndexedLight;
-    
 }

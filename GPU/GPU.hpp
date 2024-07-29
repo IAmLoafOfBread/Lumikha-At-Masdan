@@ -3,8 +3,6 @@
 
 
 
-#include <math.h>
-
 #include "../Threads/Threads.h"
 #include "../Files/Files.h"
 #include "Shader-Utilities.hpp"
@@ -47,6 +45,7 @@ public:
 	
 	Camera m_cameraData;
 	View m_cameraView;
+	float3* m_subFrusta;
 	
 	void acquire_nextImageUpdate(void);
 	void calculate_subFrustum(uint32_t in_index, uint32_t in_multiplier);
@@ -157,7 +156,6 @@ private:
 	GPUSampler m_sampler;
 	
 	GPUSharedAllocation m_subFrustumAllocation;
-	float3* m_subFrusta;
 	
 	GPUFence m_lightViewingsFinishedFence;
 	GPUFence m_shadowMappingsFinishedFences[CASCADED_SHADOW_MAP_COUNT];

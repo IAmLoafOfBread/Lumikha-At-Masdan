@@ -136,7 +136,22 @@ void invert_matrix(float4x4* in_matrix) {
 	}
 }
 
-void transform_vector(float4* in_vector, float4x4* in_matrix) {
+void transform_vector3(float3* in_vector, const float3x3* in_matrix) {
+	float* InVector = (float*)in_vector;
+	float* InMatrix = (float*)in_matrix;
+	float3 Output = { 0 };
+	float* OutVector = (float*)&Output;
+	for(uint32_t i = 0; i < 3; i++) {
+		for(uint32_t j = 0; j < 3; j++) {
+			OutVector[i] += InVector[j] * InMatrix[(j * 3) + i];
+		}
+	}
+	in_vector->x = OutVector[0];
+	in_vector->y = OutVector[1];
+	in_vector->z = OutVector[2];
+}
+
+void transform_vector4(float4* in_vector, const float4x4* in_matrix) {
 	float* InVector = (float*)in_vector;
 	float* InMatrix = (float*)in_matrix;
 	float4 Output = { 0 };
@@ -150,4 +165,21 @@ void transform_vector(float4* in_vector, float4x4* in_matrix) {
 	in_vector->y = OutVector[1];
 	in_vector->z = OutVector[2];
 	in_vector->w = OutVector[3];
+}
+
+void rotate_vector(float3* in_vector, const float3 in_rotation) {
+	const float CosX = cosf(in_rotation.x);
+	const float CosY = cosf(in_rotation.y);
+	const float CosZ = cosf(in_rotation.z);
+	const float SinX = sinf(in_rotation.x);
+	const float SinY = sinf(in_rotation.y);
+	const float SinZ = sinf(in_rotation.z);
+	const float SinX_SinY = SinX * SinY;
+	const float CosX_SinY = CosX * -SinY;
+	const float3x3 Matrix = {
+		CosY * CosZ, CosY * -SinZ, SinY,
+		(SinX_SinY * CosZ) + (CosX * SinZ), (SinX_SinY * -SinZ) + (CosX * CosZ), -SinX * CosY,
+		(CosX_SinY * CosZ) + (SinX * SinZ), (CosX_SinY * -SinZ) + (SinX * CosZ), CosX * CosY
+	};
+	transform_vector3(in_vector, &Matrix);
 }

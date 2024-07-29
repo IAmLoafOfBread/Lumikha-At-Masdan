@@ -8,6 +8,7 @@ extern "C" {
 
 
 #include <stdint.h>
+#include <math.h>
 
 #define NULL_VALUE 2147483640
 #define LENGTH_OF(array) (sizeof(array) / sizeof(array[0]))
@@ -32,12 +33,17 @@ typedef struct float4 {
 	float z;
 	float w;
 } float4;
+typedef struct float3x3 {
+	float3 vecs[3];
+} float3x3;
 typedef struct float4x4 {
 	float4 vecs[4];
 } float4x4;
 
 void invert_matrix(float4x4* in_matrix);
-void transform_vector(float4* in_vector, float4x4* in_matrix);
+void transform_vector3(float3* in_vector, const float3x3* in_matrix);
+void transform_vector4(float4* in_vector, const float4x4* in_matrix);
+void rotate_vector(float3* in_vector, const float3 in_rotation);
 
 
 

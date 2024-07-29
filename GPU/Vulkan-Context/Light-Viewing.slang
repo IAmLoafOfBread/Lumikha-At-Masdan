@@ -1,6 +1,8 @@
 #define SHADER_INCLUDE
 #include "../Shader-Utilities.hpp"
 
+
+
 struct Constants {
     float* subFrusta;
     Light* lights;
@@ -14,14 +16,15 @@ struct Constants {
     const uint SubFrustumIndex = in_mapID.x * CORNER_COUNT;
 
     Light IndexedLight = g_constants.lights[LightID];
-    const float3 Position = IndexedLight.view.position;
-    const float3 Rotation = IndexedLight.view.rotation;
 
     float3 Corners[CORNER_COUNT] = { 0 };
     for (uint i = 0; i < CORNER_COUNT; i++) {
-        Corners[i] = (float3)(g_constants.subFrusta[(SubFrustumIndex * CORNER_COUNT) + (i * 3)]);
-        Corners[i] -= Position;
-        rotate_vector(Corners[i], -Rotation);
+		uint Index = SubFrustumIndex + (i * 3);
+        Corners[i].x = g_constants.subFrusta[Index];
+        Corners[i].y = g_constants.subFrusta[Index + 1];
+        Corners[i].z = g_constants.subFrusta[Index + 2];
+        Corners[i] -= IndexedLight.view.position;
+        rotate_vector(Corners[i], -IndexedLight.view.rotation);
     }
 
     float3 Maxes = Corners[0];
@@ -44,17 +47,15 @@ struct Constants {
         return;
     }
     
-    IndexedLight.visible = true;
-
-    const float2 Midpoint = float2((Maxes.xy + Mins) / 2);
-    const float Width = distance(Maxes.x, Mins.x);
-    const float Height = distance(Maxes.y, Mins.y);
-
+    const float2 Midpoint = (Maxes.xy + Mins) / 2;
+    const float2 Extent = Maxes.xy - Mins;
+    float Fn = 0.1f - Maxes.z;
     IndexedLight.view.projection = float4x4(
-        float4( 2 / Width,        0,           0,      0),
-        float4(     0,       2 / Height,       0,      0),
-        float4(     0,            0,     1 / Maxes.z,  0),
-        float4(       -Midpoint    ,           0,      1)
+        float4(2/Extent.x,      0,             0,         0),
+        float4(     0,      2/Extent.y,        0,         0),
+        float4(     0,            0,        1/Fn,         0),
+        float4(       -Midpoint    ,      -Maxes.z/Fn,    1)
     );
+    IndexedLight.visible = true;
     g_constants.lights[LightID] = IndexedLight;
 }

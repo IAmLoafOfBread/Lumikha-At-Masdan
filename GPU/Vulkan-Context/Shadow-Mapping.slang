@@ -16,6 +16,6 @@
     Position -= g_view.position;
     rotate_vector(Position, -g_view.rotation);
     
-    return mul(float4(Position.xyz, 1.0f), g_view.projection);
+    return mul(float4(Position, 1.0f), g_view.projection);
 }
 

@@ -11,11 +11,12 @@ struct Constants {
 [[vk::push_constant]] Constants g_constants;
 
 [shader("compute")] [numthreads(CASCADED_SHADOW_MAP_COUNT, MAX_WORKGROUP_SIZE, 1)] void view_light(const uint2 in_mapID: SV_DISPATCHTHREADID) {
-	uint LightID = in_mapID.y;
-    if (LightID >= g_constants.lightCount) return;
-    const uint SubFrustumIndex = in_mapID.x * CORNER_COUNT;
+	uint LightIndex = in_mapID.y;
+	uint CascadeIndex = in_mapID.x;
+    if (LightIndex >= g_constants.lightCount || CascadeIndex >= CASCADED_SHADOW_MAP_COUNT) return;
+    const uint SubFrustumIndex = CascadeIndex * CORNER_COUNT;
 
-    Light IndexedLight = g_constants.lights[LightID];
+    Light IndexedLight = g_constants.lights[LightIndex];
 
     float3 Corners[CORNER_COUNT] = { 0 };
     for (uint i = 0; i < CORNER_COUNT; i++) {
@@ -23,8 +24,8 @@ struct Constants {
         Corners[i].x = g_constants.subFrusta[Index];
         Corners[i].y = g_constants.subFrusta[Index + 1];
         Corners[i].z = g_constants.subFrusta[Index + 2];
-        Corners[i] -= IndexedLight.view.position;
-        rotate_vector(Corners[i], -IndexedLight.view.rotation);
+        Corners[i] -= IndexedLight.position;
+        rotate_vector(Corners[i], -IndexedLight.rotation);
     }
 
     float3 Maxes = Corners[0];
@@ -43,19 +44,18 @@ struct Constants {
     Mins.y = -SHADOW_VIEW_SIZE > Mins.y ? -SHADOW_VIEW_SIZE : Mins.y;
 
     if (Mins.x >= Maxes.x || Mins.y >= Maxes.y || Maxes.z <= 0) {
-        g_constants.lights[LightID].visible = false;
+        g_constants.lights[LightIndex].visible = false;
         return;
     }
     
     const float2 Midpoint = (Maxes.xy + Mins) / 2;
     const float2 Extent = Maxes.xy - Mins;
     float Fn = 0.1f - Maxes.z;
-    IndexedLight.view.projection = float4x4(
+    g_constants.lights[LightIndex].projections[CascadeIndex] = float4x4(
         float4(2/Extent.x,      0,             0,         0),
         float4(     0,      2/Extent.y,        0,         0),
         float4(     0,            0,        1/Fn,         0),
         float4(       -Midpoint    ,      -Maxes.z/Fn,    1)
     );
-    IndexedLight.visible = true;
-    g_constants.lights[LightID] = IndexedLight;
+    g_constants.lights[LightIndex].visible = true;
 }

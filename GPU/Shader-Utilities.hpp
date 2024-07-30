@@ -76,7 +76,9 @@ struct View {
 	float4x4 projection;
 };
 struct Light {
-	View view;
+	float3 position;
+	float3 rotation;
+	float4x4 projections[CASCADED_SHADOW_MAP_COUNT];
 	float3 glare;
 	float3 colour;
 	bool visible;

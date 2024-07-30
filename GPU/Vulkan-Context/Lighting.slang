@@ -23,6 +23,13 @@ struct VSOutput {
 [[vk::binding(7, 0)]] Sampler2D<float> g_cascadedShadowMapsDB2[MAX_LIGHT_COUNT];
 [[vk::binding(8, 0)]] Sampler2D<float> g_cascadedShadowMapsDB3[MAX_LIGHT_COUNT];
 
+float cascade(uint in_cascadeIndex, uint in_lightIndex, float2 in_uv) {
+	if(in_cascadeIndex == 0) return g_cascadedShadowMapsDB1[in_lightIndex].SampleLevel(in_uv, 0);
+	if(in_cascadeIndex == 1) return g_cascadedShadowMapsDB2[in_lightIndex].SampleLevel(in_uv, 0);
+	if(in_cascadeIndex == 2) return g_cascadedShadowMapsDB3[in_lightIndex].SampleLevel(in_uv, 0);
+	return 0.0f;
+}
+
 struct Constants {
     Light* lights;
     float3 position;
@@ -63,31 +70,49 @@ float G1(float3 N, float3 X, float k) {
     for (uint i = 0; i < g_constants.lightCount; i++) {
         Light CurrentLight = g_constants.lights[i];
         if (CurrentLight.visible) {
-            float3 LightPosition = CurrentLight.view.position;
+			float3 LightPosition = CurrentLight.position;
+			
+			bool Lit = true;
+			{
+				float3 Position = PointPosition - LightPosition;
+				rotate_vector(Position, -CurrentLight.rotation);
+				for(uint j = 0; j < CASCADED_SHADOW_MAP_COUNT; j++) {
+					float4 Projected = mul(float4(Position, 1.0f), CurrentLight.projections[j]);
+					Projected /= Projected.w;
+					float Z = Projected.z;
+					float2 UV = (Projected.xy * 0.5f) + 0.5f;
+					if(Z < cascade(j, i, UV)) {
+						Lit = false;
+						break;
+					}
+				}
+			}
+			
+			if (Lit) {
+				float3 L = normalize(LightPosition - PointPosition);
+				float3 H = normalize(V + L);
+				float PL = dot(PointPosition, L);
+				float NL = dot(PointNormal, L);
+				float NH = dot(PointNormal, H); NH *= NH;
 
-            float3 L = normalize(LightPosition - PointPosition);
-            float3 H = normalize(V + L);
-            float PL = dot(PointPosition, L);
-            float NL = dot(PointNormal, L);
-            float NH = dot(PointNormal, H); NH *= NH;
+				float D = R / (PI * pow((NH * (R - 1)) + 1, 2));
+				float G = G1(PointNormal, V, A) * G1(PointNormal, L, A);
+				float3 F0 = float3(0.2f);
+				float3 Ks = F0 + ((float(1.0f) - F0) * pow(1 - dot(V, H), 5));
 
-            float D = R / (PI * pow((NH * (R - 1)) + 1, 2));
-            float G = G1(PointNormal, V, A) * G1(PointNormal, L, A);
-            float3 F0 = float3(0.2f);
-            float3 Ks = F0 + ((float(1.0f) - F0) * pow(1 - dot(V, H), 5));
+				float3 Kd = (1 - Ks) * (1 - g_metalnessInput.SampleLevel(in_uv, 0));
 
-			float3 Kd = (1 - Ks) * (1 - g_metalnessInput.SampleLevel(in_uv, 0));
+				float3 Fs = (D * G * Ks) / (4 * VN * NL);
+				float3 Fd = Kd * (Albedo / PI) * NL;
 
-            float3 Fs = (D * G * Ks) / (4 * VN * NL);
-            float3 Fd = Kd * (Albedo / PI) * NL;
+				float3 Fr = Fd + Fs;
 
-            float3 Fr = Fd + Fs;
-
-            float LightDistance = distance(LightPosition, PointPosition);
-            LightDistance *= LightDistance;
-            Output.xyz += Fr * (CurrentLight.colour * Specular / LightDistance);
+				float LightDistance = distance(LightPosition, PointPosition);
+				LightDistance *= LightDistance;
+				Output.xyz += (Fr * CurrentLight.colour * Specular) / LightDistance;
+				//Output.xyz += 0.2 * g_occlusionInput.SampleLevel(in_uv, 0);
+            }
         }
-            //Output.xyz = g_cascadedShadowMapsDB1[0].SampleLevel(in_uv, 0);
     }
 
     return Output;

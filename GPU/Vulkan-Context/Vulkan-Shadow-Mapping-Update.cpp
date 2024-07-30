@@ -50,7 +50,9 @@ void GPUFixedContext::draw_shadowMappingUpdate(uint32_t in_index, uint32_t in_di
 	for(uint32_t i = 0; i < MAX_LIGHT_COUNT; i++) {
 		vkCmdBeginRenderPass(m_shadowMappingCommandSets[in_index], &g_renderInfos[in_index][i], VK_SUBPASS_CONTENTS_INLINE);
 		if(m_lights[i].visible && i < m_lightCount) {
-			vkCmdPushConstants(m_shadowMappingCommandSets[in_index], m_shadowMappingLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(View), &m_lights[i].view);
+			vkCmdPushConstants(m_shadowMappingCommandSets[in_index], m_shadowMappingLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(float3), &m_lights[i].position);
+			vkCmdPushConstants(m_shadowMappingCommandSets[in_index], m_shadowMappingLayout, VK_SHADER_STAGE_VERTEX_BIT, sizeof(float3), sizeof(float3), &m_lights[i].rotation);
+			vkCmdPushConstants(m_shadowMappingCommandSets[in_index], m_shadowMappingLayout, VK_SHADER_STAGE_VERTEX_BIT, sizeof(float3) * 2, sizeof(float4x4), &m_lights[i].projections[in_index]);
 			vkCmdDrawIndirect(m_shadowMappingCommandSets[in_index], m_indirectCommandBuffer, 0, m_meshCount, sizeof(VkDrawIndirectCommand));
 		}
 		vkCmdEndRenderPass(m_shadowMappingCommandSets[in_index]);

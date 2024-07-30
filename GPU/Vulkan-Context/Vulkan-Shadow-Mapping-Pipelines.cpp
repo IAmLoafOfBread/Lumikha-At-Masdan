@@ -18,7 +18,7 @@ void GPUFixedContext::build_shadowMappingPipelines(void) {
 		const VkPushConstantRange PushConstant = {
 			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
 			.offset = 0,
-			.size = sizeof(View)
+			.size = (sizeof(float3) * 2) + sizeof(float4x4)
 		};
 		const VkPipelineLayoutCreateInfo CreateInfo = {
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
@@ -142,7 +142,7 @@ void GPUFixedContext::build_shadowMappingPipelines(void) {
 		.depthClampEnable = VK_FALSE,
 		.rasterizerDiscardEnable = VK_FALSE,
 		.polygonMode = VK_POLYGON_MODE_FILL,
-		.cullMode = VK_CULL_MODE_BACK_BIT,
+		.cullMode = VK_CULL_MODE_FRONT_BIT,
 		.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE,
 		.depthBiasEnable = VK_FALSE,
 		.depthBiasConstantFactor = 0,

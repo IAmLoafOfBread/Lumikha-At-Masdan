@@ -5,13 +5,13 @@
 
 
 
-#define BINDING_COUNT (GEOMETRY_PASS_COLOUR_ATTACHMENT_COUNT + CASCADED_SHADOW_MAP_COUNT)
+#define BINDING_COUNT (GEOMETRY_PASS_TOTAL_ATTACHMENT_COUNT + CASCADED_SHADOW_MAP_COUNT)
 
 
 
 void GPUFixedContext::set_lightingBindings(void) {
-	VkDescriptorImageInfo GeometryInfos[GEOMETRY_PASS_COLOUR_ATTACHMENT_COUNT] = { { VK_NULL_HANDLE } };
-	for (uint32_t i = 0; i < GEOMETRY_PASS_COLOUR_ATTACHMENT_COUNT; i++) {
+	VkDescriptorImageInfo GeometryInfos[GEOMETRY_PASS_TOTAL_ATTACHMENT_COUNT] = { { VK_NULL_HANDLE } };
+	for (uint32_t i = 0; i < GEOMETRY_PASS_TOTAL_ATTACHMENT_COUNT; i++) {
 		GeometryInfos[i].sampler = m_sampler;
 		GeometryInfos[i].imageView = m_geometryTextures[i].view;
 		GeometryInfos[i].imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
@@ -38,12 +38,12 @@ void GPUFixedContext::set_lightingBindings(void) {
 		Writes[i].pBufferInfo = nullptr;
 		Writes[i].pTexelBufferView = nullptr;
 	}
-	for (uint32_t i = 0; i < GEOMETRY_PASS_COLOUR_ATTACHMENT_COUNT; i++) {
+	for (uint32_t i = 0; i < GEOMETRY_PASS_TOTAL_ATTACHMENT_COUNT; i++) {
 		Writes[i].pImageInfo = &GeometryInfos[i];
 	}
 	for (uint32_t i = 0; i < CASCADED_SHADOW_MAP_COUNT; i++) {
-		Writes[i + GEOMETRY_PASS_COLOUR_ATTACHMENT_COUNT].descriptorCount = MAX_LIGHT_COUNT;
-		Writes[i + GEOMETRY_PASS_COLOUR_ATTACHMENT_COUNT].pImageInfo = ShadowInfos[i];
+		Writes[i + GEOMETRY_PASS_TOTAL_ATTACHMENT_COUNT].descriptorCount = MAX_LIGHT_COUNT;
+		Writes[i + GEOMETRY_PASS_TOTAL_ATTACHMENT_COUNT].pImageInfo = ShadowInfos[i];
 	}
 
 	vkUpdateDescriptorSets(m_logical, BINDING_COUNT, Writes, 0, nullptr);

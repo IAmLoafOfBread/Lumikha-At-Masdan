@@ -4,6 +4,7 @@
 
 
 #define PI 3.14159f
+#define SURROUND_COUNT 8
 
 
 
@@ -18,17 +19,11 @@ struct VSOutput {
 [[vk::binding(3, 0)]] Sampler2D<float4> g_specularInput;
 [[vk::binding(4, 0)]] Sampler2D<float> g_metalnessInput;
 [[vk::binding(5, 0)]] Sampler2D<float> g_roughnessInput;
+[[vk::binding(6, 0)]] Sampler2D<float> g_depthInput;
 
-[[vk::binding(6, 0)]] Sampler2D<float> g_cascadedShadowMapsDB1[MAX_LIGHT_COUNT];
-[[vk::binding(7, 0)]] Sampler2D<float> g_cascadedShadowMapsDB2[MAX_LIGHT_COUNT];
-[[vk::binding(8, 0)]] Sampler2D<float> g_cascadedShadowMapsDB3[MAX_LIGHT_COUNT];
-
-float cascade(uint in_cascadeIndex, uint in_lightIndex, float2 in_uv) {
-	if(in_cascadeIndex == 0) return g_cascadedShadowMapsDB1[in_lightIndex].SampleLevel(in_uv, 0);
-	if(in_cascadeIndex == 1) return g_cascadedShadowMapsDB2[in_lightIndex].SampleLevel(in_uv, 0);
-	if(in_cascadeIndex == 2) return g_cascadedShadowMapsDB3[in_lightIndex].SampleLevel(in_uv, 0);
-	return 0.0f;
-}
+[[vk::binding(7, 0)]] Sampler2D<float> g_cascadedShadowMapsDB1[MAX_LIGHT_COUNT];
+[[vk::binding(8, 0)]] Sampler2D<float> g_cascadedShadowMapsDB2[MAX_LIGHT_COUNT];
+[[vk::binding(9, 0)]] Sampler2D<float> g_cascadedShadowMapsDB3[MAX_LIGHT_COUNT];
 
 struct Constants {
     Light* lights;
@@ -41,6 +36,40 @@ struct Constants {
 float G1(float3 N, float3 X, float k) {
     float NX = dot(N, X);
     return NX / ((NX * (1 - k)) + k);
+}
+
+float cascade(uint in_cascadeIndex, uint in_lightIndex, float2 in_uv) {
+	if(in_cascadeIndex == 0) return g_cascadedShadowMapsDB1[in_lightIndex].SampleLevel(in_uv, 0);
+	if(in_cascadeIndex == 1) return g_cascadedShadowMapsDB2[in_lightIndex].SampleLevel(in_uv, 0);
+	if(in_cascadeIndex == 2) return g_cascadedShadowMapsDB3[in_lightIndex].SampleLevel(in_uv, 0);
+	return 0.0f;
+}
+
+float occlude(float2 in_uv) {
+	float Occlusion = 1;
+
+	float X = in_uv.x;
+	float Y = in_uv.y;
+	float2 Surround[SURROUND_COUNT] = {
+		float2(in_uv+1),
+		float2(in_uv-1),
+		float2(X-1,Y+1),
+		float2(X+1,Y-1),
+		float2(X,Y-1),
+		float2(X,Y+1),
+		float2(X-1,Y),
+		float2(X+1,Y),
+	};
+	
+	uint Less = 0;
+	float Depth = g_depthInput.SampleLevel(in_uv, 0);
+	
+	for(uint i = 0; i < SURROUND_COUNT; i++) {
+		if(Depth < g_depthInput.SampleLevel(Surround[i], 0)) {
+			Less++;
+		}
+	}
+	return Occlusion * (Less / SURROUND_COUNT);
 }
 
 [shader("vertex")] VSOutput output_vertex(uint in_index: SV_VERTEXID) {
@@ -110,11 +139,11 @@ float G1(float3 N, float3 X, float k) {
 				float LightDistance = distance(LightPosition, PointPosition);
 				LightDistance *= LightDistance;
 				Output.xyz += (Fr * CurrentLight.colour * Specular) / LightDistance;
-				//Output.xyz += 0.2 * g_occlusionInput.SampleLevel(in_uv, 0);
             }
         }
     }
 
+	Output.xyz -= occlude(in_uv);
     return Output;
 }
 

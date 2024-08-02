@@ -66,6 +66,8 @@ void rotate_vector(inout float3 in_vector, float3 in_rotation) {
 
 #define CORNER_COUNT 8
 
+#define OCCLUSION_SAMPLE_COUNT 128
+
 struct Instance {
 	float3 position;
 	float3 rotation;

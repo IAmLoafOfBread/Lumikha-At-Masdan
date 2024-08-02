@@ -144,6 +144,8 @@ private:
 	GPUGraphicsLayout m_lightingLayout;
 	GPUGraphicsPipeline m_lightingPipeline;
 	
+	GPULocalAllocation m_occlusionSampleAllocation;
+	
 	GPUBuffer m_vertexBuffer;
 	GPUIndirectDrawCommand* m_indirectCommands;
 	GPUBuffer m_indirectCommandBuffer;
@@ -242,6 +244,9 @@ private:
 
 	void build_lightingPipeline(void);
 	void ruin_lightingPipeline(void);
+	
+	void build_occlusionSamples(void);
+	void ruin_occlusionSamples(void);
 	
 	void build_meshes(uint32_t* in_vertexCounts, GPUStageAllocation* in_vertexAllocation, const uint32_t* in_maxInstanceCounts, GPUStageAllocation** in_textureAllocations, GPUExtent3D** in_extents);
 	void ruin_meshes(void);

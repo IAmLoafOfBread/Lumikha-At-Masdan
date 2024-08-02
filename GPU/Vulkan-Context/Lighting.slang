@@ -4,7 +4,6 @@
 
 
 #define PI 3.14159f
-#define SURROUND_COUNT 8
 
 
 
@@ -27,6 +26,7 @@ struct VSOutput {
 
 struct Constants {
     Light* lights;
+    float* occlusionSamples;
     float3 position;
     uint lightCount;
 };
@@ -46,30 +46,25 @@ float cascade(uint in_cascadeIndex, uint in_lightIndex, float2 in_uv) {
 }
 
 float occlude(float2 in_uv) {
-	float Occlusion = 1;
-
-	float X = in_uv.x;
-	float Y = in_uv.y;
-	float2 Surround[SURROUND_COUNT] = {
-		float2(in_uv+1),
-		float2(in_uv-1),
-		float2(X-1,Y+1),
-		float2(X+1,Y-1),
-		float2(X,Y-1),
-		float2(X,Y+1),
-		float2(X-1,Y),
-		float2(X+1,Y),
-	};
-	
-	uint Less = 0;
+	float Greats = OCCLUSION_SAMPLE_COUNT;
 	float Depth = g_depthInput.SampleLevel(in_uv, 0);
-	
-	for(uint i = 0; i < SURROUND_COUNT; i++) {
-		if(Depth < g_depthInput.SampleLevel(Surround[i], 0)) {
-			Less++;
+	for(uint i = 0; i < OCCLUSION_SAMPLE_COUNT; i++) {
+		float2 Sample = float2(0);
+		uint Ind = i*2;
+		Sample.x = g_constants.occlusionSamples[Ind] + in_uv.x;
+		Sample.y = g_constants.occlusionSamples[Ind+1] + in_uv.y;
+		Sample = saturate(Sample);
+		
+		float Comp = g_depthInput.SampleLevel(Sample, 0);
+		if(Depth < Comp) {
+			float Dist = distance(Depth, Comp);
+			if(Dist > 0.00005f && Dist < 0.0005f) {
+				Greats--;
+			}
 		}
 	}
-	return Occlusion * (Less / SURROUND_COUNT);
+	
+	return Greats / OCCLUSION_SAMPLE_COUNT;
 }
 
 [shader("vertex")] VSOutput output_vertex(uint in_index: SV_VERTEXID) {
@@ -143,7 +138,7 @@ float occlude(float2 in_uv) {
         }
     }
 
-	Output.xyz -= occlude(in_uv);
+	Output.xyz *= occlude(in_uv);
     return Output;
 }
 

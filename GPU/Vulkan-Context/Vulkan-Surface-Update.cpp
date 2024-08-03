@@ -8,6 +8,7 @@
 void GPUFixedContext::resize_surfaceUpdate(void) {
 	vkDeviceWaitIdle(m_logical);
 	
+	ruin_occlusionSamples();
 	ruin_geometryFramebuffer();
 	ruin_lightingFramebuffers();
 	ruin_geometryPipeline();
@@ -21,6 +22,7 @@ void GPUFixedContext::resize_surfaceUpdate(void) {
 	build_lightingPipeline();
 	build_geometryFramebuffer();
 	build_lightingFramebuffers();
+	build_occlusionSamples();
 	set_lightingBindings();
 	initialize_geometryUpdateData();
 	initialize_lightingUpdateData();

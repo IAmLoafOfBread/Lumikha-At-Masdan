@@ -54,6 +54,7 @@ GPUFixedContext::GPUFixedContext(uint32_t in_directoryLength, char* in_directory
 	m_geometryTextures{ GPU_NULL_HANDLE },
 	m_geometryFramebuffer(GPU_NULL_HANDLE),
 	m_lightingFramebuffers(nullptr),
+	m_reflectionTexture{ GPU_NULL_HANDLE },
 	m_meshCount(in_meshCount),
 	m_graphicsBindingPool(GPU_NULL_HANDLE),
 	m_geometryDescriptorLayout(GPU_NULL_HANDLE),
@@ -68,6 +69,7 @@ GPUFixedContext::GPUFixedContext(uint32_t in_directoryLength, char* in_directory
 	m_geometryPipeline(GPU_NULL_HANDLE),
 	m_lightingLayout(GPU_NULL_HANDLE),
 	m_lightingPipeline(GPU_NULL_HANDLE),
+	m_reflectionSampleAllocation{ GPU_NULL_HANDLE },
 	m_occlusionSampleAllocation{ GPU_NULL_HANDLE },
 	m_vertexBuffer(GPU_NULL_HANDLE),
 	m_indirectCommands(nullptr),
@@ -116,7 +118,8 @@ GPUFixedContext::GPUFixedContext(uint32_t in_directoryLength, char* in_directory
 	build_shadowMappingPipelines();
 	build_geometryPipeline();
 	build_lightingPipeline();
-	build_occlusionSamples();
+	build_reflectionTexture();
+	build_lightingSamples();
 	{
 		GPUStageAllocation VertexAllocations = { nullptr };
 		auto VertexCounts = new uint32_t[in_meshCount];
@@ -176,7 +179,8 @@ GPUFixedContext::~GPUFixedContext() {
 	ruin_sampler();
 	ruin_meshes();
 	ruin_lights();
-	ruin_occlusionSamples();
+	ruin_lightingSamples();
+	ruin_reflectionTexture();
 	ruin_lightViewingPipeline();
 	ruin_shadowMappingPipelines();
 	ruin_geometryPipeline();

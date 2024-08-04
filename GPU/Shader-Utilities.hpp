@@ -35,7 +35,7 @@ void rotate_vector(inout float3 in_vector, float3 in_rotation) {
 
 #endif
 
-#define MAX_LIGHT_COUNT 3
+#define MAX_LIGHT_COUNT 1
 #define MAX_WORKGROUP_SIZE 64
 #define CASCADED_SHADOW_MAP_COUNT 3
 
@@ -66,7 +66,8 @@ void rotate_vector(inout float3 in_vector, float3 in_rotation) {
 
 #define CORNER_COUNT 8
 
-#define OCCLUSION_SAMPLE_COUNT 128
+#define OCCLUSION_SAMPLE_COUNT 64
+#define REFLECTION_SAMPLE_COUNT 128
 
 struct Instance {
 	float3 position;

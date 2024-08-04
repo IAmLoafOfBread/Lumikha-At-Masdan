@@ -7,6 +7,20 @@
 
 static VkFence g_fences[2] = { VK_NULL_HANDLE };
 
+static VkImageCopy g_copyRegion = {
+	.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+	.srcSubresource.mipLevel = 0,
+	.srcSubresource.baseArrayLayer = 0,
+	.srcSubresource.layerCount = 1,
+	.srcOffset = { 0 },
+	.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+	.dstSubresource.mipLevel = 0,
+	.dstSubresource.baseArrayLayer = 0,
+	.dstSubresource.layerCount = 1,
+	.dstOffset = { 0 },
+	.extent = { 0 }
+};
+
 static VkRenderPassBeginInfo g_renderInfo = {
 	.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
 	.pNext = nullptr,
@@ -58,18 +72,22 @@ void GPUFixedContext::draw_lightingUpdate(void) {
 
 	CHECK(vkWaitForFences(m_logical, LENGTH_OF(g_fences), g_fences, VK_TRUE, UINT64_MAX))
 	g_renderInfo.framebuffer = m_lightingFramebuffers[m_currentImageIndex];
+	g_copyRegion.extent = m_surfaceExtent;
 	
 	CHECK(vkBeginCommandBuffer(m_lightingCommandSet, &G_FIXED_COMMAND_BEGIN_INFO))
 	vkCmdBindDescriptorSets(m_lightingCommandSet, VK_PIPELINE_BIND_POINT_GRAPHICS, m_lightingLayout, 0, 1, &m_lightingDescriptorSet, 0, nullptr);
 	vkCmdBindPipeline(m_lightingCommandSet, VK_PIPELINE_BIND_POINT_GRAPHICS, m_lightingPipeline);
 	vkCmdPushConstants(m_lightingCommandSet, m_lightingLayout, VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(VkDeviceAddress), &m_lightAllocation.address);
-	vkCmdPushConstants(m_lightingCommandSet, m_lightingLayout, VK_SHADER_STAGE_FRAGMENT_BIT, sizeof(VkDeviceAddress), sizeof(VkDeviceAddress), &m_occlusionSampleAllocation.address);
-	vkCmdPushConstants(m_lightingCommandSet, m_lightingLayout, VK_SHADER_STAGE_FRAGMENT_BIT, sizeof(VkDeviceAddress) * 2, sizeof(float3), &m_cameraView.position);
-	vkCmdPushConstants(m_lightingCommandSet, m_lightingLayout, VK_SHADER_STAGE_FRAGMENT_BIT, (sizeof(VkDeviceAddress) * 2) + sizeof(float3), sizeof(uint32_t), &m_lightCount);
+	vkCmdPushConstants(m_lightingCommandSet, m_lightingLayout, VK_SHADER_STAGE_FRAGMENT_BIT, sizeof(VkDeviceAddress), sizeof(VkDeviceAddress), &m_reflectionSampleAllocation.address);
+	vkCmdPushConstants(m_lightingCommandSet, m_lightingLayout, VK_SHADER_STAGE_FRAGMENT_BIT, sizeof(VkDeviceAddress) * 2, sizeof(VkDeviceAddress), &m_occlusionSampleAllocation.address);
+	vkCmdPushConstants(m_lightingCommandSet, m_lightingLayout, VK_SHADER_STAGE_FRAGMENT_BIT, sizeof(VkDeviceAddress) * 3, sizeof(float3), &m_cameraView.position);
+	vkCmdPushConstants(m_lightingCommandSet, m_lightingLayout, VK_SHADER_STAGE_FRAGMENT_BIT, (sizeof(VkDeviceAddress) * 3) + sizeof(float3), sizeof(uint32_t), &m_lightCount);
 	
 	vkCmdBeginRenderPass(m_lightingCommandSet, &g_renderInfo, VK_SUBPASS_CONTENTS_INLINE);
 	vkCmdDraw(m_lightingCommandSet, 4, 1, 0, 0);
 	vkCmdEndRenderPass(m_lightingCommandSet);
+	
+	vkCmdCopyImage(m_lightingCommandSet, m_presentImages[m_currentImageIndex], VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, m_reflectionTexture.image, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 1, &g_copyRegion);
 	
 	CHECK(vkEndCommandBuffer(m_lightingCommandSet))
 

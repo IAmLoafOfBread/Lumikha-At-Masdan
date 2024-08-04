@@ -10,7 +10,7 @@ void GPUFixedContext::build_graphicsBindingPool(uint32_t in_meshCount) {
 
 	const VkDescriptorPoolSize PoolSize = {
 		.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-		.descriptorCount = (in_meshCount * GEOMETRY_PASS_REQUIRED_TEXTURE_COUNT) + GEOMETRY_PASS_TOTAL_ATTACHMENT_COUNT + (MAX_LIGHT_COUNT * CASCADED_SHADOW_MAP_COUNT)
+		.descriptorCount = (in_meshCount * GEOMETRY_PASS_REQUIRED_TEXTURE_COUNT) + GEOMETRY_PASS_TOTAL_ATTACHMENT_COUNT + (MAX_LIGHT_COUNT * CASCADED_SHADOW_MAP_COUNT) + 1
 	};
 
 	const VkDescriptorPoolCreateInfo CreateInfo = {

@@ -24,16 +24,24 @@ struct VSOutput {
 [[vk::binding(8, 0)]] Sampler2D<float> g_cascadedShadowMapsDB2[MAX_LIGHT_COUNT];
 [[vk::binding(9, 0)]] Sampler2D<float> g_cascadedShadowMapsDB3[MAX_LIGHT_COUNT];
 
-//[[vk::binding(10, 0)]] Sampler2D<float4> g_previousOutput;
+[[vk::binding(10, 0)]] Sampler2D<float4> g_previousOutput;
 
 struct Constants {
     Light* lights;
+    float* reflectionSamples;
     float* occlusionSamples;
     float3 position;
     uint lightCount;
 };
 
 [[vk::push_constant]] Constants g_constants;
+
+float cascade(uint in_cascadeIndex, uint in_lightIndex, float2 in_uv) {
+	if(in_cascadeIndex == 0) return g_cascadedShadowMapsDB1[in_lightIndex].SampleLevel(in_uv, 0);
+	if(in_cascadeIndex == 1) return g_cascadedShadowMapsDB2[in_lightIndex].SampleLevel(in_uv, 0);
+	if(in_cascadeIndex == 2) return g_cascadedShadowMapsDB3[in_lightIndex].SampleLevel(in_uv, 0);
+	return 0.0f;
+}
 
 float G1(float3 N, float3 X, float k) {
     float NX = dot(N, X);
@@ -43,6 +51,26 @@ float G1(float3 N, float3 X, float k) {
 float3 lighting(float3 in_position, float3 in_normal, float2 in_uv) {
 	float3 Output = float3(0);
 
+	uint ReflectionCount = 0;
+	Light Reflections[REFLECTION_SAMPLE_COUNT] = { 0 };
+	for (uint i = 0; i < REFLECTION_SAMPLE_COUNT; i++) {
+		float2 Sample = in_uv;
+		
+		float2 Step = float2(g_constants.reflectionSamples[i*2], g_constants.reflectionSamples[(i*2)+1]);
+		uint RefInd = 0;
+		while (Sample.x <= 1.0f && Sample.x >= 0.0f && Sample.y <= 1.0f && Sample.y >= 0.0f) {
+			Sample += Step;
+			float3 Position = g_positionInput.SampleLevel(Sample, 0).xyz;
+			
+			if (dot(Position - in_position, in_normal) > 0) {
+				float3 Normal = (g_normalInput.SampleLevel(Sample, 0).xyz * 2) - 1;
+				Reflections[i].colour = g_previousOutput.SampleLevel(in_uv, 0).xyz * (1.0f - dot(in_normal, Normal));
+				ReflectionCount++;
+				break;
+			}
+		}
+	}
+
     float3 Albedo = g_albedoInput.SampleLevel(in_uv, 0).xyz;
     float3 Specular = g_specularInput.SampleLevel(in_uv, 0).xyz;
     float A = g_roughnessInput.SampleLevel(in_uv, 0); A *= A;
@@ -50,8 +78,9 @@ float3 lighting(float3 in_position, float3 in_normal, float2 in_uv) {
     float3 V = normalize(g_constants.position - in_position);
     float VN = dot(V, in_normal);
 
-    for (uint i = 0; i < g_constants.lightCount; i++) {
-        Light CurrentLight = g_constants.lights[i];
+	uint LightCount = g_constants.lightCount;
+    for (uint i = 0; i < LightCount + ReflectionCount; i++) {
+        Light CurrentLight = i < LightCount ? g_constants.lights[i] : Reflections[i - LightCount];
         if (CurrentLight.visible) {
 			float3 LightPosition = CurrentLight.position;
 			
@@ -99,21 +128,12 @@ float3 lighting(float3 in_position, float3 in_normal, float2 in_uv) {
 	return Output;
 }
 
-float cascade(uint in_cascadeIndex, uint in_lightIndex, float2 in_uv) {
-	if(in_cascadeIndex == 0) return g_cascadedShadowMapsDB1[in_lightIndex].SampleLevel(in_uv, 0);
-	if(in_cascadeIndex == 1) return g_cascadedShadowMapsDB2[in_lightIndex].SampleLevel(in_uv, 0);
-	if(in_cascadeIndex == 2) return g_cascadedShadowMapsDB3[in_lightIndex].SampleLevel(in_uv, 0);
-	return 0.0f;
-}
-
 float occlude(float2 in_uv) {
 	float Greats = OCCLUSION_SAMPLE_COUNT;
 	float Depth = g_depthInput.SampleLevel(in_uv, 0);
 	for(uint i = 0; i < OCCLUSION_SAMPLE_COUNT; i++) {
-		float2 Sample = float2(0);
-		uint Ind = i*2;
-		Sample.x = g_constants.occlusionSamples[Ind] + in_uv.x;
-		Sample.y = g_constants.occlusionSamples[Ind+1] + in_uv.y;
+		float2 Sample = in_uv;
+		Sample += float2(g_constants.occlusionSamples[i*2], g_constants.occlusionSamples[(i*2)+1]);
 		Sample = saturate(Sample);
 		
 		float Comp = g_depthInput.SampleLevel(Sample, 0);

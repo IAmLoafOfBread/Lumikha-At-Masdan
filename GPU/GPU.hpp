@@ -123,6 +123,8 @@ private:
 
 	GPUFramebuffer* m_lightingFramebuffers;
 	
+	GPULocalTexture m_reflectionTexture;
+	
 	uint32_t m_meshCount;
 	GPUDescriptorPool m_graphicsBindingPool;
 
@@ -144,6 +146,7 @@ private:
 	GPUGraphicsLayout m_lightingLayout;
 	GPUGraphicsPipeline m_lightingPipeline;
 	
+	GPULocalAllocation m_reflectionSampleAllocation;
 	GPULocalAllocation m_occlusionSampleAllocation;
 	
 	GPUBuffer m_vertexBuffer;
@@ -245,8 +248,11 @@ private:
 	void build_lightingPipeline(void);
 	void ruin_lightingPipeline(void);
 	
-	void build_occlusionSamples(void);
-	void ruin_occlusionSamples(void);
+	void build_reflectionTexture(void);
+	void ruin_reflectionTexture(void);
+	
+	void build_lightingSamples(void);
+	void ruin_lightingSamples(void);
 	
 	void build_meshes(uint32_t* in_vertexCounts, GPUStageAllocation* in_vertexAllocation, const uint32_t* in_maxInstanceCounts, GPUStageAllocation** in_textureAllocations, GPUExtent3D** in_extents);
 	void ruin_meshes(void);

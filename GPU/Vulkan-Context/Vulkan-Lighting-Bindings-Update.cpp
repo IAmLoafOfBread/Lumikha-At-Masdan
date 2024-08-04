@@ -5,7 +5,7 @@
 
 
 
-#define BINDING_COUNT (GEOMETRY_PASS_TOTAL_ATTACHMENT_COUNT + CASCADED_SHADOW_MAP_COUNT)
+#define BINDING_COUNT (GEOMETRY_PASS_TOTAL_ATTACHMENT_COUNT + CASCADED_SHADOW_MAP_COUNT + 1)
 
 
 
@@ -24,6 +24,12 @@ void GPUFixedContext::set_lightingBindings(void) {
 			ShadowInfos[i][j].imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 		}
 	}
+	const VkDescriptorImageInfo ReflectionInfo = {
+		.sampler = m_sampler,
+		.imageView = m_reflectionTexture.view,
+		.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
+	};
+	
 
 	VkWriteDescriptorSet Writes[BINDING_COUNT] = { VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET };
 	for (uint32_t i = 0; i < BINDING_COUNT; i++) {
@@ -45,6 +51,7 @@ void GPUFixedContext::set_lightingBindings(void) {
 		Writes[i + GEOMETRY_PASS_TOTAL_ATTACHMENT_COUNT].descriptorCount = MAX_LIGHT_COUNT;
 		Writes[i + GEOMETRY_PASS_TOTAL_ATTACHMENT_COUNT].pImageInfo = ShadowInfos[i];
 	}
+	Writes[BINDING_COUNT - 1].pImageInfo = &ReflectionInfo;
 
 	vkUpdateDescriptorSets(m_logical, BINDING_COUNT, Writes, 0, nullptr);
 }

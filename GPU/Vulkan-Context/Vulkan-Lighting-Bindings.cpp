@@ -5,7 +5,7 @@
 
 
 
-#define BINDING_COUNT (GEOMETRY_PASS_TOTAL_ATTACHMENT_COUNT + CASCADED_SHADOW_MAP_COUNT)
+#define BINDING_COUNT (GEOMETRY_PASS_TOTAL_ATTACHMENT_COUNT + CASCADED_SHADOW_MAP_COUNT + 1)
 
 
 
@@ -19,7 +19,7 @@ void GPUFixedContext::build_lightingBindings(void) {
 			Bindings[i].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
 			Bindings[i].pImmutableSamplers = nullptr;
 		}
-		for (uint32_t i = GEOMETRY_PASS_TOTAL_ATTACHMENT_COUNT; i < BINDING_COUNT; i++) {
+		for (uint32_t i = GEOMETRY_PASS_TOTAL_ATTACHMENT_COUNT; i < BINDING_COUNT - 1; i++) {
 			Bindings[i].descriptorCount = MAX_LIGHT_COUNT;
 		}
 

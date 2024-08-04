@@ -21,6 +21,23 @@ static VkImageCopy g_copyRegion = {
 	.extent = { 0 }
 };
 
+static VkImageMemoryBarrier g_transToPres = {
+	.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
+	.pNext = nullptr,
+	.srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT,
+	.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT,
+	.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+	.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+	.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+	.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+	.image = VK_NULL_HANDLE,
+	.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+	.subresourceRange.baseMipLevel = 0,
+	.subresourceRange.levelCount = 1,
+	.subresourceRange.baseArrayLayer = 0,
+	.subresourceRange.layerCount = 1,
+};
+
 static VkRenderPassBeginInfo g_renderInfo = {
 	.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
 	.pNext = nullptr,
@@ -73,6 +90,7 @@ void GPUFixedContext::draw_lightingUpdate(void) {
 	CHECK(vkWaitForFences(m_logical, LENGTH_OF(g_fences), g_fences, VK_TRUE, UINT64_MAX))
 	g_renderInfo.framebuffer = m_lightingFramebuffers[m_currentImageIndex];
 	g_copyRegion.extent = m_surfaceExtent;
+	g_transToPres.image = m_presentImages[m_currentImageIndex];
 	
 	CHECK(vkBeginCommandBuffer(m_lightingCommandSet, &G_FIXED_COMMAND_BEGIN_INFO))
 	vkCmdBindDescriptorSets(m_lightingCommandSet, VK_PIPELINE_BIND_POINT_GRAPHICS, m_lightingLayout, 0, 1, &m_lightingDescriptorSet, 0, nullptr);
@@ -87,7 +105,8 @@ void GPUFixedContext::draw_lightingUpdate(void) {
 	vkCmdDraw(m_lightingCommandSet, 4, 1, 0, 0);
 	vkCmdEndRenderPass(m_lightingCommandSet);
 	
-	vkCmdCopyImage(m_lightingCommandSet, m_presentImages[m_currentImageIndex], VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, m_reflectionTexture.image, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 1, &g_copyRegion);
+	vkCmdCopyImage(m_lightingCommandSet, m_presentImages[m_currentImageIndex], VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, m_reflectionTexture.image, VK_IMAGE_LAYOUT_GENERAL, 1, &g_copyRegion);
+	vkCmdPipelineBarrier(m_lightingCommandSet, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, 0, 0, nullptr, 0, nullptr, 1, &g_transToPres);
 	
 	CHECK(vkEndCommandBuffer(m_lightingCommandSet))
 

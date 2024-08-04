@@ -244,6 +244,9 @@ void GPUFixedContext::build_localTexture(GPULocalTexture* in_texture, GPUStageAl
 	if (in_layout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL) {
 		StageFlags = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
 	}
+	if (in_layout == VK_IMAGE_LAYOUT_GENERAL) {
+		StageFlags = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT | VK_PIPELINE_STAGE_TRANSFER_BIT;
+	}
 
 
 	const VkSubmitInfo SubmitInfo = {

@@ -27,7 +27,7 @@ void GPUFixedContext::set_lightingBindings(void) {
 	const VkDescriptorImageInfo ReflectionInfo = {
 		.sampler = m_sampler,
 		.imageView = m_reflectionTexture.view,
-		.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
+		.imageLayout = VK_IMAGE_LAYOUT_GENERAL
 	};
 	
 

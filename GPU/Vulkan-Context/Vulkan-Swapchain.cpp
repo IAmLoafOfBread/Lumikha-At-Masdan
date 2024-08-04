@@ -17,7 +17,7 @@ void GPUFixedContext::build_swapchain(void) {
 			.imageColorSpace = m_surfaceColourSpace,
 			.imageExtent = {m_surfaceExtent.width, m_surfaceExtent.height},
 			.imageArrayLayers = 1,
-			.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
+			.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT,
 			.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE,
 			.queueFamilyIndexCount = 1,
 			.pQueueFamilyIndices = &m_graphicsQueueFamilyIndex,

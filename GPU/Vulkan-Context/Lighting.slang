@@ -60,19 +60,15 @@ float3 lighting(float3 in_position, float3 in_normal, float2 in_uv) {
 		uint RefInd = 0;
 		while (Sample.x <= 1.0f && Sample.x >= 0.0f && Sample.y <= 1.0f && Sample.y >= 0.0f) {
 			Sample += Step;
-			float3 Position = g_positionInput.SampleLevel(Sample, 0).xyz;
 			
-			if (dot(Position - in_position, in_normal) > 0) {
-				float3 Normal = (g_normalInput.SampleLevel(Sample, 0).xyz * 2) - 1;
-				Reflections[i].colour = g_previousOutput.SampleLevel(in_uv, 0).xyz * (1.0f - dot(in_normal, Normal));
+			if (dot(g_positionInput.SampleLevel(Sample, 0).xyz - in_position, in_normal) > 0) {
+				Reflections[i].colour = g_previousOutput.SampleLevel(in_uv, 0).xyz * (1.0f - dot(in_normal, (g_normalInput.SampleLevel(Sample, 0).xyz * 2) - 1));
 				ReflectionCount++;
 				break;
 			}
 		}
 	}
 
-    float3 Albedo = g_albedoInput.SampleLevel(in_uv, 0).xyz;
-    float3 Specular = g_specularInput.SampleLevel(in_uv, 0).xyz;
     float A = g_roughnessInput.SampleLevel(in_uv, 0); A *= A;
     float R = A * A; A /= 2;
     float3 V = normalize(g_constants.position - in_position);
@@ -91,9 +87,7 @@ float3 lighting(float3 in_position, float3 in_normal, float2 in_uv) {
 				for(uint j = 0; j < CASCADED_SHADOW_MAP_COUNT; j++) {
 					float4 Projected = mul(float4(Position, 1.0f), CurrentLight.projections[j]);
 					Projected /= Projected.w;
-					float Z = Projected.z;
-					float2 UV = (Projected.xy * 0.5f) + 0.5f;
-					if(Z < cascade(j, i, UV)) {
+					if(Projected.z < cascade(j, i, (Projected.xy * 0.5f) + 0.5f)) {
 						Lit = false;
 						break;
 					}
@@ -103,25 +97,18 @@ float3 lighting(float3 in_position, float3 in_normal, float2 in_uv) {
 			if (Lit) {
 				float3 L = normalize(LightPosition - in_position);
 				float3 H = normalize(V + L);
-				float PL = dot(in_position, L);
 				float NL = dot(in_normal, L);
 				float NH = dot(in_normal, H); NH *= NH;
 
 				float D = R / (PI * pow((NH * (R - 1)) + 1, 2));
 				float G = G1(in_normal, V, A) * G1(in_normal, L, A);
-				float3 F0 = float3(0.2f);
-				float3 Ks = F0 + ((float(1.0f) - F0) * pow(1 - dot(V, H), 5));
+				float Ks = 0.2f + ((1.0f - 0.2f) * pow(1 - dot(V, H), 5));
 
-				float3 Kd = (1 - Ks) * (1 - g_metalnessInput.SampleLevel(in_uv, 0));
-
-				float3 Fs = (D * G * Ks) / (4 * VN * NL);
-				float3 Fd = Kd * (Albedo / PI) * NL;
-
-				float3 Fr = Fd + Fs;
+				float Kd = (1 - Ks) * (1 - g_metalnessInput.SampleLevel(in_uv, 0));
 
 				float LightDistance = distance(LightPosition, in_position);
 				LightDistance *= LightDistance;
-				Output.xyz += (Fr * CurrentLight.colour * Specular) / LightDistance;
+				Output.xyz += (((Kd * (g_albedoInput.SampleLevel(in_uv, 0).xyz / PI) * NL) + ((D * G * Ks) / (4 * VN * NL))) * CurrentLight.colour * g_specularInput.SampleLevel(in_uv, 0).xyz) / LightDistance;
             }
         }
     }
@@ -161,13 +148,6 @@ float occlude(float2 in_uv) {
 [shader("fragment")] float4 output_fragment(
     [[vk::location(0)]] float2 in_uv
 ) : SV_TARGET0 {
-    float3 Output = float3(0);
-
-    float3 PointPosition = g_positionInput.SampleLevel(in_uv, 0).xyz;
-    float3 PointNormal = normalize((g_normalInput.SampleLevel(in_uv, 0).xyz * 2) - 1);
-    Output = lighting(PointPosition, PointNormal, in_uv);
-	Output *= occlude(in_uv);
-	
-    return float4(Output, 1.0f);
+    return float4(lighting(g_positionInput.SampleLevel(in_uv, 0).xyz, normalize((g_normalInput.SampleLevel(in_uv, 0).xyz * 2) - 1), in_uv) * occlude(in_uv), 1.0f);
 }
 

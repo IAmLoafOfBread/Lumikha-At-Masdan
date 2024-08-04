@@ -5,6 +5,10 @@
 
 
 
+#define TAU 6.2831f
+
+
+
 void GPUFixedContext::build_lightingSamples(void) {
 	GPUStageAllocation SampleStage = { GPU_NULL_HANDLE };
 	{
@@ -18,14 +22,14 @@ void GPUFixedContext::build_lightingSamples(void) {
 			rotate_vector(&Vector, Rotation);
 			Samples[i].v = Vector.y / m_surfaceExtent.height;
 			Samples[i].u = Vector.x / m_surfaceExtent.width;
-			IncRot += 6.2831f / REFLECTION_SAMPLE_COUNT;
+			IncRot += TAU / REFLECTION_SAMPLE_COUNT;
 		}
 		build_localAllocation(&m_reflectionSampleAllocation, &SampleStage, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT);
 	}
 	{
 		build_stageAllocation(&SampleStage, sizeof(float2) * OCCLUSION_SAMPLE_COUNT);
 		const float RandMaxLength = static_cast<float>(RAND_MAX);
-		const float RandMaxRotation = static_cast<float>(RAND_MAX/6.2831f);
+		const float RandMaxRotation = static_cast<float>(RAND_MAX/TAU);
 		
 		float2* Samples = static_cast<float2*>(SampleStage.data);
 		for(uint32_t i = 0; i < OCCLUSION_SAMPLE_COUNT; i++) {

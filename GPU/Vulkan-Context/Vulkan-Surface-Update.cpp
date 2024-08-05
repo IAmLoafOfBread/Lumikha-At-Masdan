@@ -10,10 +10,11 @@ void GPUFixedContext::resize_surfaceUpdate(void) {
 	
 	ruin_lightingSamples();
 	ruin_geometryFramebuffer();
-	ruin_lightingFramebuffers();
-	ruin_reflectionTexture();
+	ruin_lightingFramebuffer();
+	ruin_postProcessingFramebuffers();
 	ruin_geometryPipeline();
 	ruin_lightingPipeline();
+	ruin_postProcessingPipeline();
 	ruin_swapchain();
 	ruin_surface();
 
@@ -21,11 +22,13 @@ void GPUFixedContext::resize_surfaceUpdate(void) {
 	build_swapchain();
 	build_geometryPipeline();
 	build_lightingPipeline();
+	build_postProcessingPipeline();
 	build_geometryFramebuffer();
-	build_lightingFramebuffers();
-	build_reflectionTexture();
+	build_lightingFramebuffer();
+	build_postProcessingFramebuffers();
 	build_lightingSamples();
 	set_lightingBindings();
+	set_postProcessingBindings();
 	initialize_geometryUpdateData();
 	initialize_lightingUpdateData();
 	update_camera();

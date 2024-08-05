@@ -5,36 +5,36 @@
 
 
 
-#define VERTEX_MODULE_PATH "Lighting.vert.spv"
-#define FRAGMENT_MODULE_PATH "Lighting.frag.spv"
+#define VERTEX_MODULE_PATH "Post-Processing.vert.spv"
+#define FRAGMENT_MODULE_PATH "Post-Processing.frag.spv"
 
 static VkShaderModule g_vertexModule = VK_NULL_HANDLE;
 static VkShaderModule g_fragmentModule = VK_NULL_HANDLE;
 
 
 
-void GPUFixedContext::build_lightingPipeline(void) {
+void GPUFixedContext::build_postProcessingPipeline(void) {
 	build_module(&g_vertexModule, VERTEX_MODULE_PATH);
 	build_module(&g_fragmentModule, FRAGMENT_MODULE_PATH);
-
+	
 	{
 		const VkPushConstantRange PushConstant = {
 			.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
 			.offset = 0,
-			.size = sizeof(VkDeviceAddress) + sizeof(float3) + sizeof(uint32_t)
+			.size = sizeof(VkDeviceAddress) * 2
 		};
 		const VkPipelineLayoutCreateInfo CreateInfo = {
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
 			.pNext = nullptr,
 			.flags = 0,
 			.setLayoutCount = 1,
-			.pSetLayouts = &m_lightingDescriptorLayout,
+			.pSetLayouts = &m_postProcessingDescriptorLayout,
 			.pushConstantRangeCount = 1,
 			.pPushConstantRanges = &PushConstant
 		};
-		CHECK(vkCreatePipelineLayout(m_logical, &CreateInfo, nullptr, &m_lightingLayout))
+		CHECK(vkCreatePipelineLayout(m_logical, &CreateInfo, nullptr, &m_postProcessingLayout))
 	}
-
+	
 	const VkPipelineShaderStageCreateInfo ShaderStages[] = {
 		{
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
@@ -55,7 +55,7 @@ void GPUFixedContext::build_lightingPipeline(void) {
 			.pSpecializationInfo = nullptr
 		}
 	};
-
+	
 	const VkPipelineVertexInputStateCreateInfo VertexInputState = {
 		.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
 		.pNext = nullptr,
@@ -65,7 +65,7 @@ void GPUFixedContext::build_lightingPipeline(void) {
 		.vertexAttributeDescriptionCount = 0,
 		.pVertexAttributeDescriptions = nullptr
 	};
-
+	
 	const VkPipelineInputAssemblyStateCreateInfo InputAssemblyState = {
 		.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO,
 		.pNext = nullptr,
@@ -73,14 +73,14 @@ void GPUFixedContext::build_lightingPipeline(void) {
 		.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP,
 		.primitiveRestartEnable = VK_FALSE
 	};
-
+	
 	const VkPipelineTessellationStateCreateInfo TessellationState = {
 		.sType = VK_STRUCTURE_TYPE_PIPELINE_TESSELLATION_STATE_CREATE_INFO,
 		.pNext = nullptr,
 		.flags = 0,
 		.patchControlPoints = 1
 	};
-
+	
 	const VkViewport MainViewport = {
 		.x = 0,
 		.y = 0,
@@ -102,7 +102,7 @@ void GPUFixedContext::build_lightingPipeline(void) {
 		.scissorCount = 1,
 		.pScissors = &MainScissor,
 	};
-
+	
 	const VkPipelineRasterizationStateCreateInfo RasterizationState = {
 		.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
 		.pNext = nullptr,
@@ -118,7 +118,7 @@ void GPUFixedContext::build_lightingPipeline(void) {
 		.depthBiasSlopeFactor = 0,
 		.lineWidth = 1
 	};
-
+	
 	const VkPipelineMultisampleStateCreateInfo MultisampleState = {
 		.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO,
 		.pNext = nullptr,
@@ -130,7 +130,7 @@ void GPUFixedContext::build_lightingPipeline(void) {
 		.alphaToCoverageEnable = VK_FALSE,
 		.alphaToOneEnable = VK_FALSE,
 	};
-
+	
 	const VkPipelineColorBlendAttachmentState ColourAttachment = {
 		.blendEnable = VK_FALSE,
 		.srcColorBlendFactor = VK_BLEND_FACTOR_ONE,
@@ -141,7 +141,7 @@ void GPUFixedContext::build_lightingPipeline(void) {
 		.alphaBlendOp = VK_BLEND_OP_ADD,
 		.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT
 	};
-
+	
 	const VkPipelineColorBlendStateCreateInfo ColourBlendState = {
 		.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO,
 		.pNext = nullptr,
@@ -152,7 +152,7 @@ void GPUFixedContext::build_lightingPipeline(void) {
 		.pAttachments = &ColourAttachment,
 		.blendConstants = { 0 }
 	};
-
+	
 	const VkPipelineDynamicStateCreateInfo DynamicState = {
 		.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO,
 		.pNext = nullptr,
@@ -160,7 +160,7 @@ void GPUFixedContext::build_lightingPipeline(void) {
 		.dynamicStateCount = 0,
 		.pDynamicStates = nullptr
 	};
-
+	
 	const VkGraphicsPipelineCreateInfo CreateInfo = {
 		.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
 		.pNext = nullptr,
@@ -176,18 +176,18 @@ void GPUFixedContext::build_lightingPipeline(void) {
 		.pDepthStencilState = nullptr,
 		.pColorBlendState = &ColourBlendState,
 		.pDynamicState = &DynamicState,
-		.layout = m_lightingLayout,
-		.renderPass = m_lightingPass,
+		.layout = m_postProcessingLayout,
+		.renderPass = m_postProcessingPass,
 		.subpass = 0,
 		.basePipelineHandle = VK_NULL_HANDLE,
 		.basePipelineIndex = -1
 	};
-	CHECK(vkCreateGraphicsPipelines(m_logical, nullptr, 1, &CreateInfo, nullptr, &m_lightingPipeline))
+	CHECK(vkCreateGraphicsPipelines(m_logical, nullptr, 1, &CreateInfo, nullptr, &m_postProcessingPipeline))
 }
 
-void GPUFixedContext::ruin_lightingPipeline(void) {
-	vkDestroyPipeline(m_logical, m_lightingPipeline, nullptr);
-	vkDestroyPipelineLayout(m_logical, m_lightingLayout, nullptr);
+void GPUFixedContext::ruin_postProcessingPipeline(void) {
+	vkDestroyPipeline(m_logical, m_postProcessingPipeline, nullptr);
+	vkDestroyPipelineLayout(m_logical, m_postProcessingLayout, nullptr);
 	ruin_module(g_vertexModule);
 	ruin_module(g_fragmentModule);
 }

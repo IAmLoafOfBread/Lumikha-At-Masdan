@@ -5,17 +5,17 @@
 
 
 
-void GPUFixedContext::build_lightingPass(void) {
+void GPUFixedContext::build_postProcessingPass(void) {
 	const VkAttachmentDescription Description = {
 		.flags = 0,
-		.format = VK_FORMAT_R32G32B32A32_SFLOAT,
+		.format = m_surfaceFormat,
 		.samples = VK_SAMPLE_COUNT_1_BIT,
 		.loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
 		.storeOp = VK_ATTACHMENT_STORE_OP_STORE,
 		.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
 		.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
 		.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
-		.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
+		.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
 	};
 	const VkAttachmentReference Reference = {
 		.attachment = 0,
@@ -36,9 +36,9 @@ void GPUFixedContext::build_lightingPass(void) {
 	const VkSubpassDependency Dependency = {
 		.srcSubpass = VK_SUBPASS_EXTERNAL,
 		.dstSubpass = 0,
-		.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT,
+		.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
 		.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
-		.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
+		.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
 		.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
 		.dependencyFlags = 0
 	};
@@ -53,11 +53,11 @@ void GPUFixedContext::build_lightingPass(void) {
 		.dependencyCount = 1,
 		.pDependencies = &Dependency
 	};
-	CHECK(vkCreateRenderPass(m_logical, &CreateInfo, nullptr, &m_lightingPass))
+	CHECK(vkCreateRenderPass(m_logical, &CreateInfo, nullptr, &m_postProcessingPass))
 }
 
-void GPUFixedContext::ruin_lightingPass(void) {
-	vkDestroyRenderPass(m_logical, m_lightingPass, nullptr);
+void GPUFixedContext::ruin_postProcessingPass(void) {
+	vkDestroyRenderPass(m_logical, m_postProcessingPass, nullptr);
 }
 
 

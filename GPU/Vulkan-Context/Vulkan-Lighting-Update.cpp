@@ -7,38 +7,16 @@
 
 static VkFence g_fences[2] = { VK_NULL_HANDLE };
 
-static VkImageCopy g_copyRegion = {
-	.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
-	.srcSubresource.mipLevel = 0,
-	.srcSubresource.baseArrayLayer = 0,
-	.srcSubresource.layerCount = 1,
-	.srcOffset = { 0 },
-	.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
-	.dstSubresource.mipLevel = 0,
-	.dstSubresource.baseArrayLayer = 0,
-	.dstSubresource.layerCount = 1,
-	.dstOffset = { 0 },
-	.extent = { 0 }
-};
-
-static VkImageMemoryBarrier g_transToPres = {
-	.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
+static VkRenderPassBeginInfo g_lightingRenderInfo = {
+	.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
 	.pNext = nullptr,
-	.srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT,
-	.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT,
-	.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-	.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
-	.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
-	.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
-	.image = VK_NULL_HANDLE,
-	.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
-	.subresourceRange.baseMipLevel = 0,
-	.subresourceRange.levelCount = 1,
-	.subresourceRange.baseArrayLayer = 0,
-	.subresourceRange.layerCount = 1,
+	.renderPass = VK_NULL_HANDLE,
+	.framebuffer = VK_NULL_HANDLE,
+	.renderArea = { 0 },
+	.clearValueCount = 0,
+	.pClearValues = nullptr
 };
-
-static VkRenderPassBeginInfo g_renderInfo = {
+static VkRenderPassBeginInfo g_postProcessingRenderInfo = {
 	.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
 	.pNext = nullptr,
 	.renderPass = VK_NULL_HANDLE,
@@ -71,9 +49,14 @@ void GPUFixedContext::initialize_lightingUpdateData(void) {
 		g_waitSemaphores[i] = m_shadowMappingsFinishedSemaphores[i];
 	}
 
-	g_renderInfo.renderPass = m_lightingPass;
-	g_renderInfo.renderArea.extent.width = m_surfaceExtent.width;
-	g_renderInfo.renderArea.extent.height = m_surfaceExtent.height;
+	g_lightingRenderInfo.renderPass = m_lightingPass;
+	g_lightingRenderInfo.framebuffer = m_lightingFramebuffer;
+	g_lightingRenderInfo.renderArea.extent.width = m_surfaceExtent.width;
+	g_lightingRenderInfo.renderArea.extent.height = m_surfaceExtent.height;
+	
+	g_postProcessingRenderInfo.renderPass = m_postProcessingPass;
+	g_postProcessingRenderInfo.renderArea.extent.width = m_surfaceExtent.width;
+	g_postProcessingRenderInfo.renderArea.extent.height = m_surfaceExtent.height;
 	
 	for(uint32_t i = 0; i < CASCADED_SHADOW_MAP_COUNT + 1; i++) {
 		g_waitStages[i] = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
@@ -88,25 +71,27 @@ void GPUFixedContext::draw_lightingUpdate(void) {
 	wait_semaphore(m_lightsSemaphore);
 
 	CHECK(vkWaitForFences(m_logical, LENGTH_OF(g_fences), g_fences, VK_TRUE, UINT64_MAX))
-	g_renderInfo.framebuffer = m_lightingFramebuffers[m_currentImageIndex];
-	g_copyRegion.extent = m_surfaceExtent;
-	g_transToPres.image = m_presentImages[m_currentImageIndex];
+	
+	g_postProcessingRenderInfo.framebuffer = m_postProcessingFramebuffers[m_currentImageIndex];
 	
 	CHECK(vkBeginCommandBuffer(m_lightingCommandSet, &G_FIXED_COMMAND_BEGIN_INFO))
+
+	vkCmdBeginRenderPass(m_lightingCommandSet, &g_lightingRenderInfo, VK_SUBPASS_CONTENTS_INLINE);
 	vkCmdBindDescriptorSets(m_lightingCommandSet, VK_PIPELINE_BIND_POINT_GRAPHICS, m_lightingLayout, 0, 1, &m_lightingDescriptorSet, 0, nullptr);
 	vkCmdBindPipeline(m_lightingCommandSet, VK_PIPELINE_BIND_POINT_GRAPHICS, m_lightingPipeline);
 	vkCmdPushConstants(m_lightingCommandSet, m_lightingLayout, VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(VkDeviceAddress), &m_lightAllocation.address);
-	vkCmdPushConstants(m_lightingCommandSet, m_lightingLayout, VK_SHADER_STAGE_FRAGMENT_BIT, sizeof(VkDeviceAddress), sizeof(VkDeviceAddress), &m_reflectionSampleAllocation.address);
-	vkCmdPushConstants(m_lightingCommandSet, m_lightingLayout, VK_SHADER_STAGE_FRAGMENT_BIT, sizeof(VkDeviceAddress) * 2, sizeof(VkDeviceAddress), &m_occlusionSampleAllocation.address);
-	vkCmdPushConstants(m_lightingCommandSet, m_lightingLayout, VK_SHADER_STAGE_FRAGMENT_BIT, sizeof(VkDeviceAddress) * 3, sizeof(float3), &m_cameraView.position);
-	vkCmdPushConstants(m_lightingCommandSet, m_lightingLayout, VK_SHADER_STAGE_FRAGMENT_BIT, (sizeof(VkDeviceAddress) * 3) + sizeof(float3), sizeof(uint32_t), &m_lightCount);
-	
-	vkCmdBeginRenderPass(m_lightingCommandSet, &g_renderInfo, VK_SUBPASS_CONTENTS_INLINE);
+	vkCmdPushConstants(m_lightingCommandSet, m_lightingLayout, VK_SHADER_STAGE_FRAGMENT_BIT, sizeof(VkDeviceAddress), sizeof(float3), &m_cameraView.position);
+	vkCmdPushConstants(m_lightingCommandSet, m_lightingLayout, VK_SHADER_STAGE_FRAGMENT_BIT, sizeof(VkDeviceAddress) + sizeof(float3), sizeof(uint32_t), &m_lightCount);
 	vkCmdDraw(m_lightingCommandSet, 4, 1, 0, 0);
 	vkCmdEndRenderPass(m_lightingCommandSet);
 	
-	vkCmdCopyImage(m_lightingCommandSet, m_presentImages[m_currentImageIndex], VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, m_reflectionTexture.image, VK_IMAGE_LAYOUT_GENERAL, 1, &g_copyRegion);
-	vkCmdPipelineBarrier(m_lightingCommandSet, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, 0, 0, nullptr, 0, nullptr, 1, &g_transToPres);
+	vkCmdBeginRenderPass(m_lightingCommandSet, &g_postProcessingRenderInfo, VK_SUBPASS_CONTENTS_INLINE);
+	vkCmdBindDescriptorSets(m_lightingCommandSet, VK_PIPELINE_BIND_POINT_GRAPHICS, m_postProcessingLayout, 0, 1, &m_postProcessingDescriptorSet, 0, nullptr);
+	vkCmdBindPipeline(m_lightingCommandSet, VK_PIPELINE_BIND_POINT_GRAPHICS, m_postProcessingPipeline);
+	vkCmdPushConstants(m_lightingCommandSet, m_lightingLayout, VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(VkDeviceAddress), &m_reflectionSampleAllocation.address);
+	vkCmdPushConstants(m_lightingCommandSet, m_lightingLayout, VK_SHADER_STAGE_FRAGMENT_BIT, sizeof(VkDeviceAddress), sizeof(VkDeviceAddress), &m_occlusionSampleAllocation.address);
+	vkCmdDraw(m_lightingCommandSet, 4, 1, 0, 0);
+	vkCmdEndRenderPass(m_lightingCommandSet);
 	
 	CHECK(vkEndCommandBuffer(m_lightingCommandSet))
 

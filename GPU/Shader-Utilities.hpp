@@ -16,6 +16,8 @@ using namespace metal;
 
 #define uint32_t uint
 
+#define PI 3.14159f
+
 void rotate_vector(inout float3 in_vector, float3 in_rotation) {
     const float CosX = cos(in_rotation.x);
     const float CosY = cos(in_rotation.y);
@@ -63,6 +65,8 @@ void rotate_vector(inout float3 in_vector, float3 in_rotation) {
 #define GEOMETRY_PASS_COLOUR_ATTACHMENT_COUNT 6
 #define GEOMETRY_PASS_TOTAL_ATTACHMENT_COUNT GEOMETRY_PASS_COLOUR_ATTACHMENT_COUNT + 1
 #define GEOMETRY_PASS_REQUIRED_TEXTURE_COUNT 5
+
+#define POST_PROCESSING_BINDING_COUNT 4
 
 #define CORNER_COUNT 8
 

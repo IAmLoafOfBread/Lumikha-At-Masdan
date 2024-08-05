@@ -110,6 +110,8 @@ private:
 	
 	GPURenderPass m_lightingPass;
 	
+	GPURenderPass m_postProcessingPass;
+	
 	GPUSwapchain m_swapchain;
 	GPUFence m_swapchainFence;
 	GPUTextureImage* m_presentImages;
@@ -121,9 +123,10 @@ private:
 	GPULocalTexture m_geometryTextures[GEOMETRY_PASS_COLOUR_ATTACHMENT_COUNT + 1];
 	GPUFramebuffer m_geometryFramebuffer;
 
-	GPUFramebuffer* m_lightingFramebuffers;
+	GPULocalTexture m_lightingTexture;
+	GPUFramebuffer m_lightingFramebuffer;
 	
-	GPULocalTexture m_reflectionTexture;
+	GPUFramebuffer* m_postProcessingFramebuffers;
 	
 	uint32_t m_meshCount;
 	GPUDescriptorPool m_graphicsBindingPool;
@@ -133,6 +136,9 @@ private:
 
 	GPUDescriptorLayout m_lightingDescriptorLayout;
 	GPUDescriptorSet m_lightingDescriptorSet;
+	
+	GPUDescriptorLayout m_postProcessingDescriptorLayout;
+	GPUDescriptorSet m_postProcessingDescriptorSet;
 	
 	GPUComputeLayout m_lightViewingLayout;
 	GPUComputePipeline m_lightViewingPipeline;
@@ -145,6 +151,9 @@ private:
 
 	GPUGraphicsLayout m_lightingLayout;
 	GPUGraphicsPipeline m_lightingPipeline;
+	
+	GPUGraphicsLayout m_postProcessingLayout;
+	GPUGraphicsPipeline m_postProcessingPipeline;
 	
 	GPULocalAllocation m_reflectionSampleAllocation;
 	GPULocalAllocation m_occlusionSampleAllocation;
@@ -215,6 +224,9 @@ private:
 	void build_lightingPass(void);
 	void ruin_lightingPass(void);
 	
+	void build_postProcessingPass(void);
+	void ruin_postProcessingPass(void);
+	
 	void build_swapchain(void);
 	void ruin_swapchain(void);
 	
@@ -224,8 +236,11 @@ private:
 	void build_geometryFramebuffer(void);
 	void ruin_geometryFramebuffer(void);
 
-	void build_lightingFramebuffers(void);
-	void ruin_lightingFramebuffers(void);
+	void build_lightingFramebuffer(void);
+	void ruin_lightingFramebuffer(void);
+	
+	void build_postProcessingFramebuffers(void);
+	void ruin_postProcessingFramebuffers(void);
 
 	void build_graphicsBindingPool(uint32_t in_meshCount);
 	void ruin_graphicsBindingPool(void);
@@ -235,6 +250,9 @@ private:
 
 	void build_lightingBindings(void);
 	void ruin_lightingBindings(void);
+	
+	void build_postProcessingBindings(void);
+	void ruin_postProcessingBindings(void);
 	
 	void build_lightViewingPipeline(void);
 	void ruin_lightViewingPipeline(void);
@@ -248,8 +266,8 @@ private:
 	void build_lightingPipeline(void);
 	void ruin_lightingPipeline(void);
 	
-	void build_reflectionTexture(void);
-	void ruin_reflectionTexture(void);
+	void build_postProcessingPipeline(void);
+	void ruin_postProcessingPipeline(void);
 	
 	void build_lightingSamples(void);
 	void ruin_lightingSamples(void);
@@ -269,6 +287,8 @@ private:
 	void set_geometryBindings(void);
 
 	void set_lightingBindings(void);
+	
+	void set_postProcessingBindings(void);
 	
 	void build_synchronizations(void);
 	void ruin_synchronizations(void);

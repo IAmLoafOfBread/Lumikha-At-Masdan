@@ -11,7 +11,7 @@
 
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
-#include "../Externals/SPNG/spng.h"
+#include <spng.h>
 
 #if defined(RUN_DEBUG)
 #include <stdio.h>

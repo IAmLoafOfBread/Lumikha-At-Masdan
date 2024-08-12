@@ -1,7 +1,5 @@
 #include "../GPU/GPU.hpp"
 
-#define DIR "C:\\Users\\whole\\source\\repos\\Tasting\\x64\\Debug\\"
-
 
 
 static void resize(GLFWwindow* in_window, int in_width, int in_height) {
@@ -38,31 +36,31 @@ int tasting(int argc, const char* argv[]) {
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 	
 	const char* PositionFiles[] = {
-		DIR"Board.pos.objb"
+		EXECUTABLE_DIRECTORY"Board.pos.objb"
 	};
 	const char* NormalFiles[] = {
-		DIR"Board.norm.objb"
+		EXECUTABLE_DIRECTORY"Board.norm.objb"
 	};
 	const char* UVFiles[] = {
-		DIR"Board.uv.objb"
+		EXECUTABLE_DIRECTORY"Board.uv.objb"
 	};
 	const char* IndexFiles[] = {
-		DIR"Board.ind.objb"
+		EXECUTABLE_DIRECTORY"Board.ind.objb"
 	};
 	const char* NormalMaps[] = {
-		DIR"Board.norm.png"
+		EXECUTABLE_DIRECTORY"Board.norm.png"
 	};
 	const char* AlbedoMaps[] = {
-		DIR"Board.alb.png"
+		EXECUTABLE_DIRECTORY"Board.alb.png"
 	};
 	const char* SpecularMaps[] = {
-		DIR"Board.spec.png"
+		EXECUTABLE_DIRECTORY"Board.spec.png"
 	};
 	const char* MetalnessMaps[] = {
-		DIR"Board.met.png"
+		EXECUTABLE_DIRECTORY"Board.met.png"
 	};
 	const char* RoughnessMaps[] = {
-		DIR"Board.rou.png"
+		EXECUTABLE_DIRECTORY"Board.rou.png"
 	};
 	uint32_t InstanceCounts[] = {
 		1

@@ -1,6 +1,6 @@
 #include "../GPU/GPU.hpp"
 
-#define DIR "/Users/breadloaf/Developer/Toasting/Build/Products/Debug/"
+#define DIR "C:\\Users\\whole\\source\\repos\\Tasting\\x64\\Debug\\"
 
 
 

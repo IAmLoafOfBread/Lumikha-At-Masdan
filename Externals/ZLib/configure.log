@@ -179,3 +179,1795 @@ uname = Darwin
 --------------------
 
 
+--------------------
+C:\Users\whole\source\repos\Tasting\Lumikha-At-Masdan\Externals\Zlib\configure.sh
+Mon Aug 12 19:12:56 MPST 2024
+Checking for gcc...
+=== ztest977.c ===
+extern int getchar();
+int hello() {return getchar();}
+===
+gcc -c ztest977.c
+... using gcc
+If this doesn't work for you, try win32/Makefile.gcc.
+
+Checking for obsessive-compulsive compiler options...
+=== ztest977.c ===
+int foo() { return 0; }
+===
+gcc -c -O3 ztest977.c
+
+Checking for shared library support...
+=== ztest977.c ===
+extern int getchar();
+int hello() {return getchar();}
+===
+gcc -c -O3 -fPIC ztest977.c
+gcc -shared -O3 -fPIC -o ztest977.so ztest977.o
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find dllcrt2.o: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lmingw32: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lmingwex: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lmsvcrt: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lkernel32: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lpthread: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -ladvapi32: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lshell32: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -luser32: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lkernel32: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lmingw32: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lmingwex: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lmsvcrt: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lkernel32: No such file or directory
+collect2.exe: error: ld returned 1 exit status
+(exit code 1)
+No shared library support.
+Building static library libz.a version 1.3.1 with gcc.
+
+=== ztest977.c ===
+#include <stdio.h>
+#include <stdlib.h>
+size_t dummy = 0;
+===
+gcc -c -O3 ztest977.c
+ztest977.c:1:10: fatal error: stdio.h: No such file or directory
+    1 | #include <stdio.h>
+      |          ^~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking for size_t... No.
+=== ztest977.c ===
+long long dummy = 0;
+===
+gcc -c -O3 ztest977.c
+Checking for long long... Yes.
+=== ztest977.c ===
+#include <stdio.h>
+int main(void) {
+    if (sizeof(void *) <= sizeof(int)) puts("int");
+    else if (sizeof(void *) <= sizeof(long)) puts("long");
+    else puts("z_longlong");
+    return 0;
+}
+===
+gcc -O3 -o ztest977 ztest977.c
+ztest977.c:1:10: fatal error: stdio.h: No such file or directory
+    1 | #include <stdio.h>
+      |          ^~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking for a pointer-size integer type... not found.
+
+=== ztest977.c ===
+#include <sys/types.h>
+off64_t dummy = 0;
+===
+gcc -c -O3 -D_LARGEFILE64_SOURCE=1 ztest977.c
+ztest977.c:1:10: fatal error: sys/types.h: No such file or directory
+    1 | #include <sys/types.h>
+      |          ^~~~~~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking for off64_t... No.
+
+=== ztest977.c ===
+#include <stdio.h>
+int main(void) {
+  fseeko(NULL, 0, 0);
+  return 0;
+}
+===
+gcc -O3 -o ztest977 ztest977.c
+ztest977.c:1:10: fatal error: stdio.h: No such file or directory
+    1 | #include <stdio.h>
+      |          ^~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking for fseeko... No.
+
+=== ztest977.c ===
+#include <string.h>
+#include <errno.h>
+int main() { return strlen(strerror(errno)); }
+===
+gcc -O3 -DNO_FSEEKO -o ztest977 ztest977.c
+ztest977.c:1:10: fatal error: string.h: No such file or directory
+    1 | #include <string.h>
+      |          ^~~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking for strerror... No.
+
+=== ztest977.c ===
+#include <unistd.h>
+int main() { return 0; }
+===
+gcc -c -O3 -DNO_FSEEKO -DNO_STRERROR ztest977.c
+ztest977.c:1:10: fatal error: unistd.h: No such file or directory
+    1 | #include <unistd.h>
+      |          ^~~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking for unistd.h... No.
+
+=== ztest977.c ===
+#include <stdarg.h>
+int main() { return 0; }
+===
+gcc -c -O3 -DNO_FSEEKO -DNO_STRERROR ztest977.c
+In file included from ztest977.c:1:
+C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/stdarg.h:1:15: fatal error: stdarg.h: No such file or directory
+    1 | #include_next <stdarg.h>
+      |               ^~~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking for stdarg.h... No.
+
+=== ztest977.c ===
+#include <stdio.h>
+#include <stdarg.h>
+#include "zconf.h"
+int main()
+{
+#ifndef STDC
+  choke me
+#endif
+  return 0;
+}
+===
+gcc -c -O3 -DNO_FSEEKO -DNO_STRERROR ztest977.c
+ztest977.c:1:10: fatal error: stdio.h: No such file or directory
+    1 | #include <stdio.h>
+      |          ^~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking whether to use vs[n]printf() or s[n]printf()... using s[n]printf().
+
+=== ztest977.c ===
+#include <stdio.h>
+int mytest()
+{
+  char buf[20];
+  snprintf(buf, sizeof(buf), "%s", "foo");
+  return 0;
+}
+int main()
+{
+  return (mytest());
+}
+===
+gcc -O3 -DNO_FSEEKO -DNO_STRERROR -o ztest977 ztest977.c
+ztest977.c:1:10: fatal error: stdio.h: No such file or directory
+    1 | #include <stdio.h>
+      |          ^~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking for snprintf() in stdio.h... No.
+  WARNING: snprintf() not found, falling back to sprintf(). zlib
+  can build but will be open to possible buffer-overflow security
+  vulnerabilities.
+
+=== ztest977.c ===
+#include <stdio.h>
+int mytest()
+{
+  char buf[20];
+  return sprintf(buf, "%s", "foo");
+}
+int main()
+{
+  return (mytest());
+}
+===
+gcc -c -O3 -DNO_FSEEKO -DNO_STRERROR -DNO_snprintf ztest977.c
+ztest977.c:1:10: fatal error: stdio.h: No such file or directory
+    1 | #include <stdio.h>
+      |          ^~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking for return value of sprintf()... No.
+  WARNING: apparently sprintf() does not return a value. zlib
+  can build but will be open to possible string-format security
+  vulnerabilities.
+
+=== ztest977.c ===
+#define ZLIB_INTERNAL __attribute__((visibility ("hidden")))
+int ZLIB_INTERNAL foo;
+int main()
+{
+  return 0;
+}
+===
+gcc -c -O3 -DNO_FSEEKO -DNO_STRERROR -DNO_snprintf -DHAS_sprintf_void ztest977.c
+ztest977.c:6:1: warning: visibility attribute not supported in this configuration; ignored [-Wattributes]
+    6 | }
+      | ^
+Checking for attribute(visibility) support... No.
+
+ALL = static
+AR = ar
+ARFLAGS = rc
+CC = gcc
+CFLAGS = -O3 -DNO_FSEEKO -DNO_STRERROR -DNO_snprintf -DHAS_sprintf_void
+CPP =
+EXE = .exe
+LDCONFIG = ldconfig
+LDFLAGS =
+LDSHARED = gcc
+LDSHAREDLIBC =
+OBJC = $(OBJZ) $(OBJG)
+PIC_OBJC = $(PIC_OBJZ) $(PIC_OBJG)
+RANLIB = ranlib
+SFLAGS = -O3 -fPIC -DNO_FSEEKO -DNO_STRERROR -DNO_snprintf -DHAS_sprintf_void
+SHAREDLIB =
+SHAREDLIBM =
+SHAREDLIBV =
+STATICLIB = libz.a
+TEST = all teststatic
+VER = 1.3.1
+SRCDIR = C:\Users\whole\source\repos\Tasting\Lumikha-At-Masdan\Externals\Zlib/
+exec_prefix = ${prefix}
+includedir = ${prefix}/include
+libdir = ${exec_prefix}/lib
+mandir = ${prefix}/share/man
+prefix = /usr/local
+sharedlibdir = ${libdir}
+uname = MINGW64_NT-10.0-22631
+--------------------
+
+
+--------------------
+C:\Users\whole\source\repos\Tasting\Lumikha-At-Masdan\Externals\Zlib\configure.sh
+Mon Aug 12 19:28:44 MPST 2024
+Checking for gcc...
+=== ztest1885.c ===
+extern int getchar();
+int hello() {return getchar();}
+===
+gcc -c ztest1885.c
+... using gcc
+If this doesn't work for you, try win32/Makefile.gcc.
+
+Checking for obsessive-compulsive compiler options...
+=== ztest1885.c ===
+int foo() { return 0; }
+===
+gcc -c -O3 ztest1885.c
+
+Checking for shared library support...
+=== ztest1885.c ===
+extern int getchar();
+int hello() {return getchar();}
+===
+gcc -c -O3 -fPIC ztest1885.c
+gcc -shared -O3 -fPIC -o ztest1885.so ztest1885.o
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find dllcrt2.o: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lmingw32: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lmingwex: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lmsvcrt: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lkernel32: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lpthread: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -ladvapi32: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lshell32: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -luser32: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lkernel32: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lmingw32: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lmingwex: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lmsvcrt: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lkernel32: No such file or directory
+collect2.exe: error: ld returned 1 exit status
+(exit code 1)
+No shared library support.
+Building static library libz.a version 1.3.1 with gcc.
+
+=== ztest1885.c ===
+#include <stdio.h>
+#include <stdlib.h>
+size_t dummy = 0;
+===
+gcc -c -O3 ztest1885.c
+ztest1885.c:1:10: fatal error: stdio.h: No such file or directory
+    1 | #include <stdio.h>
+      |          ^~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking for size_t... No.
+=== ztest1885.c ===
+long long dummy = 0;
+===
+gcc -c -O3 ztest1885.c
+Checking for long long... Yes.
+=== ztest1885.c ===
+#include <stdio.h>
+int main(void) {
+    if (sizeof(void *) <= sizeof(int)) puts("int");
+    else if (sizeof(void *) <= sizeof(long)) puts("long");
+    else puts("z_longlong");
+    return 0;
+}
+===
+gcc -O3 -o ztest1885 ztest1885.c
+ztest1885.c:1:10: fatal error: stdio.h: No such file or directory
+    1 | #include <stdio.h>
+      |          ^~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking for a pointer-size integer type... not found.
+
+=== ztest1885.c ===
+#include <sys/types.h>
+off64_t dummy = 0;
+===
+gcc -c -O3 -D_LARGEFILE64_SOURCE=1 ztest1885.c
+ztest1885.c:1:10: fatal error: sys/types.h: No such file or directory
+    1 | #include <sys/types.h>
+      |          ^~~~~~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking for off64_t... No.
+
+=== ztest1885.c ===
+#include <stdio.h>
+int main(void) {
+  fseeko(NULL, 0, 0);
+  return 0;
+}
+===
+gcc -O3 -o ztest1885 ztest1885.c
+ztest1885.c:1:10: fatal error: stdio.h: No such file or directory
+    1 | #include <stdio.h>
+      |          ^~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking for fseeko... No.
+
+=== ztest1885.c ===
+#include <string.h>
+#include <errno.h>
+int main() { return strlen(strerror(errno)); }
+===
+gcc -O3 -DNO_FSEEKO -o ztest1885 ztest1885.c
+ztest1885.c:1:10: fatal error: string.h: No such file or directory
+    1 | #include <string.h>
+      |          ^~~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking for strerror... No.
+
+=== ztest1885.c ===
+#include <unistd.h>
+int main() { return 0; }
+===
+gcc -c -O3 -DNO_FSEEKO -DNO_STRERROR ztest1885.c
+ztest1885.c:1:10: fatal error: unistd.h: No such file or directory
+    1 | #include <unistd.h>
+      |          ^~~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking for unistd.h... No.
+
+=== ztest1885.c ===
+#include <stdarg.h>
+int main() { return 0; }
+===
+gcc -c -O3 -DNO_FSEEKO -DNO_STRERROR ztest1885.c
+In file included from ztest1885.c:1:
+C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/stdarg.h:1:15: fatal error: stdarg.h: No such file or directory
+    1 | #include_next <stdarg.h>
+      |               ^~~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking for stdarg.h... No.
+
+=== ztest1885.c ===
+#include <stdio.h>
+#include <stdarg.h>
+#include "zconf.h"
+int main()
+{
+#ifndef STDC
+  choke me
+#endif
+  return 0;
+}
+===
+gcc -c -O3 -DNO_FSEEKO -DNO_STRERROR ztest1885.c
+ztest1885.c:1:10: fatal error: stdio.h: No such file or directory
+    1 | #include <stdio.h>
+      |          ^~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking whether to use vs[n]printf() or s[n]printf()... using s[n]printf().
+
+=== ztest1885.c ===
+#include <stdio.h>
+int mytest()
+{
+  char buf[20];
+  snprintf(buf, sizeof(buf), "%s", "foo");
+  return 0;
+}
+int main()
+{
+  return (mytest());
+}
+===
+gcc -O3 -DNO_FSEEKO -DNO_STRERROR -o ztest1885 ztest1885.c
+ztest1885.c:1:10: fatal error: stdio.h: No such file or directory
+    1 | #include <stdio.h>
+      |          ^~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking for snprintf() in stdio.h... No.
+  WARNING: snprintf() not found, falling back to sprintf(). zlib
+  can build but will be open to possible buffer-overflow security
+  vulnerabilities.
+
+=== ztest1885.c ===
+#include <stdio.h>
+int mytest()
+{
+  char buf[20];
+  return sprintf(buf, "%s", "foo");
+}
+int main()
+{
+  return (mytest());
+}
+===
+gcc -c -O3 -DNO_FSEEKO -DNO_STRERROR -DNO_snprintf ztest1885.c
+ztest1885.c:1:10: fatal error: stdio.h: No such file or directory
+    1 | #include <stdio.h>
+      |          ^~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking for return value of sprintf()... No.
+  WARNING: apparently sprintf() does not return a value. zlib
+  can build but will be open to possible string-format security
+  vulnerabilities.
+
+=== ztest1885.c ===
+#define ZLIB_INTERNAL __attribute__((visibility ("hidden")))
+int ZLIB_INTERNAL foo;
+int main()
+{
+  return 0;
+}
+===
+gcc -c -O3 -DNO_FSEEKO -DNO_STRERROR -DNO_snprintf -DHAS_sprintf_void ztest1885.c
+ztest1885.c:6:1: warning: visibility attribute not supported in this configuration; ignored [-Wattributes]
+    6 | }
+      | ^
+Checking for attribute(visibility) support... No.
+
+ALL = static
+AR = ar
+ARFLAGS = rc
+CC = gcc
+CFLAGS = -O3 -DNO_FSEEKO -DNO_STRERROR -DNO_snprintf -DHAS_sprintf_void
+CPP =
+EXE = .exe
+LDCONFIG = ldconfig
+LDFLAGS =
+LDSHARED = gcc
+LDSHAREDLIBC =
+OBJC = $(OBJZ) $(OBJG)
+PIC_OBJC = $(PIC_OBJZ) $(PIC_OBJG)
+RANLIB = ranlib
+SFLAGS = -O3 -fPIC -DNO_FSEEKO -DNO_STRERROR -DNO_snprintf -DHAS_sprintf_void
+SHAREDLIB =
+SHAREDLIBM =
+SHAREDLIBV =
+STATICLIB = libz.a
+TEST = all teststatic
+VER = 1.3.1
+SRCDIR = C:\Users\whole\source\repos\Tasting\Lumikha-At-Masdan\Externals\Zlib/
+exec_prefix = ${prefix}
+includedir = ${prefix}/include
+libdir = ${exec_prefix}/lib
+mandir = ${prefix}/share/man
+prefix = /usr/local
+sharedlibdir = ${libdir}
+uname = MINGW64_NT-10.0-22631
+--------------------
+
+
+--------------------
+C:\Users\whole\source\repos\Tasting\Lumikha-At-Masdan\Externals\Zlib\configure.sh
+Mon Aug 12 19:29:03 MPST 2024
+Checking for gcc...
+=== ztest970.c ===
+extern int getchar();
+int hello() {return getchar();}
+===
+gcc -c ztest970.c
+... using gcc
+If this doesn't work for you, try win32/Makefile.gcc.
+
+Checking for obsessive-compulsive compiler options...
+=== ztest970.c ===
+int foo() { return 0; }
+===
+gcc -c -O3 ztest970.c
+
+Checking for shared library support...
+=== ztest970.c ===
+extern int getchar();
+int hello() {return getchar();}
+===
+gcc -c -O3 -fPIC ztest970.c
+gcc -shared -O3 -fPIC -o ztest970.so ztest970.o
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find dllcrt2.o: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lmingw32: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lmingwex: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lmsvcrt: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lkernel32: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lpthread: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -ladvapi32: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lshell32: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -luser32: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lkernel32: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lmingw32: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lmingwex: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lmsvcrt: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lkernel32: No such file or directory
+collect2.exe: error: ld returned 1 exit status
+(exit code 1)
+No shared library support.
+Building static library libz.a version 1.3.1 with gcc.
+
+=== ztest970.c ===
+#include <stdio.h>
+#include <stdlib.h>
+size_t dummy = 0;
+===
+gcc -c -O3 ztest970.c
+ztest970.c:1:10: fatal error: stdio.h: No such file or directory
+    1 | #include <stdio.h>
+      |          ^~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking for size_t... No.
+=== ztest970.c ===
+long long dummy = 0;
+===
+gcc -c -O3 ztest970.c
+Checking for long long... Yes.
+=== ztest970.c ===
+#include <stdio.h>
+int main(void) {
+    if (sizeof(void *) <= sizeof(int)) puts("int");
+    else if (sizeof(void *) <= sizeof(long)) puts("long");
+    else puts("z_longlong");
+    return 0;
+}
+===
+gcc -O3 -o ztest970 ztest970.c
+ztest970.c:1:10: fatal error: stdio.h: No such file or directory
+    1 | #include <stdio.h>
+      |          ^~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking for a pointer-size integer type... not found.
+
+=== ztest970.c ===
+#include <sys/types.h>
+off64_t dummy = 0;
+===
+gcc -c -O3 -D_LARGEFILE64_SOURCE=1 ztest970.c
+ztest970.c:1:10: fatal error: sys/types.h: No such file or directory
+    1 | #include <sys/types.h>
+      |          ^~~~~~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking for off64_t... No.
+
+=== ztest970.c ===
+#include <stdio.h>
+int main(void) {
+  fseeko(NULL, 0, 0);
+  return 0;
+}
+===
+gcc -O3 -o ztest970 ztest970.c
+ztest970.c:1:10: fatal error: stdio.h: No such file or directory
+    1 | #include <stdio.h>
+      |          ^~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking for fseeko... No.
+
+=== ztest970.c ===
+#include <string.h>
+#include <errno.h>
+int main() { return strlen(strerror(errno)); }
+===
+gcc -O3 -DNO_FSEEKO -o ztest970 ztest970.c
+ztest970.c:1:10: fatal error: string.h: No such file or directory
+    1 | #include <string.h>
+      |          ^~~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking for strerror... No.
+
+=== ztest970.c ===
+#include <unistd.h>
+int main() { return 0; }
+===
+gcc -c -O3 -DNO_FSEEKO -DNO_STRERROR ztest970.c
+ztest970.c:1:10: fatal error: unistd.h: No such file or directory
+    1 | #include <unistd.h>
+      |          ^~~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking for unistd.h... No.
+
+=== ztest970.c ===
+#include <stdarg.h>
+int main() { return 0; }
+===
+gcc -c -O3 -DNO_FSEEKO -DNO_STRERROR ztest970.c
+In file included from ztest970.c:1:
+C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/stdarg.h:1:15: fatal error: stdarg.h: No such file or directory
+    1 | #include_next <stdarg.h>
+      |               ^~~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking for stdarg.h... No.
+
+=== ztest970.c ===
+#include <stdio.h>
+#include <stdarg.h>
+#include "zconf.h"
+int main()
+{
+#ifndef STDC
+  choke me
+#endif
+  return 0;
+}
+===
+gcc -c -O3 -DNO_FSEEKO -DNO_STRERROR ztest970.c
+ztest970.c:1:10: fatal error: stdio.h: No such file or directory
+    1 | #include <stdio.h>
+      |          ^~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking whether to use vs[n]printf() or s[n]printf()... using s[n]printf().
+
+=== ztest970.c ===
+#include <stdio.h>
+int mytest()
+{
+  char buf[20];
+  snprintf(buf, sizeof(buf), "%s", "foo");
+  return 0;
+}
+int main()
+{
+  return (mytest());
+}
+===
+gcc -O3 -DNO_FSEEKO -DNO_STRERROR -o ztest970 ztest970.c
+ztest970.c:1:10: fatal error: stdio.h: No such file or directory
+    1 | #include <stdio.h>
+      |          ^~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking for snprintf() in stdio.h... No.
+  WARNING: snprintf() not found, falling back to sprintf(). zlib
+  can build but will be open to possible buffer-overflow security
+  vulnerabilities.
+
+=== ztest970.c ===
+#include <stdio.h>
+int mytest()
+{
+  char buf[20];
+  return sprintf(buf, "%s", "foo");
+}
+int main()
+{
+  return (mytest());
+}
+===
+gcc -c -O3 -DNO_FSEEKO -DNO_STRERROR -DNO_snprintf ztest970.c
+ztest970.c:1:10: fatal error: stdio.h: No such file or directory
+    1 | #include <stdio.h>
+      |          ^~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking for return value of sprintf()... No.
+  WARNING: apparently sprintf() does not return a value. zlib
+  can build but will be open to possible string-format security
+  vulnerabilities.
+
+=== ztest970.c ===
+#define ZLIB_INTERNAL __attribute__((visibility ("hidden")))
+int ZLIB_INTERNAL foo;
+int main()
+{
+  return 0;
+}
+===
+gcc -c -O3 -DNO_FSEEKO -DNO_STRERROR -DNO_snprintf -DHAS_sprintf_void ztest970.c
+ztest970.c:6:1: warning: visibility attribute not supported in this configuration; ignored [-Wattributes]
+    6 | }
+      | ^
+Checking for attribute(visibility) support... No.
+
+ALL = static
+AR = ar
+ARFLAGS = rc
+CC = gcc
+CFLAGS = -O3 -DNO_FSEEKO -DNO_STRERROR -DNO_snprintf -DHAS_sprintf_void
+CPP =
+EXE = .exe
+LDCONFIG = ldconfig
+LDFLAGS =
+LDSHARED = gcc
+LDSHAREDLIBC =
+OBJC = $(OBJZ) $(OBJG)
+PIC_OBJC = $(PIC_OBJZ) $(PIC_OBJG)
+RANLIB = ranlib
+SFLAGS = -O3 -fPIC -DNO_FSEEKO -DNO_STRERROR -DNO_snprintf -DHAS_sprintf_void
+SHAREDLIB =
+SHAREDLIBM =
+SHAREDLIBV =
+STATICLIB = libz.a
+TEST = all teststatic
+VER = 1.3.1
+SRCDIR = C:\Users\whole\source\repos\Tasting\Lumikha-At-Masdan\Externals\Zlib/
+exec_prefix = ${prefix}
+includedir = ${prefix}/include
+libdir = ${exec_prefix}/lib
+mandir = ${prefix}/share/man
+prefix = /usr/local
+sharedlibdir = ${libdir}
+uname = MINGW64_NT-10.0-22631
+--------------------
+
+
+--------------------
+C:\Users\whole\source\repos\Tasting\Lumikha-At-Masdan\Externals\Zlib\configure.sh
+Mon Aug 12 19:30:55 MPST 2024
+Checking for gcc...
+=== ztest1349.c ===
+extern int getchar();
+int hello() {return getchar();}
+===
+gcc -c ztest1349.c
+... using gcc
+If this doesn't work for you, try win32/Makefile.gcc.
+
+Checking for obsessive-compulsive compiler options...
+=== ztest1349.c ===
+int foo() { return 0; }
+===
+gcc -c -O3 ztest1349.c
+
+Checking for shared library support...
+=== ztest1349.c ===
+extern int getchar();
+int hello() {return getchar();}
+===
+gcc -c -O3 -fPIC ztest1349.c
+gcc -shared -O3 -fPIC -o ztest1349.so ztest1349.o
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find dllcrt2.o: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lmingw32: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lmingwex: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lmsvcrt: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lkernel32: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lpthread: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -ladvapi32: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lshell32: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -luser32: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lkernel32: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lmingw32: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lmingwex: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lmsvcrt: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lkernel32: No such file or directory
+collect2.exe: error: ld returned 1 exit status
+(exit code 1)
+No shared library support.
+Building static library libz.a version 1.3.1 with gcc.
+
+=== ztest1349.c ===
+#include <stdio.h>
+#include <stdlib.h>
+size_t dummy = 0;
+===
+gcc -c -O3 ztest1349.c
+ztest1349.c:1:10: fatal error: stdio.h: No such file or directory
+    1 | #include <stdio.h>
+      |          ^~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking for size_t... No.
+=== ztest1349.c ===
+long long dummy = 0;
+===
+gcc -c -O3 ztest1349.c
+Checking for long long... Yes.
+=== ztest1349.c ===
+#include <stdio.h>
+int main(void) {
+    if (sizeof(void *) <= sizeof(int)) puts("int");
+    else if (sizeof(void *) <= sizeof(long)) puts("long");
+    else puts("z_longlong");
+    return 0;
+}
+===
+gcc -O3 -o ztest1349 ztest1349.c
+ztest1349.c:1:10: fatal error: stdio.h: No such file or directory
+    1 | #include <stdio.h>
+      |          ^~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking for a pointer-size integer type... not found.
+
+=== ztest1349.c ===
+#include <sys/types.h>
+off64_t dummy = 0;
+===
+gcc -c -O3 -D_LARGEFILE64_SOURCE=1 ztest1349.c
+ztest1349.c:1:10: fatal error: sys/types.h: No such file or directory
+    1 | #include <sys/types.h>
+      |          ^~~~~~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking for off64_t... No.
+
+=== ztest1349.c ===
+#include <stdio.h>
+int main(void) {
+  fseeko(NULL, 0, 0);
+  return 0;
+}
+===
+gcc -O3 -o ztest1349 ztest1349.c
+ztest1349.c:1:10: fatal error: stdio.h: No such file or directory
+    1 | #include <stdio.h>
+      |          ^~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking for fseeko... No.
+
+=== ztest1349.c ===
+#include <string.h>
+#include <errno.h>
+int main() { return strlen(strerror(errno)); }
+===
+gcc -O3 -DNO_FSEEKO -o ztest1349 ztest1349.c
+ztest1349.c:1:10: fatal error: string.h: No such file or directory
+    1 | #include <string.h>
+      |          ^~~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking for strerror... No.
+
+=== ztest1349.c ===
+#include <unistd.h>
+int main() { return 0; }
+===
+gcc -c -O3 -DNO_FSEEKO -DNO_STRERROR ztest1349.c
+ztest1349.c:1:10: fatal error: unistd.h: No such file or directory
+    1 | #include <unistd.h>
+      |          ^~~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking for unistd.h... No.
+
+=== ztest1349.c ===
+#include <stdarg.h>
+int main() { return 0; }
+===
+gcc -c -O3 -DNO_FSEEKO -DNO_STRERROR ztest1349.c
+In file included from ztest1349.c:1:
+C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/stdarg.h:1:15: fatal error: stdarg.h: No such file or directory
+    1 | #include_next <stdarg.h>
+      |               ^~~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking for stdarg.h... No.
+
+=== ztest1349.c ===
+#include <stdio.h>
+#include <stdarg.h>
+#include "zconf.h"
+int main()
+{
+#ifndef STDC
+  choke me
+#endif
+  return 0;
+}
+===
+gcc -c -O3 -DNO_FSEEKO -DNO_STRERROR ztest1349.c
+ztest1349.c:1:10: fatal error: stdio.h: No such file or directory
+    1 | #include <stdio.h>
+      |          ^~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking whether to use vs[n]printf() or s[n]printf()... using s[n]printf().
+
+=== ztest1349.c ===
+#include <stdio.h>
+int mytest()
+{
+  char buf[20];
+  snprintf(buf, sizeof(buf), "%s", "foo");
+  return 0;
+}
+int main()
+{
+  return (mytest());
+}
+===
+gcc -O3 -DNO_FSEEKO -DNO_STRERROR -o ztest1349 ztest1349.c
+ztest1349.c:1:10: fatal error: stdio.h: No such file or directory
+    1 | #include <stdio.h>
+      |          ^~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking for snprintf() in stdio.h... No.
+  WARNING: snprintf() not found, falling back to sprintf(). zlib
+  can build but will be open to possible buffer-overflow security
+  vulnerabilities.
+
+=== ztest1349.c ===
+#include <stdio.h>
+int mytest()
+{
+  char buf[20];
+  return sprintf(buf, "%s", "foo");
+}
+int main()
+{
+  return (mytest());
+}
+===
+gcc -c -O3 -DNO_FSEEKO -DNO_STRERROR -DNO_snprintf ztest1349.c
+ztest1349.c:1:10: fatal error: stdio.h: No such file or directory
+    1 | #include <stdio.h>
+      |          ^~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking for return value of sprintf()... No.
+  WARNING: apparently sprintf() does not return a value. zlib
+  can build but will be open to possible string-format security
+  vulnerabilities.
+
+=== ztest1349.c ===
+#define ZLIB_INTERNAL __attribute__((visibility ("hidden")))
+int ZLIB_INTERNAL foo;
+int main()
+{
+  return 0;
+}
+===
+gcc -c -O3 -DNO_FSEEKO -DNO_STRERROR -DNO_snprintf -DHAS_sprintf_void ztest1349.c
+ztest1349.c:6:1: warning: visibility attribute not supported in this configuration; ignored [-Wattributes]
+    6 | }
+      | ^
+Checking for attribute(visibility) support... No.
+
+ALL = static
+AR = ar
+ARFLAGS = rc
+CC = gcc
+CFLAGS = -O3 -DNO_FSEEKO -DNO_STRERROR -DNO_snprintf -DHAS_sprintf_void
+CPP =
+EXE = .exe
+LDCONFIG = ldconfig
+LDFLAGS =
+LDSHARED = gcc
+LDSHAREDLIBC =
+OBJC = $(OBJZ) $(OBJG)
+PIC_OBJC = $(PIC_OBJZ) $(PIC_OBJG)
+RANLIB = ranlib
+SFLAGS = -O3 -fPIC -DNO_FSEEKO -DNO_STRERROR -DNO_snprintf -DHAS_sprintf_void
+SHAREDLIB =
+SHAREDLIBM =
+SHAREDLIBV =
+STATICLIB = libz.a
+TEST = all teststatic
+VER = 1.3.1
+SRCDIR = C:\Users\whole\source\repos\Tasting\Lumikha-At-Masdan\Externals\Zlib/
+exec_prefix = ${prefix}
+includedir = ${prefix}/include
+libdir = ${exec_prefix}/lib
+mandir = ${prefix}/share/man
+prefix = /usr/local
+sharedlibdir = ${libdir}
+uname = MINGW64_NT-10.0-22631
+--------------------
+
+
+--------------------
+C:\Users\whole\source\repos\Tasting\Lumikha-At-Masdan\Externals\Zlib\configure.sh
+Mon Aug 12 19:31:37 MPST 2024
+Checking for gcc...
+=== ztest807.c ===
+extern int getchar();
+int hello() {return getchar();}
+===
+gcc -c ztest807.c
+... using gcc
+If this doesn't work for you, try win32/Makefile.gcc.
+
+Checking for obsessive-compulsive compiler options...
+=== ztest807.c ===
+int foo() { return 0; }
+===
+gcc -c -O3 ztest807.c
+
+Checking for shared library support...
+=== ztest807.c ===
+extern int getchar();
+int hello() {return getchar();}
+===
+gcc -c -O3 -fPIC ztest807.c
+gcc -shared -O3 -fPIC -o ztest807.so ztest807.o
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find dllcrt2.o: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lmingw32: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lmingwex: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lmsvcrt: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lkernel32: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lpthread: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -ladvapi32: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lshell32: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -luser32: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lkernel32: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lmingw32: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lmingwex: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lmsvcrt: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lkernel32: No such file or directory
+collect2.exe: error: ld returned 1 exit status
+(exit code 1)
+No shared library support.
+Building static library libz.a version 1.3.1 with gcc.
+
+=== ztest807.c ===
+#include <stdio.h>
+#include <stdlib.h>
+size_t dummy = 0;
+===
+gcc -c -O3 ztest807.c
+ztest807.c:1:10: fatal error: stdio.h: No such file or directory
+    1 | #include <stdio.h>
+      |          ^~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking for size_t... No.
+=== ztest807.c ===
+long long dummy = 0;
+===
+gcc -c -O3 ztest807.c
+Checking for long long... Yes.
+=== ztest807.c ===
+#include <stdio.h>
+int main(void) {
+    if (sizeof(void *) <= sizeof(int)) puts("int");
+    else if (sizeof(void *) <= sizeof(long)) puts("long");
+    else puts("z_longlong");
+    return 0;
+}
+===
+gcc -O3 -o ztest807 ztest807.c
+ztest807.c:1:10: fatal error: stdio.h: No such file or directory
+    1 | #include <stdio.h>
+      |          ^~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking for a pointer-size integer type... not found.
+
+=== ztest807.c ===
+#include <sys/types.h>
+off64_t dummy = 0;
+===
+gcc -c -O3 -D_LARGEFILE64_SOURCE=1 ztest807.c
+ztest807.c:1:10: fatal error: sys/types.h: No such file or directory
+    1 | #include <sys/types.h>
+      |          ^~~~~~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking for off64_t... No.
+
+=== ztest807.c ===
+#include <stdio.h>
+int main(void) {
+  fseeko(NULL, 0, 0);
+  return 0;
+}
+===
+gcc -O3 -o ztest807 ztest807.c
+ztest807.c:1:10: fatal error: stdio.h: No such file or directory
+    1 | #include <stdio.h>
+      |          ^~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking for fseeko... No.
+
+=== ztest807.c ===
+#include <string.h>
+#include <errno.h>
+int main() { return strlen(strerror(errno)); }
+===
+gcc -O3 -DNO_FSEEKO -o ztest807 ztest807.c
+ztest807.c:1:10: fatal error: string.h: No such file or directory
+    1 | #include <string.h>
+      |          ^~~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking for strerror... No.
+
+=== ztest807.c ===
+#include <unistd.h>
+int main() { return 0; }
+===
+gcc -c -O3 -DNO_FSEEKO -DNO_STRERROR ztest807.c
+ztest807.c:1:10: fatal error: unistd.h: No such file or directory
+    1 | #include <unistd.h>
+      |          ^~~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking for unistd.h... No.
+
+=== ztest807.c ===
+#include <stdarg.h>
+int main() { return 0; }
+===
+gcc -c -O3 -DNO_FSEEKO -DNO_STRERROR ztest807.c
+In file included from ztest807.c:1:
+C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/stdarg.h:1:15: fatal error: stdarg.h: No such file or directory
+    1 | #include_next <stdarg.h>
+      |               ^~~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking for stdarg.h... No.
+
+=== ztest807.c ===
+#include <stdio.h>
+#include <stdarg.h>
+#include "zconf.h"
+int main()
+{
+#ifndef STDC
+  choke me
+#endif
+  return 0;
+}
+===
+gcc -c -O3 -DNO_FSEEKO -DNO_STRERROR ztest807.c
+ztest807.c:1:10: fatal error: stdio.h: No such file or directory
+    1 | #include <stdio.h>
+      |          ^~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking whether to use vs[n]printf() or s[n]printf()... using s[n]printf().
+
+=== ztest807.c ===
+#include <stdio.h>
+int mytest()
+{
+  char buf[20];
+  snprintf(buf, sizeof(buf), "%s", "foo");
+  return 0;
+}
+int main()
+{
+  return (mytest());
+}
+===
+gcc -O3 -DNO_FSEEKO -DNO_STRERROR -o ztest807 ztest807.c
+ztest807.c:1:10: fatal error: stdio.h: No such file or directory
+    1 | #include <stdio.h>
+      |          ^~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking for snprintf() in stdio.h... No.
+  WARNING: snprintf() not found, falling back to sprintf(). zlib
+  can build but will be open to possible buffer-overflow security
+  vulnerabilities.
+
+=== ztest807.c ===
+#include <stdio.h>
+int mytest()
+{
+  char buf[20];
+  return sprintf(buf, "%s", "foo");
+}
+int main()
+{
+  return (mytest());
+}
+===
+gcc -c -O3 -DNO_FSEEKO -DNO_STRERROR -DNO_snprintf ztest807.c
+ztest807.c:1:10: fatal error: stdio.h: No such file or directory
+    1 | #include <stdio.h>
+      |          ^~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking for return value of sprintf()... No.
+  WARNING: apparently sprintf() does not return a value. zlib
+  can build but will be open to possible string-format security
+  vulnerabilities.
+
+=== ztest807.c ===
+#define ZLIB_INTERNAL __attribute__((visibility ("hidden")))
+int ZLIB_INTERNAL foo;
+int main()
+{
+  return 0;
+}
+===
+gcc -c -O3 -DNO_FSEEKO -DNO_STRERROR -DNO_snprintf -DHAS_sprintf_void ztest807.c
+ztest807.c:6:1: warning: visibility attribute not supported in this configuration; ignored [-Wattributes]
+    6 | }
+      | ^
+Checking for attribute(visibility) support... No.
+
+ALL = static
+AR = ar
+ARFLAGS = rc
+CC = gcc
+CFLAGS = -O3 -DNO_FSEEKO -DNO_STRERROR -DNO_snprintf -DHAS_sprintf_void
+CPP =
+EXE = .exe
+LDCONFIG = ldconfig
+LDFLAGS =
+LDSHARED = gcc
+LDSHAREDLIBC =
+OBJC = $(OBJZ) $(OBJG)
+PIC_OBJC = $(PIC_OBJZ) $(PIC_OBJG)
+RANLIB = ranlib
+SFLAGS = -O3 -fPIC -DNO_FSEEKO -DNO_STRERROR -DNO_snprintf -DHAS_sprintf_void
+SHAREDLIB =
+SHAREDLIBM =
+SHAREDLIBV =
+STATICLIB = libz.a
+TEST = all teststatic
+VER = 1.3.1
+SRCDIR = C:\Users\whole\source\repos\Tasting\Lumikha-At-Masdan\Externals\Zlib/
+exec_prefix = ${prefix}
+includedir = ${prefix}/include
+libdir = ${exec_prefix}/lib
+mandir = ${prefix}/share/man
+prefix = /usr/local
+sharedlibdir = ${libdir}
+uname = MINGW64_NT-10.0-22631
+--------------------
+
+
+--------------------
+C:\Users\whole\source\repos\Tasting\Lumikha-At-Masdan\Externals\Zlib\configure.sh
+Mon Aug 12 19:32:19 MPST 2024
+Checking for gcc...
+=== ztest28.c ===
+extern int getchar();
+int hello() {return getchar();}
+===
+gcc -c ztest28.c
+... using gcc
+If this doesn't work for you, try win32/Makefile.gcc.
+
+Checking for obsessive-compulsive compiler options...
+=== ztest28.c ===
+int foo() { return 0; }
+===
+gcc -c -O3 ztest28.c
+
+Checking for shared library support...
+=== ztest28.c ===
+extern int getchar();
+int hello() {return getchar();}
+===
+gcc -c -O3 -fPIC ztest28.c
+gcc -shared -O3 -fPIC -o ztest28.so ztest28.o
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find dllcrt2.o: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lmingw32: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lmingwex: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lmsvcrt: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lkernel32: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lpthread: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -ladvapi32: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lshell32: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -luser32: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lkernel32: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lmingw32: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lmingwex: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lmsvcrt: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lkernel32: No such file or directory
+collect2.exe: error: ld returned 1 exit status
+(exit code 1)
+No shared library support.
+Building static library libz.a version 1.3.1 with gcc.
+
+=== ztest28.c ===
+#include <stdio.h>
+#include <stdlib.h>
+size_t dummy = 0;
+===
+gcc -c -O3 ztest28.c
+ztest28.c:1:10: fatal error: stdio.h: No such file or directory
+    1 | #include <stdio.h>
+      |          ^~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking for size_t... No.
+=== ztest28.c ===
+long long dummy = 0;
+===
+gcc -c -O3 ztest28.c
+Checking for long long... Yes.
+=== ztest28.c ===
+#include <stdio.h>
+int main(void) {
+    if (sizeof(void *) <= sizeof(int)) puts("int");
+    else if (sizeof(void *) <= sizeof(long)) puts("long");
+    else puts("z_longlong");
+    return 0;
+}
+===
+gcc -O3 -o ztest28 ztest28.c
+ztest28.c:1:10: fatal error: stdio.h: No such file or directory
+    1 | #include <stdio.h>
+      |          ^~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking for a pointer-size integer type... not found.
+
+=== ztest28.c ===
+#include <sys/types.h>
+off64_t dummy = 0;
+===
+gcc -c -O3 -D_LARGEFILE64_SOURCE=1 ztest28.c
+ztest28.c:1:10: fatal error: sys/types.h: No such file or directory
+    1 | #include <sys/types.h>
+      |          ^~~~~~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking for off64_t... No.
+
+=== ztest28.c ===
+#include <stdio.h>
+int main(void) {
+  fseeko(NULL, 0, 0);
+  return 0;
+}
+===
+gcc -O3 -o ztest28 ztest28.c
+ztest28.c:1:10: fatal error: stdio.h: No such file or directory
+    1 | #include <stdio.h>
+      |          ^~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking for fseeko... No.
+
+=== ztest28.c ===
+#include <string.h>
+#include <errno.h>
+int main() { return strlen(strerror(errno)); }
+===
+gcc -O3 -DNO_FSEEKO -o ztest28 ztest28.c
+ztest28.c:1:10: fatal error: string.h: No such file or directory
+    1 | #include <string.h>
+      |          ^~~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking for strerror... No.
+
+=== ztest28.c ===
+#include <unistd.h>
+int main() { return 0; }
+===
+gcc -c -O3 -DNO_FSEEKO -DNO_STRERROR ztest28.c
+ztest28.c:1:10: fatal error: unistd.h: No such file or directory
+    1 | #include <unistd.h>
+      |          ^~~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking for unistd.h... No.
+
+=== ztest28.c ===
+#include <stdarg.h>
+int main() { return 0; }
+===
+gcc -c -O3 -DNO_FSEEKO -DNO_STRERROR ztest28.c
+In file included from ztest28.c:1:
+C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/stdarg.h:1:15: fatal error: stdarg.h: No such file or directory
+    1 | #include_next <stdarg.h>
+      |               ^~~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking for stdarg.h... No.
+
+=== ztest28.c ===
+#include <stdio.h>
+#include <stdarg.h>
+#include "zconf.h"
+int main()
+{
+#ifndef STDC
+  choke me
+#endif
+  return 0;
+}
+===
+gcc -c -O3 -DNO_FSEEKO -DNO_STRERROR ztest28.c
+ztest28.c:1:10: fatal error: stdio.h: No such file or directory
+    1 | #include <stdio.h>
+      |          ^~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking whether to use vs[n]printf() or s[n]printf()... using s[n]printf().
+
+=== ztest28.c ===
+#include <stdio.h>
+int mytest()
+{
+  char buf[20];
+  snprintf(buf, sizeof(buf), "%s", "foo");
+  return 0;
+}
+int main()
+{
+  return (mytest());
+}
+===
+gcc -O3 -DNO_FSEEKO -DNO_STRERROR -o ztest28 ztest28.c
+ztest28.c:1:10: fatal error: stdio.h: No such file or directory
+    1 | #include <stdio.h>
+      |          ^~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking for snprintf() in stdio.h... No.
+  WARNING: snprintf() not found, falling back to sprintf(). zlib
+  can build but will be open to possible buffer-overflow security
+  vulnerabilities.
+
+=== ztest28.c ===
+#include <stdio.h>
+int mytest()
+{
+  char buf[20];
+  return sprintf(buf, "%s", "foo");
+}
+int main()
+{
+  return (mytest());
+}
+===
+gcc -c -O3 -DNO_FSEEKO -DNO_STRERROR -DNO_snprintf ztest28.c
+ztest28.c:1:10: fatal error: stdio.h: No such file or directory
+    1 | #include <stdio.h>
+      |          ^~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking for return value of sprintf()... No.
+  WARNING: apparently sprintf() does not return a value. zlib
+  can build but will be open to possible string-format security
+  vulnerabilities.
+
+=== ztest28.c ===
+#define ZLIB_INTERNAL __attribute__((visibility ("hidden")))
+int ZLIB_INTERNAL foo;
+int main()
+{
+  return 0;
+}
+===
+gcc -c -O3 -DNO_FSEEKO -DNO_STRERROR -DNO_snprintf -DHAS_sprintf_void ztest28.c
+ztest28.c:6:1: warning: visibility attribute not supported in this configuration; ignored [-Wattributes]
+    6 | }
+      | ^
+Checking for attribute(visibility) support... No.
+
+ALL = static
+AR = ar
+ARFLAGS = rc
+CC = gcc
+CFLAGS = -O3 -DNO_FSEEKO -DNO_STRERROR -DNO_snprintf -DHAS_sprintf_void
+CPP =
+EXE = .exe
+LDCONFIG = ldconfig
+LDFLAGS =
+LDSHARED = gcc
+LDSHAREDLIBC =
+OBJC = $(OBJZ) $(OBJG)
+PIC_OBJC = $(PIC_OBJZ) $(PIC_OBJG)
+RANLIB = ranlib
+SFLAGS = -O3 -fPIC -DNO_FSEEKO -DNO_STRERROR -DNO_snprintf -DHAS_sprintf_void
+SHAREDLIB =
+SHAREDLIBM =
+SHAREDLIBV =
+STATICLIB = libz.a
+TEST = all teststatic
+VER = 1.3.1
+SRCDIR = C:\Users\whole\source\repos\Tasting\Lumikha-At-Masdan\Externals\Zlib/
+exec_prefix = ${prefix}
+includedir = ${prefix}/include
+libdir = ${exec_prefix}/lib
+mandir = ${prefix}/share/man
+prefix = /usr/local
+sharedlibdir = ${libdir}
+uname = MINGW64_NT-10.0-22631
+--------------------
+
+
+--------------------
+C:\Users\whole\source\repos\Tasting\Lumikha-At-Masdan\Externals\Zlib\configure.sh
+Mon Aug 12 19:33:23 MPST 2024
+Checking for gcc...
+=== ztest795.c ===
+extern int getchar();
+int hello() {return getchar();}
+===
+gcc -c ztest795.c
+... using gcc
+If this doesn't work for you, try win32/Makefile.gcc.
+
+Checking for obsessive-compulsive compiler options...
+=== ztest795.c ===
+int foo() { return 0; }
+===
+gcc -c -O3 ztest795.c
+
+Checking for shared library support...
+=== ztest795.c ===
+extern int getchar();
+int hello() {return getchar();}
+===
+gcc -c -O3 -fPIC ztest795.c
+gcc -shared -O3 -fPIC -o ztest795.so ztest795.o
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find dllcrt2.o: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lmingw32: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lmingwex: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lmsvcrt: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lkernel32: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lpthread: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -ladvapi32: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lshell32: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -luser32: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lkernel32: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lmingw32: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lmingwex: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lmsvcrt: No such file or directory
+C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find -lkernel32: No such file or directory
+collect2.exe: error: ld returned 1 exit status
+(exit code 1)
+No shared library support.
+Building static library libz.a version 1.3.1 with gcc.
+
+=== ztest795.c ===
+#include <stdio.h>
+#include <stdlib.h>
+size_t dummy = 0;
+===
+gcc -c -O3 ztest795.c
+ztest795.c:1:10: fatal error: stdio.h: No such file or directory
+    1 | #include <stdio.h>
+      |          ^~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking for size_t... No.
+=== ztest795.c ===
+long long dummy = 0;
+===
+gcc -c -O3 ztest795.c
+Checking for long long... Yes.
+=== ztest795.c ===
+#include <stdio.h>
+int main(void) {
+    if (sizeof(void *) <= sizeof(int)) puts("int");
+    else if (sizeof(void *) <= sizeof(long)) puts("long");
+    else puts("z_longlong");
+    return 0;
+}
+===
+gcc -O3 -o ztest795 ztest795.c
+ztest795.c:1:10: fatal error: stdio.h: No such file or directory
+    1 | #include <stdio.h>
+      |          ^~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking for a pointer-size integer type... not found.
+
+=== ztest795.c ===
+#include <sys/types.h>
+off64_t dummy = 0;
+===
+gcc -c -O3 -D_LARGEFILE64_SOURCE=1 ztest795.c
+ztest795.c:1:10: fatal error: sys/types.h: No such file or directory
+    1 | #include <sys/types.h>
+      |          ^~~~~~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking for off64_t... No.
+
+=== ztest795.c ===
+#include <stdio.h>
+int main(void) {
+  fseeko(NULL, 0, 0);
+  return 0;
+}
+===
+gcc -O3 -o ztest795 ztest795.c
+ztest795.c:1:10: fatal error: stdio.h: No such file or directory
+    1 | #include <stdio.h>
+      |          ^~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking for fseeko... No.
+
+=== ztest795.c ===
+#include <string.h>
+#include <errno.h>
+int main() { return strlen(strerror(errno)); }
+===
+gcc -O3 -DNO_FSEEKO -o ztest795 ztest795.c
+ztest795.c:1:10: fatal error: string.h: No such file or directory
+    1 | #include <string.h>
+      |          ^~~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking for strerror... No.
+
+=== ztest795.c ===
+#include <unistd.h>
+int main() { return 0; }
+===
+gcc -c -O3 -DNO_FSEEKO -DNO_STRERROR ztest795.c
+ztest795.c:1:10: fatal error: unistd.h: No such file or directory
+    1 | #include <unistd.h>
+      |          ^~~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking for unistd.h... No.
+
+=== ztest795.c ===
+#include <stdarg.h>
+int main() { return 0; }
+===
+gcc -c -O3 -DNO_FSEEKO -DNO_STRERROR ztest795.c
+In file included from ztest795.c:1:
+C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/stdarg.h:1:15: fatal error: stdarg.h: No such file or directory
+    1 | #include_next <stdarg.h>
+      |               ^~~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking for stdarg.h... No.
+
+=== ztest795.c ===
+#include <stdio.h>
+#include <stdarg.h>
+#include "zconf.h"
+int main()
+{
+#ifndef STDC
+  choke me
+#endif
+  return 0;
+}
+===
+gcc -c -O3 -DNO_FSEEKO -DNO_STRERROR ztest795.c
+ztest795.c:1:10: fatal error: stdio.h: No such file or directory
+    1 | #include <stdio.h>
+      |          ^~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking whether to use vs[n]printf() or s[n]printf()... using s[n]printf().
+
+=== ztest795.c ===
+#include <stdio.h>
+int mytest()
+{
+  char buf[20];
+  snprintf(buf, sizeof(buf), "%s", "foo");
+  return 0;
+}
+int main()
+{
+  return (mytest());
+}
+===
+gcc -O3 -DNO_FSEEKO -DNO_STRERROR -o ztest795 ztest795.c
+ztest795.c:1:10: fatal error: stdio.h: No such file or directory
+    1 | #include <stdio.h>
+      |          ^~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking for snprintf() in stdio.h... No.
+  WARNING: snprintf() not found, falling back to sprintf(). zlib
+  can build but will be open to possible buffer-overflow security
+  vulnerabilities.
+
+=== ztest795.c ===
+#include <stdio.h>
+int mytest()
+{
+  char buf[20];
+  return sprintf(buf, "%s", "foo");
+}
+int main()
+{
+  return (mytest());
+}
+===
+gcc -c -O3 -DNO_FSEEKO -DNO_STRERROR -DNO_snprintf ztest795.c
+ztest795.c:1:10: fatal error: stdio.h: No such file or directory
+    1 | #include <stdio.h>
+      |          ^~~~~~~~~
+compilation terminated.
+(exit code 1)
+Checking for return value of sprintf()... No.
+  WARNING: apparently sprintf() does not return a value. zlib
+  can build but will be open to possible string-format security
+  vulnerabilities.
+
+=== ztest795.c ===
+#define ZLIB_INTERNAL __attribute__((visibility ("hidden")))
+int ZLIB_INTERNAL foo;
+int main()
+{
+  return 0;
+}
+===
+gcc -c -O3 -DNO_FSEEKO -DNO_STRERROR -DNO_snprintf -DHAS_sprintf_void ztest795.c
+ztest795.c:6:1: warning: visibility attribute not supported in this configuration; ignored [-Wattributes]
+    6 | }
+      | ^
+Checking for attribute(visibility) support... No.
+
+ALL = static
+AR = ar
+ARFLAGS = rc
+CC = gcc
+CFLAGS = -O3 -DNO_FSEEKO -DNO_STRERROR -DNO_snprintf -DHAS_sprintf_void
+CPP =
+EXE = .exe
+LDCONFIG = ldconfig
+LDFLAGS =
+LDSHARED = gcc
+LDSHAREDLIBC =
+OBJC = $(OBJZ) $(OBJG)
+PIC_OBJC = $(PIC_OBJZ) $(PIC_OBJG)
+RANLIB = ranlib
+SFLAGS = -O3 -fPIC -DNO_FSEEKO -DNO_STRERROR -DNO_snprintf -DHAS_sprintf_void
+SHAREDLIB =
+SHAREDLIBM =
+SHAREDLIBV =
+STATICLIB = libz.a
+TEST = all teststatic
+VER = 1.3.1
+SRCDIR = C:\Users\whole\source\repos\Tasting\Lumikha-At-Masdan\Externals\Zlib/
+exec_prefix = ${prefix}
+includedir = ${prefix}/include
+libdir = ${exec_prefix}/lib
+mandir = ${prefix}/share/man
+prefix = /usr/local
+sharedlibdir = ${libdir}
+uname = MINGW64_NT-10.0-22631
+--------------------
+
+

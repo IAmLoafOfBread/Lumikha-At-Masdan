@@ -14,32 +14,32 @@
 
 CC=gcc
 
-CFLAGS=-O3 -DHAVE_HIDDEN
+CFLAGS=-O3 -DNO_FSEEKO -DNO_STRERROR -DNO_snprintf -DHAS_sprintf_void
 #CFLAGS=-O -DMAX_WBITS=14 -DMAX_MEM_LEVEL=7
 #CFLAGS=-g -DZLIB_DEBUG
 #CFLAGS=-O3 -Wall -Wwrite-strings -Wpointer-arith -Wconversion \
 #           -Wstrict-prototypes -Wmissing-prototypes
 
-SFLAGS=-O3 -fPIC -DHAVE_HIDDEN
+SFLAGS=-O3 -fPIC -DNO_FSEEKO -DNO_STRERROR -DNO_snprintf -DHAS_sprintf_void
 LDFLAGS=
 TEST_LIBS=-L. libz.a
-LDSHARED=gcc -dynamiclib -install_name ${exec_prefix}/lib/libz.1.dylib -compatibility_version 1 -current_version 1.3.1
+LDSHARED=gcc
 CPP=
 
 STATICLIB=libz.a
-SHAREDLIB=libz.dylib
-SHAREDLIBV=libz.1.3.1.dylib
-SHAREDLIBM=libz.1.dylib
+SHAREDLIB=
+SHAREDLIBV=
+SHAREDLIBM=
 LIBS=$(STATICLIB) $(SHAREDLIBV)
 
-AR=libtool
-ARFLAGS=-o
+AR=ar
+ARFLAGS=rc
 RANLIB=ranlib
 LDCONFIG=ldconfig
-LDSHAREDLIBC=-lc
+LDSHAREDLIBC=
 TAR=tar
 SHELL=/bin/sh
-EXE=
+EXE=.exe
 
 prefix =/usr/local
 exec_prefix =${prefix}
@@ -49,9 +49,9 @@ includedir =${prefix}/include
 mandir =${prefix}/share/man
 man3dir = ${mandir}/man3
 pkgconfigdir = ${libdir}/pkgconfig
-SRCDIR=
-ZINC=
-ZINCOUT=-I.
+SRCDIR=C:SERSWHOLESOURCEEPOSTASTINGumikha-at-masdanxternalsZlib/
+ZINC=-I. -include zconf.h
+ZINCOUT=-I. -I$(SRCDIR)
 
 OBJZ = adler32.o crc32.o deflate.o infback.o inffast.o inflate.o inftrees.o trees.o zutil.o
 OBJG = compress.o uncompr.o gzclose.o gzlib.o gzread.o gzwrite.o
@@ -69,7 +69,7 @@ OBJS = $(OBJC) $(OBJA)
 
 PIC_OBJS = $(PIC_OBJC) $(PIC_OBJA)
 
-all: static shared
+all: static
 
 static: example$(EXE) minigzip$(EXE)
 
@@ -79,7 +79,7 @@ all64: example64$(EXE) minigzip64$(EXE)
 
 check: test
 
-test: all teststatic testshared
+test: all teststatic
 
 teststatic: static
 	@TMPST=tmpst_$$; \
